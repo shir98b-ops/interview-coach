@@ -26,7 +26,7 @@ with another person.
 
 ## What the MVP does
 
-1. Sign in with a one-time link sent by email, then upload a resume (PDF).
+1. Sign in with Google and upload a resume (PDF).
 2. Review the details the app extracts and choose a target role.
 3. Start a simulated interview: five questions tailored to the role and the
    resume, mixing professional and behavioral questions.
@@ -38,7 +38,7 @@ with another person.
 
 | Decision                                                         | Why                                                                                                                                                                    |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sign in with an **emailed link** first; add Google later         | No password to create or forget, and no extra setup before the core flow works. Google sign-in is planned for stage 6.                                                 |
+| Sign in with **Google** only                                     | Most candidates already have a Google account, so there is no new password to create, forget or leak.                                                                  |
 | Each user can only ever see **their own data**                   | Resumes and interview answers are personal. The database itself enforces this rule (row-level security), so a bug in the app cannot expose another user's data.        |
 | Start with **written** answers; add voice later                  | Written answers deliver the core value (tailored questions and feedback) with fewer moving parts. Voice adds transcription and audio handling, so it comes in stage 8. |
 | Score against a **fixed rubric** instead of a free-form grade    | A rubric (content, structure, clarity) makes scores consistent between sessions and explainable to the user, so "3 out of 5" always means the same thing.              |

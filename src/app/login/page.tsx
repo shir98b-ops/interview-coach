@@ -11,7 +11,7 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">Sign in</h1>
         <p className="text-zinc-600 dark:text-zinc-400">
-          We&apos;ll email you a link. No password needed.
+          Use your Google account. No new password to create.
         </p>
       </div>
       <Suspense fallback={<SignInForm next="/dashboard" />}>
@@ -28,13 +28,13 @@ async function SignInSection({
   const next = safeNextPath(
     typeof params.next === "string" ? params.next : null,
   );
-  const failed = params.error === "link";
+  const failed = params.error === "link" || params.error === "google";
 
   return (
     <>
       {failed && (
         <p role="alert" className="text-sm text-red-600">
-          That link has expired or was already used. Request a new one.
+          Sign-in didn&apos;t complete. Please try again.
         </p>
       )}
       <SignInForm next={next} />
