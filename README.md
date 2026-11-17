@@ -88,6 +88,9 @@ To use sign-in locally, copy `.env.example` to `.env.local` and fill in
 the Supabase project URL and publishable key. The database tables and access
 rules are in `supabase/migrations`; run them once in the Supabase SQL editor.
 
+For deployment, add the same two variables in Vercel under Settings,
+Environment Variables, as type Config for all environments, then redeploy.
+
 Then open http://localhost:3000.
 
 | Command             | What it does                   |
