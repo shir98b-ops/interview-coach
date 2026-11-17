@@ -18,14 +18,14 @@ export const roadmap: Stage[] = [
     title: "Project foundation",
     summary: "Repository, app skeleton, automated checks and first deployment.",
     mvp: true,
-    status: "in-progress",
+    status: "done",
   },
   {
     number: 2,
     title: "Accounts and data",
-    summary: "Sign in with Google and a database for profiles and sessions.",
+    summary: "Email sign-in and a database for profiles and sessions.",
     mvp: true,
-    status: "planned",
+    status: "in-progress",
   },
   {
     number: 3,

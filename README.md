@@ -4,7 +4,7 @@ A web app for practicing job interviews on your own. Upload your resume, pick
 a target role, answer realistic interview questions and get scored, specific
 feedback, then track how you improve over time.
 
-> Status: stage 1 of 9 (project foundation). See the [roadmap](#roadmap).
+> Status: stage 2 of 9 (accounts and data) in progress. See the [roadmap](#roadmap).
 
 ## The problem
 
@@ -26,7 +26,7 @@ with another person.
 
 ## What the MVP does
 
-1. Sign in and upload a resume (PDF).
+1. Sign in with a one-time link sent by email, then upload a resume (PDF).
 2. Review the details the app extracts and choose a target role.
 3. Start a simulated interview: five questions tailored to the role and the
    resume, mixing professional and behavioral questions.
@@ -38,6 +38,8 @@ with another person.
 
 | Decision                                                         | Why                                                                                                                                                                    |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sign in with an **emailed link** first; add Google later         | No password to create or forget, and no extra setup before the core flow works. Google sign-in is planned for stage 6.                                                 |
+| Each user can only ever see **their own data**                   | Resumes and interview answers are personal. The database itself enforces this rule (row-level security), so a bug in the app cannot expose another user's data.        |
 | Start with **written** answers; add voice later                  | Written answers deliver the core value (tailored questions and feedback) with fewer moving parts. Voice adds transcription and audio handling, so it comes in stage 8. |
 | Score against a **fixed rubric** instead of a free-form grade    | A rubric (content, structure, clarity) makes scores consistent between sessions and explainable to the user, so "3 out of 5" always means the same thing.              |
 | The user **confirms** what the AI extracts from the resume       | AI extraction is fast but sometimes wrong. A quick review step keeps the profile accurate, and everything after it depends on that profile.                            |
@@ -81,6 +83,10 @@ Requires Node.js 22.
 npm install
 npm run dev
 ```
+
+To use sign-in locally, copy `.env.example` to `.env.local` and fill in
+the Supabase project URL and publishable key. The database tables and access
+rules are in `supabase/migrations`; run them once in the Supabase SQL editor.
 
 Then open http://localhost:3000.
 
