@@ -19,6 +19,12 @@ export default function Home() {
           Practice job interviews on your own: upload your resume, pick a target
           role, answer realistic questions and get scored feedback.
         </p>
+        <a
+          href="/dashboard"
+          className="w-fit rounded-md bg-zinc-900 px-4 py-2 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+        >
+          Start practicing
+        </a>
         {current && (
           <p className="text-sm text-zinc-500">
             Now building stage {current.number}: {current.title}

@@ -20,6 +20,6 @@ describe("roadmap", () => {
   });
 
   it("returns the stage in progress", () => {
-    expect(currentStage()?.number).toBe(1);
+    expect(currentStage()?.number).toBe(2);
   });
 });
