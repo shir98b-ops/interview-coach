@@ -4,7 +4,9 @@ A web app for practicing job interviews on your own. Upload your resume, pick
 a target role, answer realistic interview questions and get scored, specific
 feedback, then track how you improve over time.
 
-> Status: stage 1 of 9 (project foundation). See the [roadmap](#roadmap).
+**Live demo:** https://interview-coach-lemon.vercel.app
+
+> Status: stage 1 of 9 (project foundation) complete. See the [roadmap](#roadmap).
 
 ## The problem
 
