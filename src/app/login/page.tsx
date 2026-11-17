@@ -29,9 +29,15 @@ async function SignInSection({
     typeof params.next === "string" ? params.next : null,
   );
   const failed = params.error === "link" || params.error === "google";
+  const notConfigured = params.error === "config";
 
   return (
     <>
+      {notConfigured && (
+        <p role="alert" className="text-sm text-red-600">
+          Sign-in isn&apos;t set up on this site yet.
+        </p>
+      )}
       {failed && (
         <p role="alert" className="text-sm text-red-600">
           Sign-in didn&apos;t complete. Please try again.
