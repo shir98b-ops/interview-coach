@@ -1,0 +1,246 @@
+/**
+ * Questions that interviewers commonly ask, grouped by kind of role. The
+ * AI uses them as a base and tailors them to the candidate, so practice
+ * stays close to what real interviews sound like.
+ */
+
+export interface RoleFamily {
+  id: string;
+  label: string;
+  /** Words in a role title that point to this family. */
+  keywords: string[];
+  questions: string[];
+}
+
+/** Asked in almost every interview, whatever the role. */
+export const commonQuestions = [
+  "Tell me about yourself.",
+  "Why are you interested in this role?",
+  "Why do you want to leave your current job?",
+  "What are your greatest strengths?",
+  "What is a weakness you are working on?",
+  "Tell me about a time you failed. What did you learn?",
+  "Tell me about a time you disagreed with a colleague or manager. How did you handle it?",
+  "Tell me about a time you had to deliver under a tight deadline.",
+  "Describe a time you had to juggle several priorities. How did you decide what to do first?",
+  "Tell me about a time you received difficult feedback. What did you do with it?",
+  "Tell me about a time you made a mistake. How did you fix it?",
+  "Describe a time you influenced someone without having authority over them.",
+  "Tell me about the achievement you are most proud of.",
+  "Where do you see yourself in a few years?",
+];
+
+export const roleFamilies: RoleFamily[] = [
+  {
+    id: "product",
+    label: "Product",
+    keywords: ["product", "pm", "owner"],
+    questions: [
+      "What is a product you love, and how would you improve it?",
+      "How do you decide what goes into the next release?",
+      "Tell me about a feature you launched. How did you measure its success?",
+      "How do you say no to a stakeholder's request?",
+      "A key metric dropped 20% this week. How do you investigate?",
+      "How do you work with engineers and designers when you disagree on a solution?",
+    ],
+  },
+  {
+    id: "project",
+    label: "Project and operations",
+    keywords: [
+      "project",
+      "program",
+      "operations",
+      "ops",
+      "coordinator",
+      "scrum",
+      "logistics",
+      "supply",
+    ],
+    questions: [
+      "Tell me about a project that went off track. What did you do?",
+      "How do you keep stakeholders updated on progress and risks?",
+      "How do you plan a project with many dependencies?",
+      "Describe a process you improved. What changed as a result?",
+      "How do you handle a team member who keeps missing deadlines?",
+      "How do you decide when to escalate a problem?",
+    ],
+  },
+  {
+    id: "data",
+    label: "Data and analytics",
+    keywords: ["data", "analyst", "analytics", "bi", "insights", "research"],
+    questions: [
+      "Walk me through an analysis that changed a business decision.",
+      "How do you check that your data is correct before you share results?",
+      "How would you explain a complex finding to someone without a technical background?",
+      "How would you design an A/B test for a new feature?",
+      "What would you do if the data contradicts what a senior stakeholder believes?",
+      "Which metrics would you track to measure the health of a business like ours?",
+    ],
+  },
+  {
+    id: "marketing",
+    label: "Marketing",
+    keywords: [
+      "marketing",
+      "growth",
+      "brand",
+      "content",
+      "seo",
+      "social",
+      "communications",
+      "pr",
+    ],
+    questions: [
+      "Tell me about a campaign you ran. What were the results?",
+      "How do you decide which channels to invest in?",
+      "How do you measure whether marketing is working?",
+      "How would you launch a new product with a small budget?",
+      "Describe a campaign that did not perform. What did you change?",
+      "How do you get to know a target audience?",
+    ],
+  },
+  {
+    id: "sales",
+    label: "Sales and customer success",
+    keywords: [
+      "sales",
+      "account",
+      "business development",
+      "bdr",
+      "sdr",
+      "customer",
+      "success",
+      "support",
+      "service",
+    ],
+    questions: [
+      "Sell me this product.",
+      "Tell me about a deal you lost. What would you do differently?",
+      "How do you handle an angry customer?",
+      "How do you prioritize your accounts or leads?",
+      "Tell me about a time you turned around an unhappy customer.",
+      "How do you handle the objection that the price is too high?",
+    ],
+  },
+  {
+    id: "people",
+    label: "HR and recruiting",
+    keywords: [
+      "hr",
+      "human resources",
+      "recruit",
+      "talent",
+      "people",
+      "hiring",
+    ],
+    questions: [
+      "How do you assess whether a candidate is a good fit?",
+      "Tell me about a difficult employee situation you handled.",
+      "How would you improve employee retention?",
+      "How do you handle confidential information?",
+      "Tell me about a hiring process you improved.",
+      "How do you balance the needs of the company and the employee?",
+    ],
+  },
+  {
+    id: "design",
+    label: "Design",
+    keywords: ["design", "ux", "ui", "researcher"],
+    questions: [
+      "Walk me through a project in your portfolio, from problem to result.",
+      "How do you handle feedback you disagree with?",
+      "How do you decide when a design is good enough to ship?",
+      "Tell me about a time user research changed your direction.",
+      "How do you work with developers to make sure the design is built as intended?",
+      "How do you balance user needs with business goals?",
+    ],
+  },
+  {
+    id: "finance",
+    label: "Finance",
+    keywords: [
+      "finance",
+      "financial",
+      "accountant",
+      "accounting",
+      "controller",
+      "bookkeeper",
+      "economist",
+    ],
+    questions: [
+      "Walk me through how you build a budget or forecast.",
+      "Tell me about a time you found an error in the numbers. What did you do?",
+      "How do you explain financial results to non-financial managers?",
+      "How do you make sure month-end close happens on time?",
+      "Tell me about a cost saving you identified.",
+      "How do you handle a deadline when the data you need is late?",
+    ],
+  },
+  {
+    id: "engineering",
+    label: "Engineering",
+    keywords: [
+      "engineer",
+      "developer",
+      "software",
+      "programmer",
+      "devops",
+      "qa",
+      "tester",
+    ],
+    questions: [
+      "Tell me about a technical problem you are proud of solving.",
+      "How do you approach debugging an issue you cannot reproduce?",
+      "Tell me about a time you had to make a trade-off between speed and quality.",
+      "How do you review someone else's work?",
+      "Describe a system you built. What would you change today?",
+      "How do you keep your skills up to date?",
+    ],
+  },
+  {
+    id: "management",
+    label: "Management",
+    // "Manager" alone is left out: a Product Manager does not manage people.
+    keywords: ["lead", "head", "director", "team leader", "supervisor"],
+    questions: [
+      "How would your team describe you as a manager?",
+      "Tell me about a time you had to let someone go or deliver hard feedback.",
+      "How do you help a struggling team member improve?",
+      "How do you set goals for your team?",
+      "Tell me about a time you had to lead change that people resisted.",
+      "How do you build trust with a new team?",
+    ],
+  },
+];
+
+/**
+ * Finds the role families that match a role title. A title can match more
+ * than one, such as "Product Marketing Manager".
+ */
+export function matchRoleFamilies(title: string): RoleFamily[] {
+  const words = ` ${title.toLowerCase().replace(/[^a-z0-9]+/g, " ")} `;
+  return roleFamilies.filter((family) =>
+    family.keywords.some(
+      (keyword) =>
+        words.includes(` ${keyword} `) || words.includes(` ${keyword}s `),
+    ),
+  );
+}
+
+/** The commonly asked questions to show the AI for a role. */
+export function bankFor(
+  title: string,
+  seniority: string | null = null,
+): string[] {
+  const families = matchRoleFamilies(title);
+  const management = roleFamilies.find((f) => f.id === "management")!;
+  if (seniority === "Manager" && !families.includes(management)) {
+    families.push(management);
+  }
+  return [
+    ...commonQuestions,
+    ...families.flatMap((family) => family.questions),
+  ];
+}

@@ -45,9 +45,11 @@ async function PracticeContent() {
         .order("created_at"),
       supabase
         .from("sessions")
-        .select("id, created_at, completed_at, target_roles(title)")
+        .select(
+          "id, created_at, completed_at, overall_score, target_roles(title)",
+        )
         .order("created_at", { ascending: false })
-        .limit(10),
+        .limit(20),
     ]);
 
   if (!profile || !roles?.length) {
@@ -81,6 +83,12 @@ async function PracticeContent() {
       {sessions && sessions.length > 0 && (
         <section className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Your practice interviews</h2>
+          <ProgressChart
+            scores={sessions
+              .filter((s) => s.overall_score !== null)
+              .map((s) => s.overall_score as number)
+              .reverse()}
+          />
           <ul className="flex flex-col gap-2">
             {sessions.map((session) => {
               const role = session.target_roles as unknown as {
@@ -95,7 +103,12 @@ async function PracticeContent() {
                     <span>{role?.title ?? "Removed role"}</span>
                     <span className="text-sm text-zinc-500">
                       {new Date(session.created_at).toLocaleDateString("en-GB")}{" "}
-                      · {session.completed_at ? "Completed" : "In progress"}
+                      ·{" "}
+                      {session.overall_score !== null
+                        ? `${session.overall_score} / 100`
+                        : session.completed_at
+                          ? "Completed"
+                          : "In progress"}
                     </span>
                   </Link>
                 </li>
@@ -105,5 +118,37 @@ async function PracticeContent() {
         </section>
       )}
     </>
+  );
+}
+
+/** Scores of scored interviews, oldest first, as a simple bar chart. */
+function ProgressChart({ scores }: { scores: number[] }) {
+  if (scores.length < 2) return null;
+  const change = scores[scores.length - 1] - scores[0];
+  return (
+    <figure className="flex flex-col gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+      <figcaption className="text-sm text-zinc-600 dark:text-zinc-400">
+        Your scores over time:{" "}
+        {change > 0
+          ? `up ${change} points since your first interview.`
+          : change < 0
+            ? `down ${-change} points since your first interview.`
+            : "the same as your first interview."}
+      </figcaption>
+      <div
+        className="flex h-24 items-end gap-1"
+        role="img"
+        aria-label={`Scores: ${scores.join(", ")}`}
+      >
+        {scores.map((score, index) => (
+          <div
+            key={index}
+            title={`${score} / 100`}
+            className="flex-1 rounded-t bg-zinc-900 dark:bg-zinc-100"
+            style={{ height: `${Math.max(score, 4)}%` }}
+          />
+        ))}
+      </div>
+    </figure>
   );
 }

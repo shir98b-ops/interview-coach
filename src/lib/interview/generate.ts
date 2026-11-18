@@ -2,6 +2,7 @@ import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import type { ResumeData } from "@/lib/resume/schema";
+import { bankFor } from "./question-bank";
 import {
   QUESTION_COUNT,
   normalizeQuestions,
@@ -22,6 +23,9 @@ interview. Write ${QUESTION_COUNT} questions for the candidate below.
   specific item on the candidate's resume.
 - Match the seniority level. If none is given, aim for the level the resume
   suggests.
+- Stay close to what real interviewers ask. Base at least three questions on
+  the commonly asked questions listed below, adapting them to the role and the
+  candidate's background; do not invent unusual or trick questions.
 - Ask one thing per question, the way a real interviewer would say it.
 - Write the questions in English.`;
 
@@ -51,6 +55,12 @@ export async function generateQuestions(
           content: `${instructions}
 
 <role>${role}</role>
+
+<commonly_asked_questions>
+${bankFor(target.title, target.seniority)
+  .map((q) => `- ${q}`)
+  .join("\n")}
+</commonly_asked_questions>
 
 <resume>
 ${JSON.stringify(resume, null, 2)}

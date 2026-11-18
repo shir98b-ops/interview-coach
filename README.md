@@ -6,7 +6,7 @@ feedback, then track how you improve over time.
 
 **Live demo:** https://interview-coach-lemon.vercel.app
 
-> Status: stage 4 of 9 (written interview simulation) in progress. Stages 1-3 are done. See the [roadmap](#roadmap).
+> Status: stage 5 of 9 (scoring and feedback) in progress. Stages 1-4 are done. See the [roadmap](#roadmap).
 
 ## The problem
 
@@ -48,6 +48,8 @@ with another person.
 | The original resume file is **not stored**                       | Only the details the user approves are saved. Data we never keep cannot leak, and the product only needs the details, not the file.                                                                             |
 | A **small, fast AI model** reads resumes                         | Copying facts from a resume is a simple task. The smallest Claude model does it in seconds for about a tenth of a cent; stronger models are kept for interview feedback.                                        |
 | A **mid-tier AI model** writes interview questions               | The questions are the heart of the product, so they get a stronger model than resume reading, for about two cents per practice interview. One question at a time keeps the user focused, like a real interview. |
+| Questions start from a **bank of commonly asked questions**      | AI-written questions can drift toward unusual or generic ones. A curated list of questions real interviewers ask, grouped by kind of role, keeps practice realistic; the AI adapts them to the candidate.       |
+| All answers are **scored together** at the end                   | One scoring pass per interview is cheaper and keeps scores consistent with each other, and the user is not interrupted between questions, like in a real interview.                                             |
 | The app runs **next to its database**, in Europe                 | Every page makes several database calls, and most users are in Israel. Running the app and the database together in Frankfurt keeps each call local and both close to users.                                    |
 | Job links and gamified exercises come **after** the MVP          | A small product that works end to end is more useful, and easier to validate, than four half-built areas.                                                                                                       |
 | Practice exercises are **original**, "in the style of" a company | Real take-home tests are often confidential. Generating original exercises by type and difficulty avoids copying them.                                                                                          |

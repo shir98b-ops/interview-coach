@@ -3,6 +3,8 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { AiError } from "@/lib/ai/client";
+import { evaluateInterview } from "@/lib/interview/evaluate";
+import { overallScore, readFeedback } from "@/lib/interview/feedback";
 import { generateQuestions } from "@/lib/interview/generate";
 import { validateAnswer } from "@/lib/interview/schema";
 import { resumeSchema } from "@/lib/resume/schema";
@@ -19,6 +21,12 @@ const aiMessages: Record<AiError["reason"], string> = {
   unreadable: "We couldn't prepare questions for this role. Please try again.",
   service:
     "Something went wrong while preparing your questions. Please try again.",
+};
+
+const feedbackMessages: Record<AiError["reason"], string> = {
+  ...aiMessages,
+  unreadable: "We couldn't score these answers. Please try again.",
+  service: "Something went wrong while scoring your answers. Please try again.",
 };
 
 async function requireUser() {
@@ -131,8 +139,114 @@ export async function submitAnswer(
       .update({ completed_at: new Date().toISOString() })
       .eq("id", sessionId)
       .is("completed_at", null);
+    // If scoring fails, the summary page offers to try again.
+    await scoreSession(supabase, sessionId);
   }
 
   refresh();
+  return { error: null };
+}
+
+/** Scores a finished interview again, for when the first try failed. */
+export async function retryFeedback(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const sessionId = String(formData.get("sessionId") ?? "");
+  const { supabase } = await requireUser();
+  const result = await scoreSession(supabase, sessionId);
+  if (result.error) return result;
+  refresh();
+  return { error: null };
+}
+
+type Supabase = Awaited<ReturnType<typeof createClient>>;
+
+const one = <T>(value: T | T[] | null): T | null =>
+  Array.isArray(value) ? (value[0] ?? null) : value;
+
+/** Scores every answer of a finished interview and saves the feedback. */
+async function scoreSession(
+  supabase: Supabase,
+  sessionId: string,
+): Promise<FormState> {
+  const [{ data: session }, { data: rows }] = await Promise.all([
+    supabase
+      .from("sessions")
+      .select("id, target_roles(title, seniority)")
+      .eq("id", sessionId)
+      .maybeSingle(),
+    supabase
+      .from("questions")
+      .select("id, position, kind, text, answers(id, text, scores)")
+      .eq("session_id", sessionId)
+      .order("position"),
+  ]);
+  if (!session || !rows?.length) return { error: "Interview not found." };
+
+  const items = rows.map((row) => ({
+    questionId: row.id as string,
+    position: row.position as number,
+    kind: row.kind as string,
+    question: row.text as string,
+    answer: one(
+      row.answers as
+        | { text: string; scores: unknown }
+        | { text: string; scores: unknown }[]
+        | null,
+    ),
+  }));
+  if (items.some((item) => !item.answer)) {
+    return { error: "Answer every question first." };
+  }
+  if (items.every((item) => readFeedback(item.answer!.scores))) {
+    return { error: null };
+  }
+
+  const role = one(
+    session.target_roles as unknown as {
+      title: string;
+      seniority: string | null;
+    } | null,
+  );
+  const roleName = role
+    ? `${role.title}${role.seniority ? ` (${role.seniority})` : ""}`
+    : "Not specified";
+
+  let feedback;
+  try {
+    feedback = await evaluateInterview(
+      roleName,
+      items.map((item) => ({ ...item, answer: item.answer!.text })),
+    );
+  } catch (error) {
+    if (error instanceof AiError) {
+      console.error("Scoring failed:", error.reason, error.message);
+      return {
+        error: `${feedbackMessages[error.reason]} (Error code: ${error.code})`,
+      };
+    }
+    throw error;
+  }
+
+  const results = await Promise.all(
+    items.map((item) => {
+      const f = feedback.get(item.position)!;
+      return supabase
+        .from("answers")
+        .update({ scores: f, feedback: f.improvements })
+        .eq("question_id", item.questionId);
+    }),
+  );
+  const failed = results.find((r) => r.error);
+  if (failed?.error) {
+    console.error("Saving feedback failed:", failed.error.message);
+    return { error: "We couldn't save your feedback. Please try again." };
+  }
+
+  await supabase
+    .from("sessions")
+    .update({ overall_score: overallScore([...feedback.values()]) })
+    .eq("id", sessionId);
   return { error: null };
 }
