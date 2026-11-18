@@ -25,7 +25,7 @@ export const roadmap: Stage[] = [
     title: "Accounts and data",
     summary: "Google sign-in and a database for profiles and sessions.",
     mvp: true,
-    status: "in-progress",
+    status: "done",
   },
   {
     number: 3,
@@ -33,7 +33,7 @@ export const roadmap: Stage[] = [
     summary:
       "Upload a resume, review the extracted details, pick target roles.",
     mvp: true,
-    status: "planned",
+    status: "in-progress",
   },
   {
     number: 4,

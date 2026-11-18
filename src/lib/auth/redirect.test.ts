@@ -5,6 +5,7 @@ describe("isProtectedPath", () => {
   it("protects the dashboard and its sub-pages", () => {
     expect(isProtectedPath("/dashboard")).toBe(true);
     expect(isProtectedPath("/dashboard/history")).toBe(true);
+    expect(isProtectedPath("/profile")).toBe(true);
   });
 
   it("leaves public pages open", () => {

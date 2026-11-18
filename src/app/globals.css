@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  /* Lets native controls (dropdown lists, file pickers) follow dark mode. */
+  color-scheme: light dark;
   --background: #ffffff;
   --foreground: #171717;
 }
