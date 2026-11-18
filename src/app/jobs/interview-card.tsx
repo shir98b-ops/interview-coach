@@ -15,11 +15,14 @@ export function InterviewCard({
   now,
   showJob = true,
   children,
+  footer,
 }: {
   interview: InterviewRow;
   now: Date;
   showJob?: boolean;
   children?: React.ReactNode;
+  /** Extra content below the card's details, such as stage prep. */
+  footer?: React.ReactNode;
 }) {
   const days = daysUntil(interview.startsAt, now);
   const past =
@@ -75,6 +78,7 @@ export function InterviewCard({
         </div>
       )}
       {past && children && <div className="flex gap-2">{children}</div>}
+      {footer}
     </li>
   );
 }

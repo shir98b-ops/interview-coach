@@ -7,6 +7,13 @@ import { AiError } from "@/lib/ai/client";
 import { evaluateInterview } from "@/lib/interview/evaluate";
 import { overallScore, readFeedback } from "@/lib/interview/feedback";
 import { generateQuestions } from "@/lib/interview/generate";
+import { interviewsForJob, stagesBefore } from "@/lib/jobs/queries";
+import {
+  historyText,
+  interviewKinds,
+  parseKind,
+  stageFocus,
+} from "@/lib/jobs/schema";
 import { limitMessage } from "@/lib/interview/limits";
 import { getUsage } from "@/lib/interview/usage";
 import { parseLanguage, validateAnswer } from "@/lib/interview/schema";
@@ -44,6 +51,9 @@ export async function startPractice(
 ): Promise<FormState> {
   const roleId = String(formData.get("roleId") ?? "");
   const jobId = String(formData.get("jobId") ?? "");
+  const stageKind = formData.get("stage")
+    ? parseKind(formData.get("stage"))
+    : null;
   const language = parseLanguage(formData.get("language"));
   const { supabase, user } = await requireUser();
 
@@ -69,7 +79,10 @@ export async function startPractice(
             .maybeSingle()
         : Promise.resolve({ data: null }),
     ]);
-  // A practice for a specific job is built from its posting.
+  // A practice for a specific job is built from its posting, and for one
+  // stage of its process when a stage is chosen.
+  const stages =
+    job && stageKind ? await interviewsForJob(supabase, job.id) : [];
   const role = job
     ? {
         id: null,
@@ -77,6 +90,13 @@ export async function startPractice(
         seniority: null,
         job: job.description
           ? { company: job.company, description: job.description }
+          : null,
+        stage: stageKind
+          ? {
+              name: interviewKinds[stageKind],
+              focus: stageFocus[stageKind],
+              history: historyText(stagesBefore(stages, new Date())),
+            }
           : null,
       }
     : savedRole;
@@ -117,6 +137,7 @@ export async function startPractice(
       user_id: user.id,
       target_role_id: role.id,
       job_id: job?.id ?? null,
+      stage: job ? stageKind : null,
     })
     .select("id")
     .single();

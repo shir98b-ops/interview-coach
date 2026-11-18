@@ -18,6 +18,8 @@ export interface PracticeTarget {
   seniority: string | null;
   /** The job posting, when practicing for a specific job. */
   job?: { company: string; description: string } | null;
+  /** The stage practiced for, with what it checks and earlier stages. */
+  stage?: { name: string; focus: string; history: string } | null;
 }
 
 const instructions = `You are an experienced hiring manager preparing a first-round
@@ -78,7 +80,17 @@ ${target.job.description}
 </job_posting>
 `
     : ""
-}
+}${
+            target.stage
+              ? `
+Practice ONE stage of the hiring process: ${target.stage.name}.
+${target.stage.focus}
+Ask only what an interviewer at this stage would ask. The mix of question
+kinds above can bend to fit the stage.
+${target.stage.history}
+`
+              : ""
+          }
 <commonly_asked_questions>
 ${bankFor(target.title, target.seniority)
   .map((q) => `- ${q}`)

@@ -92,3 +92,38 @@ export function safeLink(value: string): string | null {
     return null;
   }
 }
+
+/** What each stage of a hiring process usually checks, for the AI. */
+export const stageFocus: Record<InterviewKind, string> = {
+  screen:
+    "A short phone screen with a recruiter: motivation, why this company, a quick walk through the background, availability and salary expectations.",
+  hr: "An HR interview: motivation, values and culture fit, teamwork, handling conflict and pressure, career goals and salary expectations.",
+  professional:
+    "A professional interview with the team: the core skills and tools in the posting, real cases from the candidate's experience, and how they would solve problems typical of this role.",
+  manager:
+    "An interview with the hiring manager: ownership, decision making, prioritizing, working with stakeholders, and how the candidate would approach the first months.",
+  "take-home":
+    "A take-home assignment and its review: understanding the task, structuring the answer, presenting it clearly and defending choices.",
+  final:
+    "A final interview, often with a senior leader: big-picture motivation, culture fit, long-term goals, and smart questions before an offer.",
+  other:
+    "An interview stage of unknown type: cover motivation, the key requirements of the posting and the strongest stories from the resume.",
+};
+
+export interface StageHistory {
+  kind: InterviewKind;
+  date: string;
+  reflection: string | null;
+}
+
+/** Earlier stages of the process and the candidate's notes on them. */
+export function historyText(history: StageHistory[]): string {
+  if (history.length === 0) return "This is the first stage of the process.";
+  return [
+    "Earlier stages of this process, with the candidate's own notes:",
+    ...history.map(
+      (h) => `- ${h.date}, ${h.kind}: ${h.reflection?.trim() || "(no notes)"}`,
+    ),
+    "Use these notes: do not repeat what was already covered, and strengthen what the candidate found hard.",
+  ].join("\n");
+}

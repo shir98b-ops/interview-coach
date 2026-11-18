@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { calendarStamp, googleCalendarLink, icsFile } from "./calendar";
 import {
+  historyText,
   parseDuration,
   parseKind,
   parseStatus,
@@ -120,5 +121,20 @@ describe("calendar", () => {
     expect(ics).toContain("DESCRIPTION:שורה 1\\nשורה 2");
     expect(ics).toContain("LOCATION:Zoom\; link");
     expect(ics.endsWith("END:VCALENDAR\r\n")).toBe(true);
+  });
+});
+
+describe("historyText", () => {
+  it("says when this is the first stage", () => {
+    expect(historyText([])).toContain("first stage");
+  });
+
+  it("lists earlier stages with the candidate's notes", () => {
+    const text = historyText([
+      { kind: "hr", date: "2026-11-20", reflection: "Asked about salary" },
+      { kind: "professional", date: "2026-11-25", reflection: null },
+    ]);
+    expect(text).toContain("hr: Asked about salary");
+    expect(text).toContain("professional: (no notes)");
   });
 });

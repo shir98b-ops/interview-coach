@@ -50,6 +50,13 @@
       "when": 1795043656087,
       "tag": "0006_job_prep",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795044984885,
+      "tag": "0007_interview_stages",
+      "breakpoints": true
     }
   ]
 }

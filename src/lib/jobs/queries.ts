@@ -13,10 +13,11 @@ export interface InterviewRow {
   minutes: number;
   location: string | null;
   notes: string | null;
+  reflection: string | null;
 }
 
 const columns =
-  "id, job_id, kind, starts_at, duration_minutes, location, notes, jobs(company, title)";
+  "id, job_id, kind, starts_at, duration_minutes, location, notes, reflection, jobs(company, title)";
 
 type Raw = {
   id: string;
@@ -26,6 +27,7 @@ type Raw = {
   duration_minutes: number;
   location: string | null;
   notes: string | null;
+  reflection: string | null;
   jobs:
     | { company: string; title: string }
     | { company: string; title: string }[]
@@ -44,6 +46,7 @@ function toRow(raw: Raw): InterviewRow {
     minutes: raw.duration_minutes,
     location: raw.location,
     notes: raw.notes,
+    reflection: raw.reflection,
   };
 }
 
@@ -87,4 +90,18 @@ export async function interviewById(
     .eq("id", id)
     .maybeSingle();
   return data ? toRow(data as unknown as Raw) : null;
+}
+
+/** The stages of a job before the given moment, with the user's notes. */
+export function stagesBefore(
+  interviews: InterviewRow[],
+  before: Date,
+): { kind: InterviewRow["kind"]; date: string; reflection: string | null }[] {
+  return interviews
+    .filter((i) => i.startsAt.getTime() < before.getTime())
+    .map((i) => ({
+      kind: i.kind,
+      date: i.startsAt.toISOString().slice(0, 10),
+      reflection: i.reflection,
+    }));
 }

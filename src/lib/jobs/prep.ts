@@ -9,11 +9,34 @@ import {
   timeframe,
   type PrepPlan,
 } from "./prep-schema";
+import {
+  historyText,
+  interviewKinds,
+  stageFocus,
+  type InterviewKind,
+  type StageHistory,
+} from "./schema";
 
 export interface JobForPrep {
   company: string;
   title: string;
   description: string;
+}
+
+/** The stage a plan is for, and the stages before it. */
+export interface StageForPrep {
+  kind: InterviewKind;
+  history: StageHistory[];
+}
+
+function stageInstructions(stage: StageForPrep | null): string {
+  if (!stage) {
+    return "The plan is for the process as a whole, before a specific interview is scheduled.";
+  }
+  return `The plan is for ONE stage of the hiring process: ${interviewKinds[stage.kind]} (${stage.kind}).
+${stageFocus[stage.kind]}
+Focus every section on what this stage checks; leave out what belongs to other stages.
+${historyText(stage.history)}`;
 }
 
 /** Writes a prep plan for one job, from its posting and the resume. */
@@ -22,6 +45,7 @@ export async function writePrepPlan(
   resume: ResumeData,
   daysUntilInterview: number | null,
   address: Address | null = null,
+  stage: StageForPrep | null = null,
 ): Promise<PrepPlan> {
   let response;
   try {
@@ -39,6 +63,8 @@ export async function writePrepPlan(
           role: "user",
           content: `You are an experienced interview coach. The candidate
 applied to the job below. Build a focused prep plan for its interviews.
+
+${stageInstructions(stage)}
 
 - summary: two or three sentences on what this role really needs, read from
   the posting, in plain words.

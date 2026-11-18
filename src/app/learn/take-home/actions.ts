@@ -47,18 +47,42 @@ export async function startTakeHome(
   const difficulty = parseDifficulty(formData.get("difficulty"));
   const language = parseLanguage(formData.get("language"));
 
-  const [{ data: role }, { data: recent }] = await Promise.all([
-    supabase
-      .from("target_roles")
-      .select("id, title, seniority")
-      .eq("id", String(formData.get("roleId") ?? ""))
-      .maybeSingle(),
-    supabase
-      .from("take_homes")
-      .select("created_at")
-      .gt("created_at", limitWindowStart().toISOString()),
-  ]);
-  if (!role) return { error: "צריך לבחור אחד מהתפקידים שלך." };
+  const jobId = String(formData.get("jobId") ?? "");
+  const [{ data: savedRole }, { data: job }, { data: recent }] =
+    await Promise.all([
+      supabase
+        .from("target_roles")
+        .select("id, title, seniority")
+        .eq("id", String(formData.get("roleId") ?? ""))
+        .maybeSingle(),
+      jobId
+        ? supabase
+            .from("jobs")
+            .select("id, company, title, description")
+            .eq("id", jobId)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
+      supabase
+        .from("take_homes")
+        .select("created_at")
+        .gt("created_at", limitWindowStart().toISOString()),
+    ]);
+  // A take-home for a specific job is built around its posting.
+  const role = job
+    ? {
+        id: null,
+        title: job.title,
+        seniority: null,
+        job: job.description
+          ? { company: job.company, description: job.description }
+          : null,
+      }
+    : savedRole;
+  if (!role) {
+    return {
+      error: jobId ? "המשרה לא נמצאה." : "צריך לבחור אחד מהתפקידים שלך.",
+    };
+  }
 
   const usage = usageStatus(
     (recent ?? []).map((row) => new Date(row.created_at)),
@@ -85,6 +109,7 @@ export async function startTakeHome(
     .insert({
       user_id: user.id,
       target_role_id: role.id,
+      job_id: job?.id ?? null,
       difficulty,
       language,
       brief,

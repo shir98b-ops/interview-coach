@@ -11,6 +11,7 @@ import {
   validatePaste,
 } from "@/lib/jobs/extract-schema";
 import { readLinkedInJobs } from "@/lib/jobs/linkedin-import";
+import { interviewsForJob, stagesBefore } from "@/lib/jobs/queries";
 import { writePrepPlan } from "@/lib/jobs/prep";
 import { DAILY_PREP_LIMIT, validateDescription } from "@/lib/jobs/prep-schema";
 import { resumeSchema } from "@/lib/resume/schema";
@@ -250,36 +251,47 @@ export async function createPrepPlan(
   formData: FormData,
 ): Promise<JobFormState> {
   const id = String(formData.get("id") ?? "");
+  const interviewId = String(formData.get("interviewId") ?? "");
   const { supabase, user } = await requireUser(`/jobs/${id}`);
   const now = new Date();
 
-  const [{ data: job }, { data: profile }, { data: recent }, { data: next }] =
-    await Promise.all([
-      supabase
-        .from("jobs")
-        .select("id, company, title, description")
-        .eq("id", id)
-        .maybeSingle(),
-      supabase
-        .from("profiles")
-        .select("resume_data")
-        .eq("user_id", user.id)
-        .maybeSingle(),
-      supabase
-        .from("job_preps")
-        .select("created_at")
-        .gt("created_at", limitWindowStart(now).toISOString()),
-      supabase
-        .from("interviews")
-        .select("starts_at")
-        .eq("job_id", id)
-        .gte("starts_at", now.toISOString())
-        .order("starts_at")
-        .limit(1)
-        .maybeSingle(),
-    ]);
+  const [
+    { data: job },
+    { data: profile },
+    { data: recent },
+    { data: next },
+    stages,
+  ] = await Promise.all([
+    supabase
+      .from("jobs")
+      .select("id, company, title, description")
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("resume_data")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("job_preps")
+      .select("created_at")
+      .gt("created_at", limitWindowStart(now).toISOString()),
+    supabase
+      .from("interviews")
+      .select("starts_at")
+      .eq("job_id", id)
+      .gte("starts_at", now.toISOString())
+      .order("starts_at")
+      .limit(1)
+      .maybeSingle(),
+    interviewsForJob(supabase, id),
+  ]);
 
   if (!job) return { error: "המשרה לא נמצאה." };
+  const stage = interviewId
+    ? stages.find((s) => s.id === interviewId)
+    : undefined;
+  if (interviewId && !stage) return { error: "הראיון לא נמצא." };
   if (!job.description) {
     return { error: "קודם צריך להדביק את תיאור המשרה." };
   }
@@ -304,8 +316,15 @@ export async function createPrepPlan(
     plan = await writePrepPlan(
       { company: job.company, title: job.title, description: job.description },
       resume.data,
-      next ? daysUntil(new Date(next.starts_at), now) : null,
+      stage
+        ? Math.max(0, daysUntil(stage.startsAt, now))
+        : next
+          ? daysUntil(new Date(next.starts_at), now)
+          : null,
       user.address,
+      stage
+        ? { kind: stage.kind, history: stagesBefore(stages, stage.startsAt) }
+        : null,
     );
   } catch (error) {
     if (error instanceof AiError) {
@@ -317,9 +336,12 @@ export async function createPrepPlan(
     throw error;
   }
 
-  const { error } = await supabase
-    .from("job_preps")
-    .insert({ user_id: user.id, job_id: job.id, plan });
+  const { error } = await supabase.from("job_preps").insert({
+    user_id: user.id,
+    job_id: job.id,
+    interview_id: stage?.id ?? null,
+    plan,
+  });
   if (error) {
     console.error("Saving prep plan failed:", error.message);
     return { error: "לא הצלחנו לשמור את התוכנית. אפשר לנסות שוב." };
@@ -388,4 +410,16 @@ export async function importLinkedInJobs(
     added: fresh.length,
     skipped: result.jobs.length - fresh.length,
   };
+}
+
+/** Saves the user's notes on how an interview went. */
+export async function saveReflection(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const { supabase } = await requireUser();
+  const { error } = await supabase
+    .from("interviews")
+    .update({ reflection: optional(formData.get("reflection"), 2000) })
+    .eq("id", id);
+  if (error) console.error("Saving reflection failed:", error.message);
+  refresh();
 }

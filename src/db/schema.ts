@@ -76,6 +76,8 @@ export const sessions = pgTable(
     jobId: uuid("job_id").references((): AnyPgColumn => jobs.id, {
       onDelete: "set null",
     }),
+    /** The interview stage practiced for, such as "hr" or "professional". */
+    stage: text("stage"),
     overallScore: smallint("overall_score"),
     createdAt: createdAt(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
@@ -139,6 +141,10 @@ export const takeHomes = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userId: userId(),
     targetRoleId: uuid("target_role_id").references(() => targetRoles.id, {
+      onDelete: "set null",
+    }),
+    /** Set when the take-home was built from a specific job posting. */
+    jobId: uuid("job_id").references((): AnyPgColumn => jobs.id, {
       onDelete: "set null",
     }),
     difficulty: text("difficulty").notNull(),
@@ -218,6 +224,8 @@ export const interviews = pgTable(
     durationMinutes: smallint("duration_minutes").notNull().default(60),
     location: text("location"),
     notes: text("notes"),
+    /** After the interview: what they asked and how it went. */
+    reflection: text("reflection"),
     createdAt: createdAt(),
   },
   (table) => [
@@ -235,6 +243,10 @@ export const jobPreps = pgTable(
     jobId: uuid("job_id")
       .notNull()
       .references(() => jobs.id, { onDelete: "cascade" }),
+    /** Set when the plan is for one stage of the process. */
+    interviewId: uuid("interview_id").references(() => interviews.id, {
+      onDelete: "cascade",
+    }),
     plan: jsonb("plan").notNull(),
     createdAt: createdAt(),
   },

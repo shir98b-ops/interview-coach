@@ -2,7 +2,9 @@
 
 import { useActionState, useRef, useState, useTransition } from "react";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
+import { startTakeHome } from "@/app/learn/take-home/actions";
 import { startPractice } from "@/app/practice/actions";
+import { difficulties } from "@/lib/take-home/schema";
 import { interviewLanguages } from "@/lib/interview/schema";
 import { MAX_PASTE_LENGTH } from "@/lib/jobs/extract-schema";
 import { MAX_IMPORT_BYTES, importFileText } from "@/lib/jobs/linkedin-import";
@@ -126,7 +128,7 @@ export function AddInterviewForm({ jobId }: { jobId: string }) {
     <form ref={formRef} action={action} className="grid gap-3 sm:grid-cols-2">
       <input type="hidden" name="jobId" value={jobId} />
       <label className="flex flex-col gap-1 font-bold">
-        סוג הראיון
+        סוג השלב
         <select name="kind" defaultValue="hr" className={inputStyles}>
           {Object.entries(interviewKinds).map(([key, label]) => (
             <option key={key} value={key}>
@@ -187,7 +189,7 @@ export function AddInterviewForm({ jobId }: { jobId: string }) {
         </div>
       )}
       <Button type="submit" disabled={pending} className="sm:w-fit">
-        {pending ? "שומר..." : "להוסיף ראיון"}
+        {pending ? "שומר..." : "להוסיף שלב"}
       </Button>
     </form>
   );
@@ -230,14 +232,19 @@ export function DescriptionForm({
 export function PrepPlanForm({
   jobId,
   hasPlan,
+  interviewId,
 }: {
   jobId: string;
   hasPlan: boolean;
+  interviewId?: string;
 }) {
   const [state, action, pending] = useActionState(createPrepPlan, initial);
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="id" value={jobId} />
+      {interviewId && (
+        <input type="hidden" name="interviewId" value={interviewId} />
+      )}
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button
         type="submit"
@@ -249,7 +256,9 @@ export function PrepPlanForm({
           ? "בונה תוכנית, זה לוקח כחצי דקה..."
           : hasPlan
             ? "לבנות תוכנית חדשה"
-            : "לבנות לי תוכנית הכנה"}
+            : interviewId
+              ? "להתכונן לשלב הזה"
+              : "לבנות לי תוכנית הכנה"}
       </Button>
     </form>
   );
@@ -258,11 +267,18 @@ export function PrepPlanForm({
 const languageNames: Record<string, string> = { en: "English", he: "עברית" };
 
 /** Starts a practice interview built from this job's posting. */
-export function JobPracticeForm({ jobId }: { jobId: string }) {
+export function JobPracticeForm({
+  jobId,
+  stage,
+}: {
+  jobId: string;
+  stage?: string;
+}) {
   const [state, action, pending] = useActionState(startPractice, initial);
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="jobId" value={jobId} />
+      {stage && <input type="hidden" name="stage" value={stage} />}
       <label className="flex flex-col gap-1 font-bold sm:w-60">
         שפת הראיון
         <select name="language" defaultValue="en" className={inputStyles}>
@@ -277,7 +293,9 @@ export function JobPracticeForm({ jobId }: { jobId: string }) {
       <Button type="submit" disabled={pending} className="w-full sm:w-fit">
         {pending
           ? "מכין שאלות, זה לוקח כמה שניות..."
-          : "להתחיל תרגול למשרה הזו"}
+          : stage
+            ? "לתרגל את השלב הזה"
+            : "להתחיל תרגול למשרה הזו"}
       </Button>
     </form>
   );
@@ -345,5 +363,47 @@ export function ImportLinkedInForm() {
         </p>
       )}
     </div>
+  );
+}
+
+/** Starts a practice take-home built around this job's posting. */
+export function JobTakeHomeForm({ jobId }: { jobId: string }) {
+  const [state, action, pending] = useActionState(startTakeHome, initial);
+  return (
+    <form action={action} className="flex flex-col gap-3">
+      <input type="hidden" name="jobId" value={jobId} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="flex flex-col gap-1 font-bold">
+          רמת קושי
+          <select
+            name="difficulty"
+            defaultValue="medium"
+            className={inputStyles}
+          >
+            {Object.entries(difficulties).map(([key, d]) => (
+              <option key={key} value={key}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 font-bold">
+          שפה
+          <select name="language" defaultValue="he" className={inputStyles}>
+            {Object.keys(interviewLanguages).map((code) => (
+              <option key={code} value={code}>
+                {languageNames[code] ?? code}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {state.error && <ErrorText>{state.error}</ErrorText>}
+      <Button type="submit" disabled={pending} className="w-full sm:w-fit">
+        {pending
+          ? "כותב מבחן בית, זה לוקח כחצי דקה..."
+          : "לתרגל מבחן בית למשרה הזו"}
+      </Button>
+    </form>
   );
 }
