@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isProtectedPath } from "@/lib/auth/redirect";
 import { getSupabaseEnv } from "@/lib/supabase/env";
+import { getSignedInUser } from "@/lib/supabase/user";
 
 /**
  * Runs before each page request: refreshes the sign-in session cookie and
@@ -28,9 +29,7 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSignedInUser(supabase);
 
   const { pathname, search } = request.nextUrl;
   if (!user && isProtectedPath(pathname)) {

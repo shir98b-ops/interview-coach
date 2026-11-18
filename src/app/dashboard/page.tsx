@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { signOut } from "@/app/login/actions";
 import { createClient } from "@/lib/supabase/server";
+import { getSignedInUser } from "@/lib/supabase/user";
 
 export const metadata: Metadata = { title: "Dashboard · Interview Coach" };
 
@@ -30,9 +31,7 @@ export default function DashboardPage() {
 
 async function AccountSummary() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSignedInUser(supabase);
   if (!user) redirect("/login");
 
   const { data: profile } = await supabase
