@@ -2,8 +2,17 @@
 
 import { useActionState, useRef } from "react";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
+import { startPractice } from "@/app/practice/actions";
+import { interviewLanguages } from "@/lib/interview/schema";
+import { MAX_DESCRIPTION_LENGTH } from "@/lib/jobs/prep-schema";
 import { durations, interviewKinds, jobStatuses } from "@/lib/jobs/schema";
-import { addInterview, addJob, type JobFormState } from "./actions";
+import {
+  addInterview,
+  addJob,
+  createPrepPlan,
+  saveDescription,
+  type JobFormState,
+} from "./actions";
 
 const initial: JobFormState = { error: null };
 
@@ -142,6 +151,96 @@ export function AddInterviewForm({ jobId }: { jobId: string }) {
       )}
       <Button type="submit" disabled={pending} className="sm:w-fit">
         {pending ? "שומר..." : "להוסיף ראיון"}
+      </Button>
+    </form>
+  );
+}
+
+export function DescriptionForm({
+  jobId,
+  current,
+}: {
+  jobId: string;
+  current: string | null;
+}) {
+  const [state, action, pending] = useActionState(saveDescription, initial);
+  return (
+    <form action={action} className="flex flex-col gap-3">
+      <input type="hidden" name="id" value={jobId} />
+      <textarea
+        name="description"
+        rows={current ? 6 : 8}
+        maxLength={MAX_DESCRIPTION_LENGTH}
+        dir="auto"
+        defaultValue={current ?? ""}
+        aria-label="תיאור המשרה"
+        placeholder="מעתיקים מהמודעה בלינקדאין או באתר החברה את כל הטקסט: תיאור התפקיד, דרישות ומה מציעים."
+        className={inputStyles}
+      />
+      {state.error && <ErrorText>{state.error}</ErrorText>}
+      <Button
+        type="submit"
+        variant="quiet"
+        disabled={pending}
+        className="sm:w-fit"
+      >
+        {pending ? "שומר..." : current ? "לשמור שינויים" : "לשמור את התיאור"}
+      </Button>
+    </form>
+  );
+}
+
+export function PrepPlanForm({
+  jobId,
+  hasPlan,
+}: {
+  jobId: string;
+  hasPlan: boolean;
+}) {
+  const [state, action, pending] = useActionState(createPrepPlan, initial);
+  return (
+    <form action={action} className="flex flex-col gap-3">
+      <input type="hidden" name="id" value={jobId} />
+      {state.error && <ErrorText>{state.error}</ErrorText>}
+      <Button
+        type="submit"
+        variant={hasPlan ? "quiet" : "lime"}
+        disabled={pending}
+        className="w-full sm:w-fit"
+      >
+        {pending
+          ? "בונה תוכנית, זה לוקח כחצי דקה..."
+          : hasPlan
+            ? "לבנות תוכנית חדשה"
+            : "לבנות לי תוכנית הכנה"}
+      </Button>
+    </form>
+  );
+}
+
+const languageNames: Record<string, string> = { en: "English", he: "עברית" };
+
+/** Starts a practice interview built from this job's posting. */
+export function JobPracticeForm({ jobId }: { jobId: string }) {
+  const [state, action, pending] = useActionState(startPractice, initial);
+  return (
+    <form action={action} className="flex flex-col gap-3">
+      <input type="hidden" name="jobId" value={jobId} />
+      <label className="flex flex-col gap-1 font-bold sm:w-60">
+        שפת הראיון
+        <select name="language" defaultValue="en" className={inputStyles}>
+          {Object.keys(interviewLanguages).map((code) => (
+            <option key={code} value={code}>
+              {languageNames[code] ?? code}
+            </option>
+          ))}
+        </select>
+      </label>
+      {state.error && <ErrorText>{state.error}</ErrorText>}
+      <Button type="submit" disabled={pending} className="w-full sm:w-fit">
+        {pending
+          ? "מכין שאלות, זה לוקח כמה שניות..."
+          : "להתחיל תרגול למשרה הזו"}
       </Button>
     </form>
   );

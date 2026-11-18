@@ -45,7 +45,7 @@ async function PracticeContent() {
       supabase
         .from("sessions")
         .select(
-          "id, created_at, completed_at, overall_score, target_roles(title)",
+          "id, created_at, completed_at, overall_score, target_roles(title), jobs(title, company)",
         )
         .order("created_at", { ascending: false })
         .limit(20),
@@ -104,6 +104,10 @@ async function PracticeContent() {
               const role = session.target_roles as unknown as {
                 title: string;
               } | null;
+              const job = session.jobs as unknown as {
+                title: string;
+                company: string;
+              } | null;
               return (
                 <li key={session.id}>
                   <Link
@@ -112,7 +116,9 @@ async function PracticeContent() {
                   >
                     <span className="flex flex-col">
                       <span dir="auto" className="font-bold">
-                        {role?.title ?? "תפקיד שנמחק"}
+                        {job
+                          ? `${job.title} · ${job.company}`
+                          : (role?.title ?? "תפקיד שנמחק")}
                       </span>
                       <span className="text-muted text-sm">
                         {new Date(session.created_at).toLocaleDateString(

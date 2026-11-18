@@ -43,21 +43,43 @@ export async function startPractice(
   formData: FormData,
 ): Promise<FormState> {
   const roleId = String(formData.get("roleId") ?? "");
+  const jobId = String(formData.get("jobId") ?? "");
   const language = parseLanguage(formData.get("language"));
   const { supabase, user } = await requireUser();
 
-  const [{ data: profile }, { data: role }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("resume_data")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-    supabase
-      .from("target_roles")
-      .select("id, title, seniority")
-      .eq("id", roleId)
-      .maybeSingle(),
-  ]);
+  const [{ data: profile }, { data: savedRole }, { data: job }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("resume_data")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      roleId
+        ? supabase
+            .from("target_roles")
+            .select("id, title, seniority")
+            .eq("id", roleId)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
+      jobId
+        ? supabase
+            .from("jobs")
+            .select("id, company, title, description")
+            .eq("id", jobId)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
+    ]);
+  // A practice for a specific job is built from its posting.
+  const role = job
+    ? {
+        id: null,
+        title: job.title,
+        seniority: null,
+        job: job.description
+          ? { company: job.company, description: job.description }
+          : null,
+      }
+    : savedRole;
   const usage = await getUsage(supabase);
   if (usage.remaining === 0) return { error: limitMessage(usage) };
 
@@ -65,7 +87,11 @@ export async function startPractice(
   if (!resume.success) {
     return { error: "קודם צריך להוסיף קורות חיים בעמוד הפרופיל." };
   }
-  if (!role) return { error: "צריך לבחור אחד מהתפקידים שלך." };
+  if (!role) {
+    return {
+      error: jobId ? "המשרה לא נמצאה." : "צריך לבחור אחד מהתפקידים שלך.",
+    };
+  }
 
   let questions;
   try {
@@ -87,7 +113,11 @@ export async function startPractice(
 
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
-    .insert({ user_id: user.id, target_role_id: role.id })
+    .insert({
+      user_id: user.id,
+      target_role_id: role.id,
+      job_id: job?.id ?? null,
+    })
     .select("id")
     .single();
   if (sessionError || !session) {
@@ -184,7 +214,7 @@ async function scoreSession(
   const [{ data: session }, { data: rows }] = await Promise.all([
     supabase
       .from("sessions")
-      .select("id, target_roles(title, seniority)")
+      .select("id, target_roles(title, seniority), jobs(title, company)")
       .eq("id", sessionId)
       .maybeSingle(),
     supabase
@@ -220,9 +250,14 @@ async function scoreSession(
       seniority: string | null;
     } | null,
   );
-  const roleName = role
-    ? `${role.title}${role.seniority ? ` (${role.seniority})` : ""}`
-    : "Not specified";
+  const job = one(
+    session.jobs as unknown as { title: string; company: string } | null,
+  );
+  const roleName = job
+    ? `${job.title} at ${job.company}`
+    : role
+      ? `${role.title}${role.seniority ? ` (${role.seniority})` : ""}`
+      : "Not specified";
 
   let feedback;
   try {

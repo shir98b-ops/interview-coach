@@ -1,6 +1,11 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { AiError } from "@/lib/ai/client";
+import { limitWindowStart, usageStatus } from "@/lib/interview/limits";
+import { writePrepPlan } from "@/lib/jobs/prep";
+import { DAILY_PREP_LIMIT, validateDescription } from "@/lib/jobs/prep-schema";
+import { resumeSchema } from "@/lib/resume/schema";
 import { redirect } from "next/navigation";
 import {
   parseDuration,
@@ -8,7 +13,7 @@ import {
   parseStatus,
   validateJob,
 } from "@/lib/jobs/schema";
-import { fromLocalInput } from "@/lib/jobs/time";
+import { daysUntil, fromLocalInput } from "@/lib/jobs/time";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
 
@@ -121,4 +126,119 @@ export async function deleteInterview(formData: FormData) {
   const { error } = await supabase.from("interviews").delete().eq("id", id);
   if (error) console.error("Deleting interview failed:", error.message);
   refresh();
+}
+
+/** Saves the pasted job posting. */
+export async function saveDescription(
+  _prev: JobFormState,
+  formData: FormData,
+): Promise<JobFormState> {
+  const id = String(formData.get("id") ?? "");
+  const checked = validateDescription(formData.get("description"));
+  if (!checked.ok) return { error: checked.error };
+
+  const { supabase } = await requireUser(`/jobs/${id}`);
+  const { error } = await supabase
+    .from("jobs")
+    .update({ description: checked.text, updated_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) {
+    console.error("Saving job description failed:", error.message);
+    return { error: "לא הצלחנו לשמור את התיאור. אפשר לנסות שוב." };
+  }
+  refresh();
+  return { error: null };
+}
+
+const prepMessages: Record<AiError["reason"], string> = {
+  config: "תוכנית ההכנה עדיין לא מוגדרת. אפשר לנסות שוב מאוחר יותר.",
+  auth: "תוכנית ההכנה לא זמינה כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
+  billing:
+    "תוכנית ההכנה לא זמינה כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
+  unreadable: "לא הצלחנו לבנות תוכנית מהמודעה הזו. אפשר לנסות שוב.",
+  service: "משהו השתבש בבניית התוכנית. אפשר לנסות שוב.",
+};
+
+/** Builds a prep plan for the job from its posting and the resume. */
+export async function createPrepPlan(
+  _prev: JobFormState,
+  formData: FormData,
+): Promise<JobFormState> {
+  const id = String(formData.get("id") ?? "");
+  const { supabase, user } = await requireUser(`/jobs/${id}`);
+  const now = new Date();
+
+  const [{ data: job }, { data: profile }, { data: recent }, { data: next }] =
+    await Promise.all([
+      supabase
+        .from("jobs")
+        .select("id, company, title, description")
+        .eq("id", id)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("resume_data")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("job_preps")
+        .select("created_at")
+        .gt("created_at", limitWindowStart(now).toISOString()),
+      supabase
+        .from("interviews")
+        .select("starts_at")
+        .eq("job_id", id)
+        .gte("starts_at", now.toISOString())
+        .order("starts_at")
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+  if (!job) return { error: "המשרה לא נמצאה." };
+  if (!job.description) {
+    return { error: "קודם צריך להדביק את תיאור המשרה." };
+  }
+  const resume = resumeSchema.safeParse(profile?.resume_data);
+  if (!resume.success) {
+    return { error: "קודם צריך להעלות קורות חיים בעמוד הפרופיל." };
+  }
+  const usage = usageStatus(
+    (recent ?? []).map((row) => new Date(row.created_at)),
+    now,
+    DAILY_PREP_LIMIT,
+  );
+  if (usage.remaining === 0) {
+    const hours = usage.hoursUntilNext ?? 1;
+    return {
+      error: `הגעת למגבלה של ${usage.limit} תוכניות ביום. אפשר שוב בעוד כ־${hours === 1 ? "שעה" : `${hours} שעות`}.`,
+    };
+  }
+
+  let plan;
+  try {
+    plan = await writePrepPlan(
+      { company: job.company, title: job.title, description: job.description },
+      resume.data,
+      next ? daysUntil(new Date(next.starts_at), now) : null,
+      user.address,
+    );
+  } catch (error) {
+    if (error instanceof AiError) {
+      console.error("Prep plan failed:", error.reason, error.message);
+      return {
+        error: `${prepMessages[error.reason]} (קוד שגיאה: ${error.code})`,
+      };
+    }
+    throw error;
+  }
+
+  const { error } = await supabase
+    .from("job_preps")
+    .insert({ user_id: user.id, job_id: job.id, plan });
+  if (error) {
+    console.error("Saving prep plan failed:", error.message);
+    return { error: "לא הצלחנו לשמור את התוכנית. אפשר לנסות שוב." };
+  }
+  refresh();
+  return { error: null };
 }

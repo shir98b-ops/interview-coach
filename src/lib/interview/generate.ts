@@ -16,6 +16,8 @@ import {
 export interface PracticeTarget {
   title: string;
   seniority: string | null;
+  /** The job posting, when practicing for a specific job. */
+  job?: { company: string; description: string } | null;
 }
 
 const instructions = `You are an experienced hiring manager preparing a first-round
@@ -64,7 +66,19 @@ naturally, not word for word). Keep the role title and professional terms as
 they are commonly used in that language. ${addressInstruction(address)}
 
 <role>${role}</role>
+${
+  target.job
+    ? `
+This interview is for a specific job. Base at least three questions on the
+requirements and responsibilities in this posting, the way this company's
+interviewer would ask them:
 
+<job_posting company="${target.job.company.replace(/"/g, "'")}">
+${target.job.description}
+</job_posting>
+`
+    : ""
+}
 <commonly_asked_questions>
 ${bankFor(target.title, target.seniority)
   .map((q) => `- ${q}`)

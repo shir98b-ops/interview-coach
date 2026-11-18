@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   index,
   integer,
   jsonb,
@@ -69,6 +70,10 @@ export const sessions = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userId: userId(),
     targetRoleId: uuid("target_role_id").references(() => targetRoles.id, {
+      onDelete: "set null",
+    }),
+    /** Set when the interview was built from a specific job posting. */
+    jobId: uuid("job_id").references((): AnyPgColumn => jobs.id, {
       onDelete: "set null",
     }),
     overallScore: smallint("overall_score"),
@@ -187,6 +192,8 @@ export const jobs = pgTable(
     company: text("company").notNull(),
     title: text("title").notNull(),
     link: text("link"),
+    /** The job posting text, pasted by the user. Prep and practice use it. */
+    description: text("description"),
     status: text("status").notNull().default("applied"),
     notes: text("notes"),
     createdAt: createdAt(),
@@ -217,4 +224,19 @@ export const interviews = pgTable(
     ownRowsOnly("interviews"),
     index("interviews_user_starts_idx").on(table.userId, table.startsAt),
   ],
+).enableRLS();
+
+/** An AI prep plan for one job, built from its posting and the resume. */
+export const jobPreps = pgTable(
+  "job_preps",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: userId(),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    plan: jsonb("plan").notNull(),
+    createdAt: createdAt(),
+  },
+  () => [ownRowsOnly("job_preps")],
 ).enableRLS();

@@ -4,13 +4,20 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Loading } from "@/components/app-shell";
 import { Button, Card, Chip, inputStyles } from "@/components/ui";
+import { readPrepPlan } from "@/lib/jobs/prep-schema";
 import { interviewsForJob } from "@/lib/jobs/queries";
 import { jobStatuses, parseStatus } from "@/lib/jobs/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { deleteInterview, deleteJob, updateJob } from "../actions";
-import { AddInterviewForm } from "../forms";
+import {
+  AddInterviewForm,
+  DescriptionForm,
+  JobPracticeForm,
+  PrepPlanForm,
+} from "../forms";
 import { InterviewCard } from "../interview-card";
+import { PrepPlanView } from "../prep-plan";
 
 export const metadata: Metadata = { title: "משרה · Interview Coach" };
 
@@ -34,17 +41,32 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
   if (!user) redirect(`/login?next=/jobs/${id}`);
 
   // Row level security returns nothing for another user's job.
-  const [{ data: job }, interviews] = await Promise.all([
-    supabase
-      .from("jobs")
-      .select("id, company, title, link, status, notes")
-      .eq("id", id)
-      .maybeSingle(),
-    interviewsForJob(supabase, id),
-  ]);
+  const [{ data: job }, interviews, { data: prep }, { data: practices }] =
+    await Promise.all([
+      supabase
+        .from("jobs")
+        .select("id, company, title, link, description, status, notes")
+        .eq("id", id)
+        .maybeSingle(),
+      interviewsForJob(supabase, id),
+      supabase
+        .from("job_preps")
+        .select("plan, created_at")
+        .eq("job_id", id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("sessions")
+        .select("id, created_at, overall_score")
+        .eq("job_id", id)
+        .order("created_at", { ascending: false })
+        .limit(10),
+    ]);
   if (!job) notFound();
   const status = parseStatus(job.status);
   const now = new Date();
+  const plan = readPrepPlan(prep?.plan);
 
   return (
     <>
@@ -70,6 +92,60 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
           </a>
         )}
       </header>
+
+      {!job.description ? (
+        <Card tone="orange" className="gap-4 p-6 sm:p-8">
+          <h2 className="text-2xl font-extrabold">מתחילים בתיאור המשרה</h2>
+          <p className="text-lg">
+            מדביקים כאן את הטקסט של המודעה, ומקבלים תוכנית הכנה ותרגול ראיון
+            שבנויים בדיוק למשרה הזו.
+          </p>
+          <DescriptionForm jobId={job.id} current={null} />
+        </Card>
+      ) : (
+        <Card className="gap-6 p-6 sm:p-8">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl font-extrabold">תוכנית הכנה למשרה</h2>
+            <p className="text-muted">
+              {plan
+                ? `נבנתה ${new Date(prep!.created_at).toLocaleDateString("he-IL")} לפי המודעה וקורות החיים שלך.`
+                : "מה הם מחפשים, מה כבר יש לך, אילו שאלות צפויות ואיך להתכונן בזמן שנשאר."}
+            </p>
+          </div>
+          {plan && <PrepPlanView plan={plan} />}
+          <PrepPlanForm jobId={job.id} hasPlan={Boolean(plan)} />
+        </Card>
+      )}
+
+      {job.description && (
+        <Card tone="lilac" className="gap-4 p-6 sm:p-8">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl font-extrabold">תרגול ראיון למשרה</h2>
+            <p>חמש שאלות שנבנות מתוך המודעה, ואחריהן ציון ומשוב על כל תשובה.</p>
+          </div>
+          <JobPracticeForm jobId={job.id} />
+          {practices && practices.length > 0 && (
+            <ul className="flex flex-col gap-2">
+              {practices.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={`/practice/${p.id}`}
+                    className="hover:bg-violet-soft flex items-center justify-between rounded-2xl bg-white px-4 py-3"
+                  >
+                    <span>
+                      תרגול מ־
+                      {new Date(p.created_at).toLocaleDateString("he-IL")}
+                    </span>
+                    <span className="text-violet font-extrabold">
+                      {p.overall_score ?? "בתהליך"}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+      )}
 
       <Card className="gap-4 p-6 sm:p-8">
         <h2 className="text-2xl font-extrabold">ראיונות</h2>
@@ -141,6 +217,17 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
           </Button>
         </form>
       </Card>
+
+      {job.description && (
+        <details className="group">
+          <summary className="text-muted cursor-pointer font-bold">
+            תיאור המשרה ששמרת
+          </summary>
+          <div className="mt-4">
+            <DescriptionForm jobId={job.id} current={job.description} />
+          </div>
+        </details>
+      )}
 
       <form action={deleteJob}>
         <input type="hidden" name="id" value={job.id} />

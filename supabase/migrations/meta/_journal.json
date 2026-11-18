@@ -43,6 +43,13 @@
       "when": 1795042625723,
       "tag": "0005_jobs_and_interviews",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795043656087,
+      "tag": "0006_job_prep",
+      "breakpoints": true
     }
   ]
 }
