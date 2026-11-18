@@ -6,6 +6,8 @@ import { AiError } from "@/lib/ai/client";
 import { evaluateInterview } from "@/lib/interview/evaluate";
 import { overallScore, readFeedback } from "@/lib/interview/feedback";
 import { generateQuestions } from "@/lib/interview/generate";
+import { limitMessage } from "@/lib/interview/limits";
+import { getUsage } from "@/lib/interview/usage";
 import { parseLanguage, validateAnswer } from "@/lib/interview/schema";
 import { resumeSchema } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
@@ -57,6 +59,9 @@ export async function startPractice(
       .eq("id", roleId)
       .maybeSingle(),
   ]);
+  const usage = await getUsage(supabase);
+  if (usage.remaining === 0) return { error: limitMessage(usage) };
+
   const resume = resumeSchema.safeParse(profile?.resume_data);
   if (!resume.success) {
     return { error: "Add your resume on the profile page first." };

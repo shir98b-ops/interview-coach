@@ -47,7 +47,7 @@ export const roadmap: Stage[] = [
     title: "Scoring and feedback",
     summary: "Rubric-based scores, improvement tips and a progress history.",
     mvp: true,
-    status: "in-progress",
+    status: "done",
   },
   {
     number: 6,
@@ -55,7 +55,7 @@ export const roadmap: Stage[] = [
     summary:
       "End-to-end tests, error handling, usage limits and documentation.",
     mvp: true,
-    status: "planned",
+    status: "in-progress",
   },
   {
     number: 7,

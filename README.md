@@ -6,7 +6,7 @@ feedback, then track how you improve over time.
 
 **Live demo:** https://interview-coach-lemon.vercel.app
 
-> Status: stage 5 of 9 (scoring and feedback) in progress. Stages 1-4 are done. See the [roadmap](#roadmap).
+> Status: stage 6 of 9 (MVP polish and launch) in progress. Stages 1-5 are done. See the [roadmap](#roadmap).
 
 ## The problem
 
@@ -30,11 +30,13 @@ with another person.
 
 1. Sign in with Google and upload a resume (PDF).
 2. Review the details the app extracts and choose a target role.
-3. Start a simulated interview: five questions tailored to the role and the
-   resume, mixing professional and behavioral questions.
-4. Answer each question in writing.
-5. Get a score per answer against a fixed rubric, with concrete tips and an
-   example of a stronger answer. Every session is saved to a history.
+3. Start a simulated interview in English or Hebrew: five questions tailored
+   to the role and the resume, based on questions real interviewers commonly
+   ask and mixing professional and behavioral questions.
+4. Answer each question in writing, one at a time.
+5. Get a score per answer against a fixed rubric (content, structure,
+   clarity), with what worked, what to improve and an outline of a stronger
+   answer. Every interview is saved, with a chart of scores over time.
 
 ## Key product decisions
 
@@ -51,6 +53,7 @@ with another person.
 | Questions start from a **bank of commonly asked questions**      | AI-written questions can drift toward unusual or generic ones. A curated list of questions real interviewers ask, grouped by kind of role, keeps practice realistic; the AI adapts them to the candidate.       |
 | All answers are **scored together** at the end                   | One scoring pass per interview is cheaper and keeps scores consistent with each other, and the user is not interrupted between questions, like in a real interview.                                             |
 | The app runs **next to its database**, in Europe                 | Every page makes several database calls, and most users are in Israel. Running the app and the database together in Frankfurt keeps each call local and both close to users.                                    |
+| Each user can start **five interviews a day**                    | Every interview costs a few cents of AI usage. A daily limit protects against surprise bills when the site is shared, without getting in the way of real practice. Paid plans can raise it later.               |
 | Job links and gamified exercises come **after** the MVP          | A small product that works end to end is more useful, and easier to validate, than four half-built areas.                                                                                                       |
 | Practice exercises are **original**, "in the style of" a company | Real take-home tests are often confidential. Generating original exercises by type and difficulty avoids copying them.                                                                                          |
 
@@ -72,14 +75,14 @@ Stages 1 to 6 make up the MVP.
 
 ## How it is built
 
-| Layer             | Choice                                   |
-| ----------------- | ---------------------------------------- |
-| App (UI + server) | Next.js with TypeScript                  |
-| Styling           | Tailwind CSS                             |
-| Data and sign-in  | Supabase (Postgres, Auth)                |
-| AI                | Claude API                               |
-| Hosting           | Vercel                                   |
-| Quality checks    | ESLint, Prettier, Vitest, GitHub Actions |
+| Layer             | Choice                                               |
+| ----------------- | ---------------------------------------------------- |
+| App (UI + server) | Next.js with TypeScript                              |
+| Styling           | Tailwind CSS                                         |
+| Data and sign-in  | Supabase (Postgres, Auth)                            |
+| AI                | Claude API                                           |
+| Hosting           | Vercel                                               |
+| Quality checks    | ESLint, Prettier, Vitest, Playwright, GitHub Actions |
 
 All AI calls run on the server, so API keys never reach the browser.
 
@@ -99,15 +102,16 @@ rules are in `supabase/migrations`; run them once in the Supabase SQL editor.
 For deployment, add the same two variables in Vercel under Settings,
 Environment Variables, as type Config for all environments, then redeploy.
 
-Resume reading also needs `ANTHROPIC_API_KEY` (from console.anthropic.com).
+Resume reading, interview questions and feedback also need `ANTHROPIC_API_KEY` (from console.anthropic.com).
 Add it to `.env.local`, and in Vercel as type Secret for all environments.
 
 Then open http://localhost:3000.
 
-| Command             | What it does                   |
-| ------------------- | ------------------------------ |
-| `npm run lint`      | Lint the code                  |
-| `npm run typecheck` | Check TypeScript types         |
-| `npm test`          | Run unit tests                 |
-| `npm run format`    | Format all files with Prettier |
-| `npm run build`     | Build for production           |
+| Command             | What it does                      |
+| ------------------- | --------------------------------- |
+| `npm run lint`      | Lint the code                     |
+| `npm run typecheck` | Check TypeScript types            |
+| `npm test`          | Run unit tests                    |
+| `npm run test:e2e`  | Run browser tests (after a build) |
+| `npm run format`    | Format all files with Prettier    |
+| `npm run build`     | Build for production              |
