@@ -1,20 +1,52 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { startPractice } from "@/app/practice/actions";
 import { interviewLanguages } from "@/lib/interview/schema";
+import { MAX_PASTE_LENGTH } from "@/lib/jobs/extract-schema";
+import { MAX_IMPORT_BYTES, importFileText } from "@/lib/jobs/linkedin-import";
 import { MAX_DESCRIPTION_LENGTH } from "@/lib/jobs/prep-schema";
 import { durations, interviewKinds, jobStatuses } from "@/lib/jobs/schema";
 import {
   addInterview,
   addJob,
   createPrepPlan,
+  importLinkedInJobs,
+  type ImportState,
   saveDescription,
   type JobFormState,
 } from "./actions";
 
 const initial: JobFormState = { error: null };
+
+/** One paste of the job page, read by the AI. */
+export function PasteJobForm() {
+  const [state, action, pending] = useActionState(addJob, initial);
+  return (
+    <form action={action} className="flex flex-col gap-3">
+      <textarea
+        name="posting"
+        rows={6}
+        required
+        maxLength={MAX_PASTE_LENGTH}
+        dir="rtl"
+        aria-label="עמוד המשרה"
+        placeholder="מלינקדאין: פותחים את המשרה, מסמנים הכל, מעתיקים ומדביקים כאן. מאתר של חברה: מספיק להדביק את הקישור."
+        className={inputStyles}
+      />
+      {state.error && <ErrorText>{state.error}</ErrorText>}
+      <Button
+        type="submit"
+        variant="lime"
+        disabled={pending}
+        className="w-full sm:w-fit"
+      >
+        {pending ? "קורא את המשרה..." : "להוסיף משרה"}
+      </Button>
+    </form>
+  );
+}
 
 export function AddJobForm() {
   const [state, action, pending] = useActionState(addJob, initial);
@@ -68,8 +100,13 @@ export function AddJobForm() {
           <ErrorText>{state.error}</ErrorText>
         </div>
       )}
-      <Button type="submit" disabled={pending} className="sm:w-fit">
-        {pending ? "שומר..." : "להוסיף משרה"}
+      <Button
+        type="submit"
+        variant="quiet"
+        disabled={pending}
+        className="sm:w-fit"
+      >
+        {pending ? "שומר..." : "להוסיף ידנית"}
       </Button>
     </form>
   );
@@ -243,5 +280,70 @@ export function JobPracticeForm({ jobId }: { jobId: string }) {
           : "להתחיל תרגול למשרה הזו"}
       </Button>
     </form>
+  );
+}
+
+/**
+ * Imports the jobs from LinkedIn's data export. The archive is opened here in
+ * the browser, and only the job applications file is sent to the server.
+ */
+export function ImportLinkedInForm() {
+  const [state, action, pending] = useActionState<ImportState, FormData>(
+    importLinkedInJobs,
+    { error: null },
+  );
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [reading, startReading] = useTransition();
+
+  function onFile(file: File | undefined) {
+    setFileError(null);
+    if (!file) return;
+    if (file.size > MAX_IMPORT_BYTES) {
+      setFileError("הקובץ גדול מדי.");
+      return;
+    }
+    startReading(async () => {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const csv = importFileText(file.name, bytes);
+      if (!csv) {
+        setFileError(
+          "לא מצאנו בקובץ את רשימת המשרות. צריך את הקובץ שלינקדאין שלחה, או את קובץ המשרות שבתוכו.",
+        );
+        return;
+      }
+      const data = new FormData();
+      data.set("csv", csv);
+      action(data);
+    });
+  }
+
+  const busy = pending || reading;
+  return (
+    <div className="flex flex-col gap-3">
+      <label className="flex flex-col gap-2 font-bold">
+        הקובץ מלינקדאין
+        <input
+          type="file"
+          accept=".zip,.csv,application/zip,text/csv"
+          disabled={busy}
+          onChange={(e) => onFile(e.target.files?.[0])}
+          className="file:bg-violet text-sm file:me-3 file:min-h-11 file:rounded-full file:border-0 file:px-4 file:font-bold file:text-white"
+        />
+      </label>
+      {busy && <p className="text-muted">מייבא...</p>}
+      {(fileError || state.error) && (
+        <ErrorText>{fileError ?? state.error}</ErrorText>
+      )}
+      {!busy && state.added !== undefined && (
+        <p role="status" className="text-success-ink font-bold">
+          {state.added > 0
+            ? `נוספו ${state.added} משרות.`
+            : "כל המשרות מהקובץ כבר נמצאות כאן."}
+          {state.added > 0 && state.skipped
+            ? ` ${state.skipped} כבר היו כאן.`
+            : ""}
+        </p>
+      )}
+    </div>
   );
 }

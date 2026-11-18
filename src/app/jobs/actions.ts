@@ -3,6 +3,14 @@
 import { refresh } from "next/cache";
 import { AiError } from "@/lib/ai/client";
 import { limitWindowStart, usageStatus } from "@/lib/interview/limits";
+import { extractJob } from "@/lib/jobs/extract";
+import { checkJobLink, fetchJobPage } from "@/lib/jobs/fetch-page";
+import {
+  DAILY_JOB_LIMIT,
+  MAX_PASTE_LENGTH,
+  validatePaste,
+} from "@/lib/jobs/extract-schema";
+import { readLinkedInJobs } from "@/lib/jobs/linkedin-import";
 import { writePrepPlan } from "@/lib/jobs/prep";
 import { DAILY_PREP_LIMIT, validateDescription } from "@/lib/jobs/prep-schema";
 import { resumeSchema } from "@/lib/resume/schema";
@@ -31,18 +39,95 @@ const optional = (value: FormDataEntryValue | null, max: number) => {
   return text ? text.slice(0, max) : null;
 };
 
-/** Adds a job and opens its page. */
+const pasteMessages: Record<AiError["reason"], string> = {
+  config: "קריאת משרות עדיין לא מוגדרת. אפשר להוסיף ידנית בינתיים.",
+  auth: "קריאת משרות לא זמינה כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
+  billing:
+    "קריאת משרות לא זמינה כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
+  unreadable:
+    "לא מצאנו משרה בטקסט הזה. כדאי להעתיק את כל עמוד המשרה, או להוסיף ידנית.",
+  service: "משהו השתבש בקריאת המשרה. אפשר לנסות שוב.",
+};
+
+/**
+ * Adds a job and opens its page. Either from one pasted job page, which the
+ * AI reads, or from fields filled in by hand.
+ */
 export async function addJob(
   _prev: JobFormState,
   formData: FormData,
 ): Promise<JobFormState> {
-  const checked = validateJob(formData);
-  if (!checked.ok) return { error: checked.error };
+  const fromPaste = formData.has("posting");
+  const pasted = fromPaste ? validatePaste(formData.get("posting")) : null;
+  if (pasted && !pasted.ok) return { error: pasted.error };
+  const manual = fromPaste ? null : validateJob(formData);
+  if (manual && !manual.ok) return { error: manual.error };
 
   const { supabase, user } = await requireUser();
+  const { data: recent } = await supabase
+    .from("jobs")
+    .select("created_at")
+    .gt("created_at", limitWindowStart().toISOString());
+  const usage = usageStatus(
+    (recent ?? []).map((row) => new Date(row.created_at)),
+    new Date(),
+    DAILY_JOB_LIMIT,
+  );
+  if (usage.remaining === 0) {
+    return { error: `הגעת למגבלה של ${usage.limit} משרות חדשות ביום.` };
+  }
+
+  let row;
+  if (pasted?.ok) {
+    let pageText: string;
+    let pageLink: string | null = null;
+    if (pasted.kind === "link") {
+      const link = checkJobLink(pasted.link);
+      if (!link.ok) {
+        return {
+          error:
+            link.reason === "linkedin"
+              ? "לינקדאין לא מאפשרת לאתרים אחרים לקרוא משרות. פותחים את המשרה, מסמנים את כל הטקסט, מעתיקים ומדביקים כאן."
+              : "הקישור לא תקין.",
+        };
+      }
+      const page = await fetchJobPage(link.url);
+      if (!page) {
+        return {
+          error:
+            "לא הצלחנו לקרוא את הדף מהקישור. פותחים את המשרה, מסמנים את כל הטקסט, מעתיקים ומדביקים כאן.",
+        };
+      }
+      pageText = page.slice(0, MAX_PASTE_LENGTH);
+      pageLink = link.url.toString();
+    } else {
+      pageText = pasted.text;
+    }
+    try {
+      const job = await extractJob(pageText);
+      row = {
+        ...job,
+        link: pageLink ?? job.link,
+        status: "applied" as const,
+      };
+    } catch (error) {
+      if (error instanceof AiError) {
+        console.error("Job extraction failed:", error.reason, error.message);
+        return {
+          error: `${pasteMessages[error.reason]} (קוד שגיאה: ${error.code})`,
+        };
+      }
+      throw error;
+    }
+  } else if (manual?.ok) {
+    row = manual.value;
+  } else {
+    return { error: "צריך להדביק את עמוד המשרה." };
+  }
+
   const { data, error } = await supabase
     .from("jobs")
-    .insert({ user_id: user.id, ...checked.value })
+    .insert({ user_id: user.id, ...row })
     .select("id")
     .single();
   if (error || !data) {
@@ -241,4 +326,66 @@ export async function createPrepPlan(
   }
   refresh();
   return { error: null };
+}
+
+export type ImportState = {
+  error: string | null;
+  added?: number;
+  skipped?: number;
+};
+
+/**
+ * Adds the jobs from LinkedIn's applications file. The browser takes the file
+ * out of the archive, so only this one file is sent.
+ */
+export async function importLinkedInJobs(
+  _prev: ImportState,
+  formData: FormData,
+): Promise<ImportState> {
+  const csv = String(formData.get("csv") ?? "");
+  if (!csv || csv.length > 900_000) {
+    return { error: "הקובץ ריק או גדול מדי." };
+  }
+  const result = readLinkedInJobs(csv);
+  if (!result.ok) return { error: result.error };
+
+  const { supabase, user } = await requireUser();
+  const { data: existing } = await supabase
+    .from("jobs")
+    .select("company, title, link");
+  const known = new Set(
+    (existing ?? []).flatMap((j) => [
+      ...(j.link ? [j.link] : []),
+      `${j.company}|${j.title}`.toLowerCase(),
+    ]),
+  );
+  const fresh = result.jobs.filter(
+    (j) =>
+      !(j.link && known.has(j.link)) &&
+      !known.has(`${j.company}|${j.title}`.toLowerCase()),
+  );
+  if (fresh.length === 0) {
+    return { error: null, added: 0, skipped: result.jobs.length };
+  }
+
+  const { error } = await supabase.from("jobs").insert(
+    fresh.map((j) => ({
+      user_id: user.id,
+      company: j.company,
+      title: j.title,
+      link: j.link,
+      status: "applied",
+      notes: j.appliedAt ? `הוגש בלינקדאין: ${j.appliedAt}` : null,
+    })),
+  );
+  if (error) {
+    console.error("Importing jobs failed:", error.message);
+    return { error: "לא הצלחנו לשמור את המשרות. אפשר לנסות שוב." };
+  }
+  refresh();
+  return {
+    error: null,
+    added: fresh.length,
+    skipped: result.jobs.length - fresh.length,
+  };
 }

@@ -8,7 +8,7 @@ import { upcomingInterviews } from "@/lib/jobs/queries";
 import { activeStatuses, jobStatuses, parseStatus } from "@/lib/jobs/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
-import { AddJobForm } from "./forms";
+import { AddJobForm, ImportLinkedInForm, PasteJobForm } from "./forms";
 import { InterviewCard, JobName } from "./interview-card";
 
 export const metadata: Metadata = { title: "משרות · Interview Coach" };
@@ -57,12 +57,11 @@ async function JobsContent() {
 
   return (
     <>
-      <Card
-        tone={upcoming.length ? "lilac" : "white"}
-        className="gap-4 p-6 sm:p-8"
-      >
-        <h2 className="text-2xl font-extrabold">ראיונות קרובים</h2>
-        {upcoming.length ? (
+      {all.length === 0 && <AddJobCard first />}
+
+      {upcoming.length > 0 && (
+        <Card tone="lilac" className="gap-4 p-6 sm:p-8">
+          <h2 className="text-2xl font-extrabold">ראיונות קרובים</h2>
           <ul className="flex flex-col gap-3">
             {upcoming.map((interview) => (
               <InterviewCard
@@ -72,28 +71,24 @@ async function JobsContent() {
               />
             ))}
           </ul>
-        ) : (
-          <p className="text-muted">
-            אין ראיונות בלוח. כשנקבע ראיון, מוסיפים אותו בעמוד של המשרה.
-          </p>
-        )}
-      </Card>
+        </Card>
+      )}
 
-      <Card className="gap-4 p-6 sm:p-8">
-        <h2 className="text-2xl font-extrabold">משרות פעילות</h2>
-        {active.length ? (
+      {active.length > 0 && (
+        <Card className="gap-4 p-6 sm:p-8">
+          <h2 className="text-2xl font-extrabold">משרות פעילות</h2>
           <JobList jobs={active} />
-        ) : (
-          <p className="text-muted">
-            עוד אין משרות. מוסיפים את הראשונה כאן למטה.
-          </p>
-        )}
-      </Card>
+          {upcoming.length === 0 && (
+            <p className="text-muted text-sm">
+              קיבלת ראיון? מוסיפים אותו בעמוד של המשרה, והוא יופיע כאן למעלה.
+            </p>
+          )}
+        </Card>
+      )}
 
-      <Card className="gap-4 p-6 sm:p-8">
-        <h2 className="text-2xl font-extrabold">להוסיף משרה</h2>
-        <AddJobForm />
-      </Card>
+      {all.length > 0 && <AddJobCard />}
+
+      <ImportCard />
 
       {closed.length > 0 && (
         <details className="group">
@@ -137,5 +132,77 @@ function JobList({
         </li>
       ))}
     </ul>
+  );
+}
+
+function AddJobCard({ first = false }: { first?: boolean }) {
+  return (
+    <Card tone={first ? "orange" : "white"} className="gap-4 p-6 sm:p-8">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl font-extrabold">
+          {first ? "מוסיפים את המשרה הראשונה" : "להוסיף משרה"}
+        </h2>
+        <p className={first ? "text-lg" : "text-muted"}>
+          הדבקה אחת של עמוד המשרה, ואנחנו מוציאים ממנו את החברה, התפקיד
+          והדרישות.
+        </p>
+      </div>
+      <PasteJobForm />
+      <details>
+        <summary className="text-muted cursor-pointer font-bold">
+          או להוסיף ידנית
+        </summary>
+        <div className="mt-4">
+          <AddJobForm />
+        </div>
+      </details>
+    </Card>
+  );
+}
+
+function ImportCard() {
+  return (
+    <Card tone="lilac" className="gap-4 p-6 sm:p-8">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl font-extrabold">
+          כל המשרות שהגשת בלינקדאין, בבת אחת
+        </h2>
+        <p>
+          לינקדאין מאפשרת להוריד קובץ עם המשרות שהגשת אליהן. מעלים אותו כאן,
+          וכולן נכנסות לרשימה.
+        </p>
+      </div>
+      <details>
+        <summary className="cursor-pointer font-bold">
+          איך מורידים את הקובץ
+        </summary>
+        <ol className="mt-3 flex list-decimal flex-col gap-2 ps-5">
+          <li>
+            בלינקדאין במחשב, לוחצים לפי הסדר:
+            <span
+              dir="ltr"
+              className="mt-1 flex flex-col items-end font-mono text-sm"
+            >
+              <span>Me</span>
+              <span>Settings &amp; Privacy</span>
+              <span>Data privacy</span>
+              <span>Get a copy of your data</span>
+            </span>
+          </li>
+          <li>
+            בוחרים את האפשרות שמאפשרת לבחור מידע מסוים, ומסמנים את המשרות שהגשת
+            אליהן.
+          </li>
+          <li>
+            לינקדאין שולחת מייל כשהקובץ מוכן, בדרך כלל תוך כמה דקות עד יום.
+          </li>
+          <li>מעלים כאן את הקובץ כמו שהוא, בלי לפתוח אותו.</li>
+        </ol>
+      </details>
+      <ImportLinkedInForm />
+      <p className="text-muted text-sm">
+        הקובץ נפתח אצלך בדפדפן, ורק רשימת המשרות נשלחת אלינו.
+      </p>
+    </Card>
   );
 }
