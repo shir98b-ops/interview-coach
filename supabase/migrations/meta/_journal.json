@@ -36,6 +36,13 @@
       "when": 1795040989513,
       "tag": "0004_feedback_and_account_deletion",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795042625723,
+      "tag": "0005_jobs_and_interviews",
+      "breakpoints": true
     }
   ]
 }

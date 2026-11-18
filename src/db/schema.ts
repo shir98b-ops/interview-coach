@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  index,
   integer,
   jsonb,
   pgPolicy,
@@ -175,4 +176,45 @@ export const feedback = pgTable(
     createdAt: createdAt(),
   },
   () => [ownRowsOnly("feedback")],
+).enableRLS();
+
+/** A job the user saved or applied to, and where the application stands. */
+export const jobs = pgTable(
+  "jobs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: userId(),
+    company: text("company").notNull(),
+    title: text("title").notNull(),
+    link: text("link"),
+    status: text("status").notNull().default("applied"),
+    notes: text("notes"),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  () => [ownRowsOnly("jobs")],
+).enableRLS();
+
+/** A scheduled interview for one of the user's jobs. */
+export const interviews = pgTable(
+  "interviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: userId(),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    durationMinutes: smallint("duration_minutes").notNull().default(60),
+    location: text("location"),
+    notes: text("notes"),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    ownRowsOnly("interviews"),
+    index("interviews_user_starts_idx").on(table.userId, table.startsAt),
+  ],
 ).enableRLS();
