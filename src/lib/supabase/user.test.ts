@@ -14,7 +14,16 @@ describe("getSignedInUser", () => {
     expect(await getSignedInUser(supabase)).toEqual({
       id: "u1",
       email: "a@b.co",
+      address: null,
     });
+  });
+
+  it("reads the chosen form of address", async () => {
+    const supabase = clientWith({
+      data: { claims: { sub: "u1", user_metadata: { address: "f" } } },
+      error: null,
+    });
+    expect((await getSignedInUser(supabase))?.address).toBe("f");
   });
 
   it("returns null when there is no valid session", async () => {

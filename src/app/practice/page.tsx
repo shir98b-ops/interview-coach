@@ -55,9 +55,9 @@ async function PracticeContent() {
   if (!profile || !roles?.length) {
     return (
       <Card className="gap-4 p-8">
-        <h2 className="text-2xl font-extrabold">קודם כל, ספר לנו עליך</h2>
+        <h2 className="text-2xl font-extrabold">קודם כל, כמה פרטים עליך</h2>
         <p className="text-muted text-lg">
-          השאלות מותאמות לקורות החיים ולתפקיד שאתה רוצה, אז צריך קודם
+          השאלות מותאמות לקורות החיים ולתפקיד המבוקש, אז צריך קודם
           {profile
             ? " להוסיף לפחות תפקיד אחד."
             : " להעלות קורות חיים ולבחור תפקיד."}

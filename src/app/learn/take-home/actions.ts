@@ -19,11 +19,11 @@ import { getSignedInUser } from "@/lib/supabase/user";
 export type TakeHomeState = { error: string | null };
 
 const aiMessages: Record<AiError["reason"], string> = {
-  config: "מבחני הבית עדיין לא מוגדרים. נסה שוב מאוחר יותר.",
+  config: "מבחני הבית עדיין לא מוגדרים. אפשר לנסות שוב מאוחר יותר.",
   auth: "השירות לא זמין כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
   billing: "השירות לא זמין כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
-  unreadable: "לא הצלחנו להכין מבחן בית. נסה שוב.",
-  service: "משהו השתבש. נסה שוב.",
+  unreadable: "לא הצלחנו להכין מבחן בית. אפשר לנסות שוב.",
+  service: "משהו השתבש. אפשר לנסות שוב.",
 };
 
 function aiError(error: AiError, what: string): TakeHomeState {
@@ -58,7 +58,7 @@ export async function startTakeHome(
       .select("created_at")
       .gt("created_at", limitWindowStart().toISOString()),
   ]);
-  if (!role) return { error: "בחר אחד מהתפקידים שלך." };
+  if (!role) return { error: "צריך לבחור אחד מהתפקידים שלך." };
 
   const usage = usageStatus(
     (recent ?? []).map((row) => new Date(row.created_at)),
@@ -74,7 +74,7 @@ export async function startTakeHome(
 
   let brief;
   try {
-    brief = await generateTakeHome(role, difficulty, language);
+    brief = await generateTakeHome(role, difficulty, language, user.address);
   } catch (error) {
     if (error instanceof AiError) return aiError(error, "Take-home generation");
     throw error;
@@ -93,7 +93,7 @@ export async function startTakeHome(
     .single();
   if (error || !created) {
     console.error("Saving take-home failed:", error?.message);
-    return { error: "לא הצלחנו לשמור את מבחן הבית. נסה שוב." };
+    return { error: "לא הצלחנו לשמור את מבחן הבית. אפשר לנסות שוב." };
   }
   redirect(`/learn/take-home/${created.id}`);
 }
@@ -107,7 +107,7 @@ export async function submitTakeHome(
   formData: FormData,
 ): Promise<TakeHomeState> {
   const id = String(formData.get("id") ?? "");
-  const { supabase } = await requireUser(`/learn/take-home/${id}`);
+  const { supabase, user } = await requireUser(`/learn/take-home/${id}`);
 
   // Row level security returns nothing for another user's take-home.
   const { data: takeHome } = await supabase
@@ -131,7 +131,7 @@ export async function submitTakeHome(
       .is("submission", null);
     if (error) {
       console.error("Saving submission failed:", error.message);
-      return { error: "לא הצלחנו לשמור את ההגשה. נסה שוב." };
+      return { error: "לא הצלחנו לשמור את ההגשה. אפשר לנסות שוב." };
     }
   }
 
@@ -141,7 +141,7 @@ export async function submitTakeHome(
   } | null;
   let feedback;
   try {
-    feedback = await evaluateTakeHome(role, brief, submission);
+    feedback = await evaluateTakeHome(role, brief, submission, user.address);
   } catch (error) {
     refresh();
     if (error instanceof AiError) return aiError(error, "Take-home scoring");
@@ -154,7 +154,7 @@ export async function submitTakeHome(
     .eq("id", id);
   if (error) {
     console.error("Saving take-home feedback failed:", error.message);
-    return { error: "לא הצלחנו לשמור את המשוב. נסה שוב." };
+    return { error: "לא הצלחנו לשמור את המשוב. אפשר לנסות שוב." };
   }
   refresh();
   return { error: null };

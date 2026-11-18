@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { AddressPicker } from "@/components/address-picker";
 import { Loading } from "@/components/app-shell";
-import { Button, Card, PageHeading, inputStyles } from "@/components/ui";
+import {
+  Button,
+  ButtonLink,
+  Card,
+  PageHeading,
+  inputStyles,
+} from "@/components/ui";
 import type { ResumeData } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
@@ -69,17 +76,42 @@ async function ProfileContent({
         </p>
       )}
 
+      <Card className="gap-4 p-6 sm:p-8">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-extrabold">איך לפנות אליך?</h2>
+          <p className="text-muted">
+            בעברית, שאלות, משובים ושיעורים משתנים לפי לשון הפנייה. אפשר לשנות
+            בכל רגע.
+          </p>
+        </div>
+        <AddressPicker current={user.address} next="/profile" />
+      </Card>
+
       <Card className="gap-5 p-6 sm:p-8">
         <h2 className="text-2xl font-extrabold">קורות חיים</h2>
         {resume && <ResumeSummary resume={resume} />}
         <ResumeFlow hasProfile={Boolean(resume)} />
       </Card>
 
+      {resume && (
+        <Card tone="orange" className="gap-3 p-6 sm:p-8">
+          <h2 className="text-2xl font-extrabold">
+            כמה חזקים קורות החיים שלך?
+          </h2>
+          <p className="text-lg">
+            מקבלים ציון מתוך 100 לפי התפקיד, ושורות מוכנות לשכתוב.
+          </p>
+          <ButtonLink href="/profile/review" className="w-full sm:w-fit">
+            לדרג את קורות החיים
+          </ButtonLink>
+        </Card>
+      )}
+
       <Card className="gap-5 p-6 sm:p-8">
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-extrabold">התפקידים שלי</h2>
           <p className="text-muted">
-            התפקידים שאליהם אתה מתכונן. השאלות בתרגול יותאמו אליהם.
+            התפקידים שאליהם מתכוננים. השאלות בתרגול יותאמו אליהם.
           </p>
         </div>
         {roles && roles.length > 0 && (

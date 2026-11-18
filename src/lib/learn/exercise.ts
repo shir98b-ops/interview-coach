@@ -1,5 +1,6 @@
 import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import {
   exerciseEvaluationSchema,
@@ -12,6 +13,7 @@ import type { Lesson } from "./lessons";
 export async function evaluateExercise(
   lesson: Lesson,
   answer: string,
+  address: Address | null = null,
 ): Promise<ExerciseFeedback> {
   let response;
   try {
@@ -36,7 +38,7 @@ it and would work in a real interview. A very short or off-topic answer
 scores 1 or 2. Then say what worked, the one or two changes that would help
 most, and a short stronger version built from the candidate's own story.
 Speak to the candidate directly. Write everything in the language of the
-candidate's answer.
+candidate's answer. ${addressInstruction(address)}
 
 <question>${lesson.exercise.question}</question>
 <candidate_answer>

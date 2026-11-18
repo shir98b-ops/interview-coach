@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { AddressPicker } from "@/components/address-picker";
 import { Loading } from "@/components/app-shell";
 import { ButtonLink, Card, Chip } from "@/components/ui";
 import { getLearningState } from "@/lib/learn/progress";
-import { lessons } from "@/lib/learn/lessons";
+import { forAddress, lessons } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
 
@@ -49,7 +50,8 @@ async function Dashboard() {
   const latest = scores[0];
   const change = scores.length > 1 ? scores[0] - scores[1] : null;
   const ready = Boolean(profile) && (roleCount ?? 0) > 0;
-  const lesson = learning.recommended;
+  const lesson =
+    learning.recommended && forAddress(learning.recommended, user.address);
 
   return (
     <>
@@ -57,11 +59,17 @@ async function Dashboard() {
         {firstName ? `היי ${firstName}!` : "היי!"}
       </h1>
 
+      {!user.address && (
+        <Card tone="lilac" className="gap-4">
+          <h2 className="text-xl font-extrabold">איך לפנות אליך?</h2>
+          <p>כדי שהשאלות, המשובים והשיעורים ידברו אליך נכון.</p>
+          <AddressPicker current={null} next="/dashboard" />
+        </Card>
+      )}
+
       {!ready ? (
         <Card className="gap-5 p-8">
-          <h2 className="text-2xl font-extrabold">
-            בוא נכין אותך לתרגול הראשון
-          </h2>
+          <h2 className="text-2xl font-extrabold">מתכוננים לתרגול הראשון</h2>
           <ol className="flex flex-col gap-3 text-lg">
             <Step done={Boolean(profile)} number={1}>
               מעלים קורות חיים ומאשרים את הפרטים

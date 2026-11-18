@@ -39,8 +39,7 @@ export function ResumeFlow({ hasProfile }: { hasProfile: boolean }) {
         className={`${input} file:bg-violet-soft file:text-violet-dark file:me-4 file:rounded-xl file:border-0 file:px-4 file:py-2 file:font-bold`}
       />
       <p className="text-muted text-sm">
-        קובץ PDF עד 4 מגה. הקובץ נקרא פעם אחת ולא נשמר. נשמרים רק הפרטים שאתה
-        מאשר.
+        קובץ PDF עד 4 מגה. הקובץ נקרא פעם אחת ולא נשמר. נשמרים רק הפרטים מאשר.
       </p>
       {state.status === "error" && <ErrorText>{state.error}</ErrorText>}
       <Button type="submit" disabled={pending} className="w-full sm:w-fit">
@@ -82,7 +81,8 @@ function ReviewForm({
       }}
     >
       <p className="text-muted">
-        בדוק את הפרטים שמצאנו ותקן מה שלא מדויק. שום דבר לא נשמר עד שתאשר.
+        כדאי לעבור על הפרטים שמצאנו ולתקן מה שלא מדויק. שום דבר לא נשמר לפני
+        האישור.
       </p>
 
       <Field label="שם מלא">

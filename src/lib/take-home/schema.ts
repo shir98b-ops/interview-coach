@@ -179,7 +179,7 @@ export function validateSubmission(
 ): { ok: true; text: string } | { ok: false; error: string } {
   const text = typeof value === "string" ? value.trim() : "";
   if (text.length < 50) {
-    return { ok: false, error: "ההגשה קצרה מדי. כתוב לפחות כמה פסקאות." };
+    return { ok: false, error: "ההגשה קצרה מדי. צריך לפחות כמה פסקאות." };
   }
   if (text.length > MAX_SUBMISSION_LENGTH) {
     return {

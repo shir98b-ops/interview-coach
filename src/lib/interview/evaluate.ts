@@ -1,5 +1,6 @@
 import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import {
   evaluationSchema,
@@ -33,6 +34,7 @@ the interview was held in, the language of the questions.`;
 export async function evaluateInterview(
   role: string,
   items: AnsweredQuestion[],
+  address: Address | null = null,
 ): Promise<Map<number, AnswerFeedback>> {
   const transcript = items
     .map(
@@ -60,6 +62,7 @@ ${item.answer}
         {
           role: "user",
           content: `${instructions}
+${addressInstruction(address)}
 
 <role>${role}</role>
 

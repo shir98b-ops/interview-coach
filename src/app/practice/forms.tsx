@@ -111,7 +111,7 @@ export function AnswerForm({
         required
         rows={10}
         maxLength={MAX_ANSWER_LENGTH}
-        placeholder="כתוב את התשובה כמו שהיית אומר אותה בראיון."
+        placeholder="התשובה, כמו שהיית עונה בראיון."
         className={`${inputStyles} min-h-56`}
       />
       <p className="text-muted text-sm">

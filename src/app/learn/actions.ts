@@ -20,11 +20,11 @@ export type ExerciseState =
   | { status: "done"; feedback: ExerciseFeedback };
 
 const aiMessages: Record<AiError["reason"], string> = {
-  config: "הבדיקה עדיין לא מוגדרת. נסה שוב מאוחר יותר.",
+  config: "הבדיקה עדיין לא מוגדרת. אפשר לנסות שוב מאוחר יותר.",
   auth: "הבדיקה לא זמינה כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
   billing: "הבדיקה לא זמינה כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
-  unreadable: "לא הצלחנו לבדוק את התשובה. נסה שוב.",
-  service: "משהו השתבש בבדיקת התשובה. נסה שוב.",
+  unreadable: "לא הצלחנו לבדוק את התשובה. אפשר לנסות שוב.",
+  service: "משהו השתבש בבדיקת התשובה. אפשר לנסות שוב.",
 };
 
 /** Checks a lesson exercise answer and saves it with its feedback. */
@@ -62,7 +62,7 @@ export async function submitExercise(
 
   let feedback;
   try {
-    feedback = await evaluateExercise(lesson, answer.text);
+    feedback = await evaluateExercise(lesson, answer.text, user.address);
   } catch (error) {
     if (error instanceof AiError) {
       console.error("Exercise feedback failed:", error.reason, error.message);
@@ -82,7 +82,10 @@ export async function submitExercise(
   });
   if (error) {
     console.error("Saving lesson attempt failed:", error.message);
-    return { status: "error", error: "לא הצלחנו לשמור את התשובה. נסה שוב." };
+    return {
+      status: "error",
+      error: "לא הצלחנו לשמור את התשובה. אפשר לנסות שוב.",
+    };
   }
 
   refresh();

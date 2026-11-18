@@ -59,7 +59,7 @@ async function TakeHomes() {
         <Card className="gap-4 p-8">
           <h2 className="text-2xl font-extrabold">קודם בוחרים תפקיד</h2>
           <p className="text-muted text-lg">
-            מבחן הבית נכתב לפי התפקיד שאליו אתה מתכונן.
+            מבחן הבית נכתב לפי התפקיד שאליו מתכוננים.
           </p>
           <ButtonLink href="/profile" variant="lime" className="w-fit">
             להוסיף תפקיד

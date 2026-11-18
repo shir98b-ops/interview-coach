@@ -44,7 +44,7 @@ export function validateResumeFile(
   file: File | null,
 ): { ok: true; file: File } | { ok: false; error: string } {
   if (!file || file.size === 0) {
-    return { ok: false, error: "בחר קובץ PDF להעלאה." };
+    return { ok: false, error: "צריך לבחור קובץ PDF להעלאה." };
   }
   if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
     return { ok: false, error: "כרגע אפשר להעלות רק קבצי PDF." };

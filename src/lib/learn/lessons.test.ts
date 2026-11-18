@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getLesson, lessons, recommendLesson } from "./lessons";
+import { forAddress, getLesson, lessons, recommendLesson } from "./lessons";
 
 const scores = (content: number, structure: number, clarity: number) => ({
   content,
@@ -65,5 +65,29 @@ describe("recommendLesson", () => {
         lessons.map((l) => l.slug),
       ),
     ).toBeUndefined();
+  });
+});
+
+describe("forAddress", () => {
+  it("resolves every marked word in every lesson", () => {
+    for (const lesson of lessons) {
+      for (const address of ["m", "f", null] as const) {
+        const l = forAddress(lesson, address);
+        const texts = [
+          l.title,
+          l.summary,
+          l.exercise.question,
+          l.exercise.hint,
+          ...l.sections.flatMap((s) => [s.heading, s.body, s.example ?? ""]),
+        ];
+        for (const text of texts) expect(text).not.toMatch(/[{}]/);
+      }
+    }
+  });
+
+  it("speaks to the chosen gender", () => {
+    const star = getLesson("star")!;
+    expect(forAddress(star, "f").exercise.hint).toMatch(/^כתבי/);
+    expect(forAddress(star, "m").exercise.hint).toMatch(/^כתוב/);
   });
 });

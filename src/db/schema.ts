@@ -146,3 +146,20 @@ export const takeHomes = pgTable(
   },
   () => [ownRowsOnly("take_homes")],
 ).enableRLS();
+
+/** An AI rating of the user's resume, for a target role or in general. */
+export const resumeReviews = pgTable(
+  "resume_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: userId(),
+    targetRoleId: uuid("target_role_id").references(() => targetRoles.id, {
+      onDelete: "set null",
+    }),
+    roleTitle: text("role_title"),
+    score: smallint("score").notNull(),
+    feedback: jsonb("feedback").notNull(),
+    createdAt: createdAt(),
+  },
+  () => [ownRowsOnly("resume_reviews")],
+).enableRLS();

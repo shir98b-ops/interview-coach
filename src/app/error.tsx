@@ -9,7 +9,7 @@ export default function AppError({ reset }: { reset: () => void }) {
       <Card className="items-start gap-4 p-8">
         <h1 className="text-3xl font-extrabold">משהו השתבש</h1>
         <p className="text-muted text-lg">
-          לא הצלחנו לטעון את העמוד. נסה שוב בעוד רגע.
+          לא הצלחנו לטעון את העמוד. אפשר לנסות שוב בעוד רגע.
         </p>
         <Button type="button" onClick={reset}>
           לנסות שוב

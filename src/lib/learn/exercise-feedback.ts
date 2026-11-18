@@ -31,9 +31,9 @@ export function readExerciseFeedback(value: unknown): ExerciseFeedback | null {
 
 /** A short word of encouragement for a 1 to 5 score. */
 export function scoreLabel(score: number): string {
-  if (score >= 5) return "מצוין! מוכן לראיון אמיתי";
+  if (score >= 5) return "מצוין! תשובה שמוכנה לראיון אמיתי";
   if (score >= 4) return "חזק מאוד";
   if (score >= 3) return "בכיוון הנכון";
   if (score >= 2) return "יש על מה לעבוד";
-  return "בוא ננסה שוב";
+  return "ננסה שוב?";
 }

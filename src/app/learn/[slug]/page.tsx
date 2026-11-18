@@ -6,7 +6,8 @@ import { Loading } from "@/components/app-shell";
 import { Card, Chip } from "@/components/ui";
 import { rubric } from "@/lib/interview/feedback";
 import { readExerciseFeedback } from "@/lib/learn/exercise-feedback";
-import { getLesson, lessons } from "@/lib/learn/lessons";
+import { g } from "@/lib/address";
+import { forAddress, getLesson, lessons } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { ExerciseForm } from "../exercise-form";
@@ -20,26 +21,55 @@ export async function generateMetadata({
   params,
 }: PageProps<"/learn/[slug]">): Promise<Metadata> {
   const lesson = getLesson((await params).slug);
-  return { title: `${lesson?.title ?? "שיעור"} · Interview Coach` };
+  return {
+    title: `${lesson ? g(lesson.title, null) : "שיעור"} · Interview Coach`,
+  };
 }
 
 export default async function LessonPage({
   params,
 }: PageProps<"/learn/[slug]">) {
-  const lesson = getLesson((await params).slug);
-  if (!lesson) notFound();
-  const track = lessons.filter((l) => l.track === lesson.track);
-  const next = track[track.indexOf(lesson) + 1];
+  const { slug } = await params;
+  if (!getLesson(slug)) notFound();
 
   return (
     <article className="mx-auto flex w-full max-w-3xl flex-col gap-8">
       <Link href="/learn" className="text-violet w-fit font-medium">
         → לכל השיעורים
       </Link>
+      <Suspense fallback={<Loading />}>
+        <LessonContent slug={slug} />
+      </Suspense>
+    </article>
+  );
+}
+
+/** The lesson, worded for the signed-in user, with their past answers. */
+async function LessonContent({ slug }: { slug: string }) {
+  const supabase = await createClient();
+  const user = await getSignedInUser(supabase);
+  if (!user) redirect(`/login?next=/learn/${slug}`);
+
+  const original = getLesson(slug)!;
+  const lesson = forAddress(original, user.address);
+  const track = lessons.filter((l) => l.track === original.track);
+  const position = track.indexOf(original);
+  const next =
+    track[position + 1] && forAddress(track[position + 1], user.address);
+
+  const { data: attempts } = await supabase
+    .from("lesson_attempts")
+    .select("id, answer, feedback, created_at")
+    .eq("lesson_slug", slug)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  return (
+    <>
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           <Chip tone="violet">
-            שיעור {track.indexOf(lesson) + 1} מתוך {track.length}
+            שיעור {position + 1} מתוך {track.length}
           </Chip>
           <Chip>
             {lesson.minutes} דקות ·{" "}
@@ -79,9 +109,7 @@ export default async function LessonPage({
         <ExerciseForm lesson={lesson.slug} hint={lesson.exercise.hint} />
       </Card>
 
-      <Suspense fallback={<Loading />}>
-        <PastAttempts slug={lesson.slug} />
-      </Suspense>
+      <PastAttempts attempts={attempts ?? []} />
 
       {next && (
         <Link
@@ -92,22 +120,21 @@ export default async function LessonPage({
           <span className="text-xl font-bold">{next.title}</span>
         </Link>
       )}
-    </article>
+    </>
   );
 }
 
-async function PastAttempts({ slug }: { slug: string }) {
-  const supabase = await createClient();
-  const user = await getSignedInUser(supabase);
-  if (!user) redirect(`/login?next=/learn/${slug}`);
-
-  const { data: attempts } = await supabase
-    .from("lesson_attempts")
-    .select("id, answer, feedback, created_at")
-    .eq("lesson_slug", slug)
-    .order("created_at", { ascending: false })
-    .limit(10);
-  if (!attempts?.length) return null;
+function PastAttempts({
+  attempts,
+}: {
+  attempts: {
+    id: string;
+    answer: string;
+    feedback: unknown;
+    created_at: string;
+  }[];
+}) {
+  if (!attempts.length) return null;
 
   return (
     <section className="flex flex-col gap-4">
