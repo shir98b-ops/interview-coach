@@ -6,6 +6,7 @@ import type { ResumeData } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { addTargetRole, removeTargetRole } from "./actions";
 import { ResumeFlow } from "./resume-flow";
+import { getSignedInUser } from "@/lib/supabase/user";
 
 export const metadata: Metadata = { title: "Your profile · Interview Coach" };
 
@@ -33,9 +34,7 @@ async function ProfileContent({
 }: Pick<PageProps<"/profile">, "searchParams">) {
   const { saved } = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSignedInUser(supabase);
   if (!user) redirect("/login?next=/profile");
 
   const [{ data: profile }, { data: roles }] = await Promise.all([

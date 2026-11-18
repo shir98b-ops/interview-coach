@@ -9,6 +9,7 @@ import {
   type ResumeData,
 } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
+import { getSignedInUser } from "@/lib/supabase/user";
 
 export type ExtractState =
   | { status: "idle" }
@@ -27,9 +28,7 @@ const extractionMessages: Record<ExtractionError["reason"], string> = {
 
 async function requireUser() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSignedInUser(supabase);
   if (!user) redirect("/login?next=/profile");
   return { supabase, user };
 }
