@@ -20,10 +20,16 @@ resume does not state it. Keep the resume's original language.`;
 
 /** Sends a PDF resume to Claude and returns the structured details. */
 export async function extractResume(pdf: ArrayBuffer): Promise<ResumeData> {
-  if (!process.env.ANTHROPIC_API_KEY) {
+  // Keys are plain ASCII. Pasting one from a right-to-left page can add
+  // invisible direction marks or spaces, which break the request header.
+  const apiKey = (process.env.ANTHROPIC_API_KEY ?? "").replace(
+    /[^\x21-\x7e]/g,
+    "",
+  );
+  if (!apiKey) {
     throw new ExtractionError("ANTHROPIC_API_KEY is not set", "config");
   }
-  const client = new Anthropic();
+  const client = new Anthropic({ apiKey });
 
   let response;
   try {
