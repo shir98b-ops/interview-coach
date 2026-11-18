@@ -62,7 +62,8 @@ async function AccountSummary() {
         <div className="flex flex-col gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
           <h2 className="font-semibold">Practice an interview</h2>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Answer five questions tailored to your target role and resume.
+            Answer five questions tailored to your target role and resume, then
+            get scores and tips for each answer.
           </p>
           <Link href="/practice" className="font-medium underline">
             Start practicing

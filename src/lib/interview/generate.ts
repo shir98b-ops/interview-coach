@@ -2,10 +2,13 @@ import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import type { ResumeData } from "@/lib/resume/schema";
+import { bankFor } from "./question-bank";
 import {
   QUESTION_COUNT,
+  interviewLanguages,
   normalizeQuestions,
   questionSetSchema,
+  type InterviewLanguage,
   type QuestionKind,
 } from "./schema";
 
@@ -22,13 +25,16 @@ interview. Write ${QUESTION_COUNT} questions for the candidate below.
   specific item on the candidate's resume.
 - Match the seniority level. If none is given, aim for the level the resume
   suggests.
-- Ask one thing per question, the way a real interviewer would say it.
-- Write the questions in English.`;
+- Stay close to what real interviewers ask. Base at least three questions on
+  the commonly asked questions listed below, adapting them to the role and the
+  candidate's background; do not invent unusual or trick questions.
+- Ask one thing per question, the way a real interviewer would say it.`;
 
 /** Asks Claude for interview questions tailored to the role and resume. */
 export async function generateQuestions(
   target: PracticeTarget,
   resume: ResumeData,
+  language: InterviewLanguage = "en",
 ): Promise<{ kind: QuestionKind; text: string }[]> {
   const role = target.seniority
     ? `${target.title} (${target.seniority})`
@@ -50,7 +56,18 @@ export async function generateQuestions(
           role: "user",
           content: `${instructions}
 
+Write the questions in ${interviewLanguages[language]}, phrased the way a
+native-speaking interviewer would ask them (translate the listed questions
+naturally, not word for word). Keep the role title and professional terms as
+they are commonly used in that language.
+
 <role>${role}</role>
+
+<commonly_asked_questions>
+${bankFor(target.title, target.seniority)
+  .map((q) => `- ${q}`)
+  .join("\n")}
+</commonly_asked_questions>
 
 <resume>
 ${JSON.stringify(resume, null, 2)}

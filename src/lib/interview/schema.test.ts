@@ -3,6 +3,7 @@ import {
   MAX_ANSWER_LENGTH,
   QUESTION_COUNT,
   normalizeQuestions,
+  parseLanguage,
   validateAnswer,
 } from "./schema";
 
@@ -32,5 +33,14 @@ describe("validateAnswer", () => {
     expect(validateAnswer("   ").ok).toBe(false);
     expect(validateAnswer(null).ok).toBe(false);
     expect(validateAnswer("a".repeat(MAX_ANSWER_LENGTH + 1)).ok).toBe(false);
+  });
+});
+
+describe("parseLanguage", () => {
+  it("accepts Hebrew and falls back to English", () => {
+    expect(parseLanguage("he")).toBe("he");
+    expect(parseLanguage("en")).toBe("en");
+    expect(parseLanguage("fr")).toBe("en");
+    expect(parseLanguage(null)).toBe("en");
   });
 });

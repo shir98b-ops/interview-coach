@@ -40,14 +40,14 @@ export const roadmap: Stage[] = [
     title: "Written interview simulation",
     summary: "Questions tailored to the role and resume, answered in writing.",
     mvp: true,
-    status: "in-progress",
+    status: "done",
   },
   {
     number: 5,
     title: "Scoring and feedback",
     summary: "Rubric-based scores, improvement tips and a progress history.",
     mvp: true,
-    status: "planned",
+    status: "in-progress",
   },
   {
     number: 6,
