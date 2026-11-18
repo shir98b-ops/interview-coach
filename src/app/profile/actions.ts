@@ -17,6 +17,9 @@ export type ExtractState =
 
 const extractionMessages: Record<ExtractionError["reason"], string> = {
   config: "Resume reading is not set up yet. Please try again later.",
+  auth: "Resume reading is not available right now: the AI service did not accept our access key.",
+  billing:
+    "Resume reading is not available right now: the AI service account is out of credit.",
   unreadable:
     "We couldn't read this file. Try a different PDF, or one exported directly from your editor rather than scanned.",
   service: "Something went wrong while reading the file. Please try again.",
@@ -47,7 +50,10 @@ export async function extractResumeAction(
   } catch (error) {
     if (error instanceof ExtractionError) {
       console.error("Resume extraction failed:", error.reason, error.message);
-      return { status: "error", error: extractionMessages[error.reason] };
+      return {
+        status: "error",
+        error: `${extractionMessages[error.reason]} (Error code: ${error.code})`,
+      };
     }
     throw error;
   }

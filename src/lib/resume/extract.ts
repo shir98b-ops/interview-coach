@@ -6,7 +6,9 @@ import { resumeSchema, type ResumeData } from "./schema";
 export class ExtractionError extends Error {
   constructor(
     message: string,
-    readonly reason: "config" | "unreadable" | "service",
+    readonly reason: "config" | "auth" | "billing" | "unreadable" | "service",
+    /** A short code shown to the user so a failure can be diagnosed. */
+    readonly code: string = reason,
   ) {
     super(message);
   }
@@ -52,10 +54,7 @@ export async function extractResume(pdf: ArrayBuffer): Promise<ResumeData> {
       ],
     });
   } catch (error) {
-    if (error instanceof Anthropic.BadRequestError) {
-      throw new ExtractionError(error.message, "unreadable");
-    }
-    throw new ExtractionError(String(error), "service");
+    throw toExtractionError(error);
   }
 
   if (response.stop_reason === "refusal" || !response.parsed_output) {
@@ -65,4 +64,33 @@ export async function extractResume(pdf: ArrayBuffer): Promise<ResumeData> {
     );
   }
   return response.parsed_output;
+}
+
+function toExtractionError(error: unknown): ExtractionError {
+  if (
+    error instanceof Anthropic.AuthenticationError ||
+    error instanceof Anthropic.PermissionDeniedError
+  ) {
+    return new ExtractionError(error.message, "auth", `${error.status}`);
+  }
+  if (error instanceof Anthropic.BadRequestError) {
+    const billing = /credit|billing/i.test(error.message);
+    return new ExtractionError(
+      error.message,
+      billing ? "billing" : "unreadable",
+      `${error.status}`,
+    );
+  }
+  if (error instanceof Anthropic.APIError) {
+    return new ExtractionError(
+      error.message,
+      "service",
+      `${error.status ?? "network"}`,
+    );
+  }
+  return new ExtractionError(
+    String(error),
+    "service",
+    error instanceof Error ? error.name : "unknown",
+  );
 }
