@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Logo } from "@/components/app-shell";
@@ -22,6 +23,13 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
           <SignInSection searchParams={searchParams} />
         </Suspense>
       </Card>
+      <p className="text-muted text-center text-sm">
+        הכניסה מסכימה ל
+        <Link href="/privacy" className="text-violet font-bold">
+          מדיניות הפרטיות
+        </Link>
+        .
+      </p>
     </main>
   );
 }
@@ -35,9 +43,18 @@ async function SignInSection({
   );
   const failed = params.error === "link" || params.error === "google";
   const notConfigured = params.error === "config";
+  const deleted = params.deleted === "1";
 
   return (
     <>
+      {deleted && (
+        <p
+          role="status"
+          className="bg-success-soft text-success-ink rounded-2xl p-4 font-bold"
+        >
+          החשבון וכל המידע שלו נמחקו.
+        </p>
+      )}
       {notConfigured && <ErrorText>הכניסה עדיין לא מוגדרת באתר הזה.</ErrorText>}
       {failed && <ErrorText>הכניסה לא הצליחה. אפשר לנסות שוב.</ErrorText>}
       <SignInForm next={next} />

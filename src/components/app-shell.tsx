@@ -1,7 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { signOut } from "@/app/login/actions";
+import { FeedbackButton } from "./feedback-button";
 import { NavLinks } from "./nav-links";
+import { SiteFooter } from "./site-footer";
 
 export function Logo() {
   return (
@@ -19,35 +21,54 @@ export function Logo() {
           />
         </svg>
       </span>
-      <span dir="ltr">Interview Coach</span>
+      <span dir="ltr" className="whitespace-nowrap">
+        Interview Coach
+      </span>
     </Link>
   );
 }
 
-/** The page frame for signed-in screens: logo, navigation and sign out. */
+/**
+ * The page frame for signed-in screens: logo, navigation, feedback and sign
+ * out. On phones the links move to a tab bar at the bottom of the screen.
+ */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       <header className="border-line bg-canvas/90 sticky top-0 z-10 border-b backdrop-blur">
         <nav
           aria-label="ראשי"
-          className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6"
+          className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6"
         >
           <Logo />
-          <NavLinks />
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="text-muted hover:bg-violet-soft min-h-11 rounded-full px-4 font-medium"
-            >
-              יציאה
-            </button>
-          </form>
+          <div className="hidden sm:block">
+            <NavLinks />
+          </div>
+          <div className="flex items-center">
+            <FeedbackButton />
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="text-muted hover:bg-violet-soft min-h-11 rounded-full px-4 font-medium"
+              >
+                יציאה
+              </button>
+            </form>
+          </div>
         </nav>
       </header>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
         {children}
       </main>
+      <div className="pb-20 sm:pb-0">
+        <SiteFooter />
+      </div>
+      <nav
+        aria-label="ניווט בטלפון"
+        className="border-line bg-canvas/95 fixed inset-x-0 bottom-0 z-10 border-t px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur sm:hidden"
+      >
+        <NavLinks variant="tabs" />
+      </nav>
     </>
   );
 }

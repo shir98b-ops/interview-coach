@@ -14,6 +14,7 @@ import type { ResumeData } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { addTargetRole, removeTargetRole } from "./actions";
+import { DeleteAccount } from "./delete-account";
 import { ResumeFlow } from "./resume-flow";
 
 export const metadata: Metadata = { title: "פרופיל · Interview Coach" };
@@ -166,6 +167,17 @@ async function ProfileContent({
           </select>
           <Button type="submit">להוסיף</Button>
         </form>
+      </Card>
+
+      <Card className="ring-danger/30 gap-4 p-6 ring-2 sm:p-8">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-extrabold">מחיקת החשבון</h2>
+          <p className="text-muted">
+            נמחקים לצמיתות קורות החיים, התפקידים, התרגולים, התשובות והציונים. אי
+            אפשר לשחזר אותם אחר כך.
+          </p>
+        </div>
+        <DeleteAccount />
       </Card>
     </>
   );

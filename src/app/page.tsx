@@ -1,5 +1,6 @@
 import { Logo } from "@/components/app-shell";
 import { ButtonLink, Card, Chip } from "@/components/ui";
+import { SiteFooter } from "@/components/site-footer";
 
 const steps = [
   {
@@ -97,6 +98,7 @@ export default function Home() {
           <ButtonLink href="/dashboard">להתחיל עכשיו</ButtonLink>
         </Card>
       </main>
+      <SiteFooter />
     </>
   );
 }

@@ -29,6 +29,13 @@
       "when": 1795039001691,
       "tag": "0003_resume_reviews",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795040989513,
+      "tag": "0004_feedback_and_account_deletion",
+      "breakpoints": true
     }
   ]
 }
