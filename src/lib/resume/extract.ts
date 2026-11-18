@@ -77,7 +77,11 @@ function toExtractionError(error: unknown): ExtractionError {
     error instanceof Anthropic.AuthenticationError ||
     error instanceof Anthropic.PermissionDeniedError
   ) {
-    return new ExtractionError(error.message, "auth", `${error.status}`);
+    return new ExtractionError(
+      error.message,
+      "auth",
+      `${error.status}, ${describeKey(process.env.ANTHROPIC_API_KEY ?? "")}`,
+    );
   }
   if (error instanceof Anthropic.BadRequestError) {
     const billing = /credit|billing/i.test(error.message);
@@ -99,4 +103,17 @@ function toExtractionError(error: unknown): ExtractionError {
     "service",
     error instanceof Error ? error.name : "unknown",
   );
+}
+
+/**
+ * Describes the configured key's shape without revealing it, so a wrong
+ * paste (the key name, a partial key, extra text) can be spotted.
+ */
+export function describeKey(raw: string): string {
+  const key = raw.replace(/[^\x21-\x7e]/g, "");
+  const prefix = key.startsWith("sk-ant-api03-")
+    ? "starts correctly"
+    : `starts with "${key.slice(0, 6)}"`;
+  const removed = raw.length - key.length;
+  return `key ${prefix}, ${key.length} characters${removed ? `, ${removed} hidden removed` : ""}`;
 }
