@@ -21,6 +21,8 @@ import {
 export interface TakeHomeTarget {
   title: string;
   seniority: string | null;
+  /** The job posting, when practicing for a specific job's take-home. */
+  job?: { company: string; description: string } | null;
 }
 
 function roleName(target: TakeHomeTarget): string {
@@ -59,7 +61,19 @@ for a fictional company (never copy a real company's test).
   hiring manager would. Keep professional terms as commonly used.
   ${addressInstruction(address)}
 
-<role>${roleName(target)}</role>`,
+<role>${roleName(target)}</role>${
+            target.job
+              ? `
+
+The candidate expects a take-home from this company. Build the assignment
+around the work this posting describes, the kind of task this company would
+likely send. Keep the data and details invented.
+
+<job_posting company="${target.job.company.replace(/"/g, "'")}">
+${target.job.description}
+</job_posting>`
+              : ""
+          }`,
         },
       ],
     });

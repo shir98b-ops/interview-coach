@@ -4,6 +4,7 @@ export const protectedPrefixes = [
   "/profile",
   "/practice",
   "/learn",
+  "/jobs",
 ];
 
 export function isProtectedPath(pathname: string): boolean {

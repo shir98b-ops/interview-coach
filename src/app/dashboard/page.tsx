@@ -4,6 +4,8 @@ import { Suspense } from "react";
 import { AddressPicker } from "@/components/address-picker";
 import { Loading } from "@/components/app-shell";
 import { ButtonLink, Card, Chip } from "@/components/ui";
+import { InterviewCard } from "@/app/jobs/interview-card";
+import { upcomingInterviews } from "@/lib/jobs/queries";
 import { getLearningState } from "@/lib/learn/progress";
 import { forAddress, lessons } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
@@ -23,12 +25,14 @@ async function Dashboard() {
   const supabase = await createClient();
   const user = await getSignedInUser(supabase);
   if (!user) redirect("/login");
+  const now = new Date();
 
   const [
     { data: profile },
     { count: roleCount },
     { data: sessions },
     learning,
+    interviews,
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -43,7 +47,11 @@ async function Dashboard() {
       .order("created_at", { ascending: false })
       .limit(50),
     getLearningState(supabase),
+    upcomingInterviews(supabase, now, 5),
   ]);
+  const nextInterviews = interviews
+    .filter((i) => i.startsAt.getTime() + i.minutes * 60000 >= now.getTime())
+    .slice(0, 2);
 
   const firstName = profile?.full_name?.trim().split(/\s+/)[0];
   const scores = (sessions ?? []).map((s) => s.overall_score as number);
@@ -64,6 +72,30 @@ async function Dashboard() {
           <h2 className="text-xl font-extrabold">איך לפנות אליך?</h2>
           <p>כדי שהשאלות, המשובים והשיעורים ידברו אליך נכון.</p>
           <AddressPicker current={null} next="/dashboard" />
+        </Card>
+      )}
+
+      {nextInterviews.length > 0 && (
+        <Card tone="lilac" className="gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-xl font-extrabold">ראיונות קרובים</h2>
+            <ButtonLink
+              href="/jobs"
+              variant="quiet"
+              className="min-h-11 py-2 text-base"
+            >
+              לכל המשרות
+            </ButtonLink>
+          </div>
+          <ul className="flex flex-col gap-3">
+            {nextInterviews.map((interview) => (
+              <InterviewCard
+                key={interview.id}
+                interview={interview}
+                now={now}
+              />
+            ))}
+          </ul>
         </Card>
       )}
 

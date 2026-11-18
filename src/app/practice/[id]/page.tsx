@@ -71,7 +71,9 @@ async function SessionContent({
     await Promise.all([
       supabase
         .from("sessions")
-        .select("id, overall_score, target_roles(title, seniority)")
+        .select(
+          "id, overall_score, target_roles(title, seniority), jobs(title, company)",
+        )
         .eq("id", id)
         .maybeSingle(),
       supabase
@@ -88,9 +90,15 @@ async function SessionContent({
     title: string;
     seniority: string | null;
   } | null;
-  const roleName = role
-    ? `${role.title}${role.seniority ? ` · ${role.seniority}` : ""}`
-    : "תפקיד שנמחק";
+  const job = session.jobs as unknown as {
+    title: string;
+    company: string;
+  } | null;
+  const roleName = job
+    ? `${job.title} · ${job.company}`
+    : role
+      ? `${role.title}${role.seniority ? ` · ${role.seniority}` : ""}`
+      : "תפקיד שנמחק";
   const current = questions.find((q) => answerText(q) === null);
 
   if (current) {

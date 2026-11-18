@@ -6,6 +6,7 @@ import { Suspense } from "react";
 
 const links = [
   { href: "/dashboard", label: "בית" },
+  { href: "/jobs", label: "משרות" },
   { href: "/practice", label: "תרגול" },
   { href: "/learn", label: "למידה" },
   { href: "/profile", label: "פרופיל" },
@@ -35,7 +36,7 @@ function LinkList({
 }) {
   const tabs = variant === "tabs";
   return (
-    <ul className={tabs ? "grid grid-cols-4 gap-1" : "flex flex-wrap gap-1"}>
+    <ul className={tabs ? "grid grid-cols-5 gap-1" : "flex flex-wrap gap-1"}>
       {links.map((link) => {
         const active =
           pathname !== null &&
