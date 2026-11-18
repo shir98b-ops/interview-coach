@@ -49,5 +49,6 @@ export function usageStatus(
 
 export function limitMessage(status: UsageStatus): string {
   const hours = status.hoursUntilNext ?? 1;
-  return `You've reached the limit of ${status.limit} practice interviews a day. You can start another in about ${hours} hour${hours === 1 ? "" : "s"}.`;
+  const wait = hours === 1 ? "בעוד כשעה" : `בעוד כ־${hours} שעות`;
+  return `הגעת למגבלה של ${status.limit} תרגולים ביום. אפשר להתחיל תרגול חדש ${wait}.`;
 }

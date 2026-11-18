@@ -18,7 +18,7 @@ export interface AnsweredQuestion {
 const instructions = `You are an experienced interview coach. Score each written
 answer below against this rubric, from 1 to 5 per criterion:
 
-${rubric.map((r) => `- ${r.label}: ${r.description}`).join("\n")}
+${rubric.map((r) => `- ${r.prompt}`).join("\n")}
 
 Scale: 1 = missing or off topic, 2 = weak, 3 = acceptable but generic,
 4 = strong, 5 = excellent, ready for a real interview. Be honest and

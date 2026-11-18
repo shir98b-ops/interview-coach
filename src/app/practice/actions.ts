@@ -16,19 +16,17 @@ import { getSignedInUser } from "@/lib/supabase/user";
 export type FormState = { error: string | null };
 
 const aiMessages: Record<AiError["reason"], string> = {
-  config: "Interview practice is not set up yet. Please try again later.",
-  auth: "Interview practice is not available right now: the AI service did not accept our access key.",
-  billing:
-    "Interview practice is not available right now: the AI service account is out of credit.",
-  unreadable: "We couldn't prepare questions for this role. Please try again.",
-  service:
-    "Something went wrong while preparing your questions. Please try again.",
+  config: "התרגול עדיין לא מוגדר. נסה שוב מאוחר יותר.",
+  auth: "התרגול לא זמין כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
+  billing: "התרגול לא זמין כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
+  unreadable: "לא הצלחנו להכין שאלות לתפקיד הזה. נסה שוב.",
+  service: "משהו השתבש בהכנת השאלות. נסה שוב.",
 };
 
 const feedbackMessages: Record<AiError["reason"], string> = {
   ...aiMessages,
-  unreadable: "We couldn't score these answers. Please try again.",
-  service: "Something went wrong while scoring your answers. Please try again.",
+  unreadable: "לא הצלחנו לתת ציון לתשובות. נסה שוב.",
+  service: "משהו השתבש בזמן מתן הציונים. נסה שוב.",
 };
 
 async function requireUser() {
@@ -64,9 +62,9 @@ export async function startPractice(
 
   const resume = resumeSchema.safeParse(profile?.resume_data);
   if (!resume.success) {
-    return { error: "Add your resume on the profile page first." };
+    return { error: "קודם צריך להוסיף קורות חיים בעמוד הפרופיל." };
   }
-  if (!role) return { error: "Choose one of your target roles." };
+  if (!role) return { error: "בחר אחד מהתפקידים שלך." };
 
   let questions;
   try {
@@ -75,7 +73,7 @@ export async function startPractice(
     if (error instanceof AiError) {
       console.error("Question generation failed:", error.reason, error.message);
       return {
-        error: `${aiMessages[error.reason]} (Error code: ${error.code})`,
+        error: `${aiMessages[error.reason]} (קוד שגיאה: ${error.code})`,
       };
     }
     throw error;
@@ -88,7 +86,7 @@ export async function startPractice(
     .single();
   if (sessionError || !session) {
     console.error("Creating session failed:", sessionError?.message);
-    return { error: "We couldn't save your practice. Please try again." };
+    return { error: "לא הצלחנו לשמור את התרגול. נסה שוב." };
   }
 
   const { error: questionsError } = await supabase.from("questions").insert(
@@ -103,7 +101,7 @@ export async function startPractice(
   if (questionsError) {
     console.error("Saving questions failed:", questionsError.message);
     await supabase.from("sessions").delete().eq("id", session.id);
-    return { error: "We couldn't save your practice. Please try again." };
+    return { error: "לא הצלחנו לשמור את התרגול. נסה שוב." };
   }
 
   redirect(`/practice/${session.id}`);
@@ -126,7 +124,7 @@ export async function submitAnswer(
   // 23505 means this question was already answered, e.g. after a double click.
   if (error && error.code !== "23505") {
     console.error("Saving answer failed:", error.message);
-    return { error: "We couldn't save your answer. Please try again." };
+    return { error: "לא הצלחנו לשמור את התשובה. נסה שוב." };
   }
 
   // Row level security limits both reads to the user's own rows.
@@ -188,7 +186,7 @@ async function scoreSession(
       .eq("session_id", sessionId)
       .order("position"),
   ]);
-  if (!session || !rows?.length) return { error: "Interview not found." };
+  if (!session || !rows?.length) return { error: "התרגול לא נמצא." };
 
   const items = rows.map((row) => ({
     questionId: row.id as string,
@@ -203,7 +201,7 @@ async function scoreSession(
     ),
   }));
   if (items.some((item) => !item.answer)) {
-    return { error: "Answer every question first." };
+    return { error: "קודם צריך לענות על כל השאלות." };
   }
   if (items.every((item) => readFeedback(item.answer!.scores))) {
     return { error: null };
@@ -229,7 +227,7 @@ async function scoreSession(
     if (error instanceof AiError) {
       console.error("Scoring failed:", error.reason, error.message);
       return {
-        error: `${feedbackMessages[error.reason]} (Error code: ${error.code})`,
+        error: `${feedbackMessages[error.reason]} (קוד שגיאה: ${error.code})`,
       };
     }
     throw error;
@@ -247,7 +245,7 @@ async function scoreSession(
   const failed = results.find((r) => r.error);
   if (failed?.error) {
     console.error("Saving feedback failed:", failed.error.message);
-    return { error: "We couldn't save your feedback. Please try again." };
+    return { error: "לא הצלחנו לשמור את המשוב. נסה שוב." };
   }
 
   await supabase

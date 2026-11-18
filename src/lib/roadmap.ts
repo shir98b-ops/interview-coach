@@ -53,7 +53,7 @@ export const roadmap: Stage[] = [
     number: 6,
     title: "MVP polish and launch",
     summary:
-      "End-to-end tests, error handling, usage limits and documentation.",
+      "A fresh Hebrew design, short lessons with exercises, usage limits and tests.",
     mvp: true,
     status: "in-progress",
   },
@@ -74,7 +74,7 @@ export const roadmap: Stage[] = [
   {
     number: 9,
     title: "Learn by playing",
-    summary: "Short take-home style exercises with points and streaks.",
+    summary: "Points, streaks and more lessons on top of the learning area.",
     mvp: false,
     status: "planned",
   },

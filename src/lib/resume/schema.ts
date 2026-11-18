@@ -44,13 +44,13 @@ export function validateResumeFile(
   file: File | null,
 ): { ok: true; file: File } | { ok: false; error: string } {
   if (!file || file.size === 0) {
-    return { ok: false, error: "Choose a PDF file to upload." };
+    return { ok: false, error: "בחר קובץ PDF להעלאה." };
   }
   if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
-    return { ok: false, error: "Only PDF files are supported for now." };
+    return { ok: false, error: "כרגע אפשר להעלות רק קבצי PDF." };
   }
   if (file.size > MAX_RESUME_BYTES) {
-    return { ok: false, error: "The file is larger than 4 MB." };
+    return { ok: false, error: "הקובץ גדול מ־4 מגה." };
   }
   return { ok: true, file };
 }

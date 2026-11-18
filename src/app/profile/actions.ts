@@ -17,13 +17,13 @@ export type ExtractState =
   | { status: "review"; data: ResumeData };
 
 const extractionMessages: Record<ExtractionError["reason"], string> = {
-  config: "Resume reading is not set up yet. Please try again later.",
-  auth: "Resume reading is not available right now: the AI service did not accept our access key.",
+  config: "קריאת קורות חיים עדיין לא מוגדרת. נסה שוב מאוחר יותר.",
+  auth: "קריאת קורות חיים לא זמינה כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
   billing:
-    "Resume reading is not available right now: the AI service account is out of credit.",
+    "קריאת קורות חיים לא זמינה כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
   unreadable:
-    "We couldn't read this file. Try a different PDF, or one exported directly from your editor rather than scanned.",
-  service: "Something went wrong while reading the file. Please try again.",
+    "לא הצלחנו לקרוא את הקובץ. נסה קובץ PDF אחר, עדיף כזה שיוצא ישירות מהמסמך ולא סרוק.",
+  service: "משהו השתבש בקריאת הקובץ. נסה שוב.",
 };
 
 async function requireUser() {
@@ -51,7 +51,7 @@ export async function extractResumeAction(
       console.error("Resume extraction failed:", error.reason, error.message);
       return {
         status: "error",
-        error: `${extractionMessages[error.reason]} (Error code: ${error.code})`,
+        error: `${extractionMessages[error.reason]} (קוד שגיאה: ${error.code})`,
       };
     }
     throw error;
@@ -63,7 +63,7 @@ export async function saveProfile(
   input: ResumeData,
 ): Promise<{ error: string } | void> {
   const parsed = resumeSchema.safeParse(input);
-  if (!parsed.success) return { error: "Some fields are invalid." };
+  if (!parsed.success) return { error: "חלק מהשדות לא תקינים." };
 
   const { supabase, user } = await requireUser();
   const { error } = await supabase.from("profiles").upsert({
@@ -74,7 +74,7 @@ export async function saveProfile(
   });
   if (error) {
     console.error("Saving profile failed:", error.message);
-    return { error: "We couldn't save your profile. Please try again." };
+    return { error: "לא הצלחנו לשמור את הפרופיל. נסה שוב." };
   }
   redirect("/profile?saved=1");
 }

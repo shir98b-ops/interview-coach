@@ -1,70 +1,102 @@
-import { currentStage, roadmap, type Stage } from "@/lib/roadmap";
+import { Logo } from "@/components/app-shell";
+import { ButtonLink, Card, Chip } from "@/components/ui";
 
-const statusLabel: Record<Stage["status"], string> = {
-  done: "Done",
-  "in-progress": "In progress",
-  planned: "Planned",
-};
+const steps = [
+  {
+    title: "מעלים קורות חיים",
+    body: "המערכת קוראת אותם ומבינה מי אתה, ואתה בוחר לאיזה תפקיד אתה מתכונן.",
+  },
+  {
+    title: "מתאמנים על ראיון",
+    body: "חמש שאלות כמו בראיון אמיתי, מותאמות לתפקיד ולניסיון שלך. בעברית או באנגלית.",
+  },
+  {
+    title: "מקבלים ציון ומשוב",
+    body: "ציון לכל תשובה, מה עבד, מה לשפר ודוגמה לתשובה חזקה יותר.",
+  },
+  {
+    title: "לומדים ומשתפרים",
+    body: "שיעורים קצרים עם תרגיל, לפי מה שהכי יעזור לך, וגרף שמראה את ההתקדמות.",
+  },
+];
 
 export default function Home() {
-  const current = currentStage();
-
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-6 py-16">
-      <header className="flex flex-col gap-4">
-        <h1 className="text-4xl font-semibold tracking-tight">
-          Interview Coach
-        </h1>
-        <p className="text-lg text-zinc-600 dark:text-zinc-400">
-          Practice job interviews on your own: upload your resume, pick a target
-          role, answer realistic questions and get scored feedback.
-        </p>
-        <a
-          href="/dashboard"
-          className="w-fit rounded-md bg-zinc-900 px-4 py-2 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+    <>
+      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+        <Logo />
+        <ButtonLink
+          href="/login"
+          variant="quiet"
+          className="min-h-11 text-base"
         >
-          Start practicing
-        </a>
-        {current && (
-          <p className="text-sm text-zinc-500">
-            Now building stage {current.number}: {current.title}
-          </p>
-        )}
+          כניסה
+        </ButtonLink>
       </header>
-
-      <section
-        aria-labelledby="roadmap-heading"
-        className="flex flex-col gap-4"
-      >
-        <h2 id="roadmap-heading" className="text-xl font-semibold">
-          Roadmap
-        </h2>
-        <ol className="flex flex-col gap-3">
-          {roadmap.map((stage) => (
-            <li
-              key={stage.number}
-              className="flex items-start justify-between gap-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-4 py-10 sm:px-6 sm:py-16">
+        <section className="grid items-center gap-10 md:grid-cols-2">
+          <div className="flex flex-col gap-6">
+            <Chip tone="violet">מאמן ראיונות אישי</Chip>
+            <h1 className="text-4xl leading-tight font-extrabold sm:text-6xl">
+              הראיון הבא שלך
+              <br />
+              <span className="text-violet">יתחיל בביטחון</span>
+            </h1>
+            <p className="text-muted text-xl leading-relaxed">
+              מתאמנים על שאלות אמיתיות, מקבלים משוב אישי על כל תשובה, ולומדים
+              בדיוק את מה שחסר לך. בלי לקבוע ראיון דמה עם אף אחד.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink href="/dashboard" variant="lime">
+                להתחיל להתאמן
+              </ButtonLink>
+            </div>
+          </div>
+          <Card tone="violet" className="gap-4 p-8">
+            <p className="text-base opacity-90">הציון שלך בתרגול האחרון</p>
+            <p
+              dir="ltr"
+              className="text-right text-7xl leading-none font-extrabold"
             >
-              <div className="flex flex-col gap-1">
-                <span className="font-medium">
-                  {stage.number}. {stage.title}
-                  {stage.mvp && (
-                    <span className="ml-2 rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                      MVP
-                    </span>
-                  )}
-                </span>
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {stage.summary}
-                </span>
-              </div>
-              <span className="shrink-0 text-sm text-zinc-500">
-                {statusLabel[stage.status]}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </section>
-    </main>
+              72<span className="text-2xl opacity-80"> / 100</span>
+            </p>
+            <p className="text-lime font-bold">עלית 12 נקודות מהפעם הקודמת</p>
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="text-sm opacity-90">הטיפ שלך</p>
+              <p className="font-medium">
+                הוסף מספר אחד לסיפור, והתשובה תישמע הרבה יותר משכנעת.
+              </p>
+            </div>
+          </Card>
+        </section>
+
+        <section aria-labelledby="how" className="flex flex-col gap-6">
+          <h2 id="how" className="text-3xl font-extrabold">
+            איך זה עובד
+          </h2>
+          <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {steps.map((step, index) => (
+              <li key={step.title}>
+                <Card className="h-full">
+                  <span className="bg-lime flex h-11 w-11 items-center justify-center rounded-2xl text-xl font-extrabold">
+                    {index + 1}
+                  </span>
+                  <h3 className="text-xl font-bold">{step.title}</h3>
+                  <p className="text-muted">{step.body}</p>
+                </Card>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <Card tone="orange" className="items-start gap-4 p-8">
+          <h2 className="text-2xl font-extrabold">מוכן לסיבוב הראשון?</h2>
+          <p className="text-muted text-lg">
+            נכנסים עם חשבון גוגל, ותוך שתי דקות אתה כבר עונה על השאלה הראשונה.
+          </p>
+          <ButtonLink href="/dashboard">להתחיל עכשיו</ButtonLink>
+        </Card>
+      </main>
+    </>
   );
 }

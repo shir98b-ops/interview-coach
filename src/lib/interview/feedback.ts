@@ -4,20 +4,24 @@ import { z } from "zod";
 export const rubric = [
   {
     key: "content",
-    label: "Content",
-    description:
-      "Answers the question asked, with a specific, relevant example and a clear result.",
+    label: "תוכן",
+    description: "עונה על השאלה, עם דוגמה ספציפית ורלוונטית ותוצאה ברורה.",
+    prompt:
+      "Content: answers the question asked, with a specific, relevant example and a clear result.",
   },
   {
     key: "structure",
-    label: "Structure",
+    label: "מבנה",
     description:
-      "Easy to follow from start to end. For stories: the situation, what you did and what happened (the STAR method).",
+      "קל לעקוב מההתחלה ועד הסוף. בסיפורים: המצב, מה עשית ומה יצא (שיטת STAR).",
+    prompt:
+      "Structure: easy to follow from start to end. For stories: the situation, what you did and what happened (the STAR method).",
   },
   {
     key: "clarity",
-    label: "Clarity",
-    description: "Concise and clear, without rambling or vague wording.",
+    label: "בהירות",
+    description: "קצר וברור, בלי להתפזר ובלי ניסוחים מעורפלים.",
+    prompt: "Clarity: concise and clear, without rambling or vague wording.",
   },
 ] as const;
 

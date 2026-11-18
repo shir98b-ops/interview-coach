@@ -1,75 +1,184 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { signOut } from "@/app/login/actions";
+import { Loading } from "@/components/app-shell";
+import { ButtonLink, Card, Chip } from "@/components/ui";
+import { getLearningState } from "@/lib/learn/progress";
+import { lessons } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
 
-export const metadata: Metadata = { title: "Dashboard · Interview Coach" };
+export const metadata: Metadata = { title: "בית · Interview Coach" };
 
 export default function DashboardPage() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-16">
-      <header className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold">Your dashboard</h1>
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="text-sm text-zinc-600 underline dark:text-zinc-400"
-          >
-            Sign out
-          </button>
-        </form>
-      </header>
-      <Suspense fallback={<p className="text-zinc-500">Loading...</p>}>
-        <AccountSummary />
-      </Suspense>
-    </main>
+    <Suspense fallback={<Loading />}>
+      <Dashboard />
+    </Suspense>
   );
 }
 
-async function AccountSummary() {
+async function Dashboard() {
   const supabase = await createClient();
   const user = await getSignedInUser(supabase);
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const [
+    { data: profile },
+    { count: roleCount },
+    { data: sessions },
+    learning,
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase.from("target_roles").select("id", { count: "exact", head: true }),
+    supabase
+      .from("sessions")
+      .select("overall_score")
+      .not("overall_score", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    getLearningState(supabase),
+  ]);
+
+  const firstName = profile?.full_name?.trim().split(/\s+/)[0];
+  const scores = (sessions ?? []).map((s) => s.overall_score as number);
+  const latest = scores[0];
+  const change = scores.length > 1 ? scores[0] - scores[1] : null;
+  const ready = Boolean(profile) && (roleCount ?? 0) > 0;
+  const lesson = learning.recommended;
 
   return (
-    <div className="flex flex-col gap-6">
-      <p className="text-zinc-600 dark:text-zinc-400">
-        Signed in as {user.email}.
-      </p>
-      <div className="flex flex-col gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="font-semibold">
-          {profile ? "Your profile is ready" : "Start with your resume"}
-        </h2>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          {profile
-            ? "Update your resume details or the roles you are preparing for."
-            : "Upload your resume and choose the roles you are preparing for."}
-        </p>
-        <Link href="/profile" className="font-medium underline">
-          {profile ? "Edit profile" : "Set up your profile"}
-        </Link>
-      </div>
-      {profile && (
-        <div className="flex flex-col gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
-          <h2 className="font-semibold">Practice an interview</h2>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Answer five questions tailored to your target role and resume, then
-            get scores and tips for each answer.
-          </p>
-          <Link href="/practice" className="font-medium underline">
-            Start practicing
-          </Link>
+    <>
+      <h1 className="text-3xl font-extrabold sm:text-4xl">
+        {firstName ? `היי ${firstName}!` : "היי!"}
+      </h1>
+
+      {!ready ? (
+        <Card className="gap-5 p-8">
+          <h2 className="text-2xl font-extrabold">
+            בוא נכין אותך לתרגול הראשון
+          </h2>
+          <ol className="flex flex-col gap-3 text-lg">
+            <Step done={Boolean(profile)} number={1}>
+              מעלים קורות חיים ומאשרים את הפרטים
+            </Step>
+            <Step done={(roleCount ?? 0) > 0} number={2}>
+              בוחרים לאיזה תפקיד מתכוננים
+            </Step>
+            <Step done={false} number={3}>
+              מתחילים תרגול ראיון ראשון
+            </Step>
+          </ol>
+          <ButtonLink href="/profile" variant="lime" className="w-fit">
+            {profile ? "להוסיף תפקיד" : "להעלות קורות חיים"}
+          </ButtonLink>
+        </Card>
+      ) : (
+        <div className="grid gap-5 md:grid-cols-2">
+          <Card tone="violet" className="gap-3 p-7">
+            {latest !== undefined ? (
+              <>
+                <p className="opacity-90">הציון האחרון שלך</p>
+                <p
+                  dir="ltr"
+                  className="text-right text-6xl leading-none font-extrabold"
+                >
+                  {latest}
+                  <span className="text-2xl opacity-80"> / 100</span>
+                </p>
+                {change !== null && (
+                  <p className="text-lime font-bold">
+                    {change > 0
+                      ? `עלית ${change} נקודות מהפעם הקודמת`
+                      : change < 0
+                        ? `ירדת ${-change} נקודות. זה חלק מהדרך.`
+                        : "בדיוק כמו בפעם הקודמת"}
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <p className="text-2xl font-extrabold">
+                  הכל מוכן לתרגול הראשון
+                </p>
+                <p className="opacity-90">
+                  חמש שאלות, ואחריהן ציון ומשוב על כל תשובה.
+                </p>
+              </>
+            )}
+            <ButtonLink href="/practice" variant="lime" className="mt-2">
+              להתחיל תרגול
+            </ButtonLink>
+          </Card>
+
+          <div className="flex flex-col gap-5">
+            {lesson ? (
+              <Card tone="orange">
+                <Chip>השיעור הבא בשבילך</Chip>
+                <h2 className="text-xl font-bold">{lesson.title}</h2>
+                <p className="text-muted">
+                  {lesson.minutes} דקות · {lesson.summary}
+                </p>
+                <ButtonLink
+                  href={`/learn/${lesson.slug}`}
+                  variant="quiet"
+                  className="w-fit"
+                >
+                  לשיעור
+                </ButtonLink>
+              </Card>
+            ) : (
+              <Card tone="lime">
+                <h2 className="text-xl font-bold">סיימת את כל השיעורים!</h2>
+                <p className="text-muted">אפשר לחזור לכל שיעור ולתרגל שוב.</p>
+              </Card>
+            )}
+            <div className="grid grid-cols-2 gap-5">
+              <Stat value={scores.length} label="תרגולים" />
+              <Stat
+                value={`${learning.completed.size}/${lessons.length}`}
+                label="שיעורים"
+              />
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
+  );
+}
+
+function Step({
+  done,
+  number,
+  children,
+}: {
+  done: boolean;
+  number: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="flex items-center gap-3">
+      <span
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl font-extrabold ${
+          done ? "bg-lime" : "bg-violet-soft text-violet-dark"
+        }`}
+      >
+        {done ? "✓" : number}
+      </span>
+      <span className={done ? "text-muted line-through" : ""}>{children}</span>
+    </li>
+  );
+}
+
+function Stat({ value, label }: { value: number | string; label: string }) {
+  return (
+    <Card className="gap-1">
+      <p className="text-3xl font-extrabold">{value}</p>
+      <p className="text-muted">{label}</p>
+    </Card>
   );
 }

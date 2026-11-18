@@ -1,22 +1,27 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { Logo } from "@/components/app-shell";
+import { Card, ErrorText } from "@/components/ui";
 import { safeNextPath } from "@/lib/auth/redirect";
 import { SignInForm } from "./sign-in-form";
 
-export const metadata: Metadata = { title: "Sign in · Interview Coach" };
+export const metadata: Metadata = { title: "כניסה · Interview Coach" };
 
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-6 py-16">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Sign in</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Use your Google account. No new password to create.
-        </p>
-      </div>
-      <Suspense fallback={<SignInForm next="/dashboard" />}>
-        <SignInSection searchParams={searchParams} />
-      </Suspense>
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 px-4 py-16">
+      <Logo />
+      <Card className="gap-5 p-8">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-extrabold">כניסה</h1>
+          <p className="text-muted text-lg">
+            נכנסים עם חשבון גוגל. אין סיסמה חדשה לזכור.
+          </p>
+        </div>
+        <Suspense fallback={<SignInForm next="/dashboard" />}>
+          <SignInSection searchParams={searchParams} />
+        </Suspense>
+      </Card>
     </main>
   );
 }
@@ -33,16 +38,8 @@ async function SignInSection({
 
   return (
     <>
-      {notConfigured && (
-        <p role="alert" className="text-sm text-red-600">
-          Sign-in isn&apos;t set up on this site yet.
-        </p>
-      )}
-      {failed && (
-        <p role="alert" className="text-sm text-red-600">
-          Sign-in didn&apos;t complete. Please try again.
-        </p>
-      )}
+      {notConfigured && <ErrorText>הכניסה עדיין לא מוגדרת באתר הזה.</ErrorText>}
+      {failed && <ErrorText>הכניסה לא הצליחה. אפשר לנסות שוב.</ErrorText>}
       <SignInForm next={next} />
     </>
   );
