@@ -26,6 +26,7 @@ for (const path of [
   "/learn/star",
   "/learn/take-home",
   "/learn/take-home/abc",
+  "/profile/review",
 ]) {
   test(`signed-out visitors of ${path} are sent to sign in`, async ({
     page,

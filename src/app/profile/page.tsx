@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Loading } from "@/components/app-shell";
-import { Button, Card, PageHeading, inputStyles } from "@/components/ui";
+import {
+  Button,
+  ButtonLink,
+  Card,
+  PageHeading,
+  inputStyles,
+} from "@/components/ui";
 import type { ResumeData } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
@@ -74,6 +80,20 @@ async function ProfileContent({
         {resume && <ResumeSummary resume={resume} />}
         <ResumeFlow hasProfile={Boolean(resume)} />
       </Card>
+
+      {resume && (
+        <Card tone="orange" className="gap-3 p-6 sm:p-8">
+          <h2 className="text-2xl font-extrabold">
+            כמה חזקים קורות החיים שלך?
+          </h2>
+          <p className="text-lg">
+            מקבלים ציון מתוך 100 לפי התפקיד, ושורות מוכנות לשכתוב.
+          </p>
+          <ButtonLink href="/profile/review" className="w-full sm:w-fit">
+            לדרג את קורות החיים
+          </ButtonLink>
+        </Card>
+      )}
 
       <Card className="gap-5 p-6 sm:p-8">
         <div className="flex flex-col gap-1">
