@@ -1,5 +1,6 @@
 import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import type { ResumeData } from "@/lib/resume/schema";
 import { bankFor } from "./question-bank";
@@ -35,6 +36,7 @@ export async function generateQuestions(
   target: PracticeTarget,
   resume: ResumeData,
   language: InterviewLanguage = "en",
+  address: Address | null = null,
 ): Promise<{ kind: QuestionKind; text: string }[]> {
   const role = target.seniority
     ? `${target.title} (${target.seniority})`
@@ -59,7 +61,7 @@ export async function generateQuestions(
 Write the questions in ${interviewLanguages[language]}, phrased the way a
 native-speaking interviewer would ask them (translate the listed questions
 naturally, not word for word). Keep the role title and professional terms as
-they are commonly used in that language.
+they are commonly used in that language. ${addressInstruction(address)}
 
 <role>${role}</role>
 

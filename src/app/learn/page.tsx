@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { Loading } from "@/components/app-shell";
 import { ButtonLink, Card, Chip, PageHeading } from "@/components/ui";
 import { rubric } from "@/lib/interview/feedback";
-import { lessons, type Lesson } from "@/lib/learn/lessons";
+import { forAddress, lessons, type Lesson } from "@/lib/learn/lessons";
 import { getLearningState } from "@/lib/learn/progress";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
@@ -35,7 +35,11 @@ async function LessonList() {
   const user = await getSignedInUser(supabase);
   if (!user) redirect("/login?next=/learn");
 
-  const { completed, recommended } = await getLearningState(supabase);
+  const learning = await getLearningState(supabase);
+  const completed = learning.completed;
+  const recommended =
+    learning.recommended && forAddress(learning.recommended, user.address);
+  const all = lessons.map((l) => forAddress(l, user.address));
 
   return (
     <>
@@ -88,12 +92,12 @@ async function LessonList() {
 
       <LessonGrid
         title="שיעורים על מבחני בית"
-        items={lessons.filter((l) => l.track === "take-home")}
+        items={all.filter((l) => l.track === "take-home")}
         completed={completed}
       />
       <LessonGrid
         title="שיעורים על הראיון"
-        items={lessons.filter((l) => l.track === "interview")}
+        items={all.filter((l) => l.track === "interview")}
         completed={completed}
       />
     </>

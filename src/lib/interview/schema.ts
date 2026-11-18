@@ -51,7 +51,7 @@ export function validateAnswer(
   value: unknown,
 ): { ok: true; text: string } | { ok: false; error: string } {
   const text = typeof value === "string" ? value.trim() : "";
-  if (!text) return { ok: false, error: "כתוב תשובה לפני שממשיכים." };
+  if (!text) return { ok: false, error: "צריך לכתוב תשובה לפני שממשיכים." };
   if (text.length > MAX_ANSWER_LENGTH) {
     return {
       ok: false,

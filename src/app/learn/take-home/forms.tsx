@@ -130,8 +130,8 @@ export function SubmitTakeHomeForm({
             className={`${inputStyles} min-h-96`}
           />
           <p className="text-muted text-sm">
-            טיפ: התחל בתקציר קצר, וכתוב את ההנחות שלך. אפשר לכתוב קודם במסמך אחר
-            ולהדביק כאן.
+            טיפ: כדאי לפתוח בתקציר קצר ולכתוב את ההנחות שלך. אפשר לכתוב קודם
+            במסמך אחר ולהדביק כאן.
           </p>
         </>
       )}

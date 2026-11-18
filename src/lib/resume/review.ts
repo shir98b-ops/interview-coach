@@ -1,5 +1,6 @@
 import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import {
   readReview,
@@ -13,6 +14,7 @@ import type { ResumeData } from "./schema";
 export async function reviewResume(
   resume: ResumeData,
   role: string | null,
+  address: Address | null = null,
 ): Promise<ResumeReview> {
   let response;
   try {
@@ -43,7 +45,7 @@ one and write a better line built only from facts in the resume; where a
 number is unknown, use a placeholder like [X%] for the candidate to fill in.
 Never invent experience. Speak to the candidate directly, and write all
 feedback in Hebrew. Keep quoted and rewritten resume lines in the language
-the resume is written in.
+the resume is written in. ${addressInstruction(address)}
 
 <resume>
 ${JSON.stringify(resume, null, 2)}

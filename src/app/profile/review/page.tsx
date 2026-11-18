@@ -77,8 +77,8 @@ async function Reviews() {
       <Card className="gap-4 p-6 sm:p-8">
         <RateResumeForm roles={roles ?? []} rated={Boolean(latest)} />
         <p className="text-muted text-sm">
-          הדירוג נעשה על התוכן שאישרת בפרופיל, לא על העיצוב של הקובץ. אחרי
-          שתעדכן את קורות החיים, העלה אותם מחדש ודרג שוב כדי לראות את השיפור.
+          הדירוג נעשה על התוכן שאישרת בפרופיל, לא על העיצוב של הקובץ. אחרי עדכון
+          של קורות החיים, מעלים אותם מחדש ומדרגים שוב כדי לראות את השיפור.
         </p>
       </Card>
 
@@ -213,7 +213,7 @@ function ReviewDetails({
             ))}
           </ol>
           <p className="text-muted text-sm">
-            איפה שמופיע סימון כמו [X%], השלם את המספר האמיתי.
+            איפה שמופיע סימון כמו [X%], משלימים את המספר האמיתי.
           </p>
         </section>
       )}
@@ -231,7 +231,7 @@ function ReviewDetails({
             ))}
           </div>
           <p className="text-muted text-sm">
-            הוסף רק את מה שבאמת יש לך ניסיון בו.
+            כדאי להוסיף רק את מה שבאמת יש לך ניסיון בו.
           </p>
         </Card>
       )}

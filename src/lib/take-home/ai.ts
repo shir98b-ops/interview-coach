@@ -1,5 +1,6 @@
 import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import {
   interviewLanguages,
@@ -33,6 +34,7 @@ export async function generateTakeHome(
   target: TakeHomeTarget,
   difficulty: Difficulty,
   language: InterviewLanguage,
+  address: Address | null = null,
 ): Promise<TakeHomeBrief> {
   let response;
   try {
@@ -55,6 +57,7 @@ for a fictional company (never copy a real company's test).
   to analyze, and leave room for judgment.
 - Write it in ${interviewLanguages[language]}, the way a native-speaking
   hiring manager would. Keep professional terms as commonly used.
+  ${addressInstruction(address)}
 
 <role>${roleName(target)}</role>`,
         },
@@ -79,6 +82,7 @@ export async function evaluateTakeHome(
   target: TakeHomeTarget | null,
   brief: TakeHomeBrief,
   submission: string,
+  address: Address | null = null,
 ): Promise<TakeHomeFeedback> {
   let response;
   try {
@@ -104,7 +108,7 @@ that skips tasks cannot score above 2 on solution.
 Then say what worked, the most useful specific improvements, and the
 questions an interviewer would likely ask about it in the follow-up
 interview. Speak to the candidate directly. Write the feedback in the
-language of the brief.
+language of the brief. ${addressInstruction(address)}
 
 <role>${target ? roleName(target) : "Not given"}</role>
 

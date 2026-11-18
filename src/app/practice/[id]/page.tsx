@@ -11,7 +11,7 @@ import {
   type AnswerFeedback,
 } from "@/lib/interview/feedback";
 import { kindLabels, type QuestionKind } from "@/lib/interview/schema";
-import { recommendLesson } from "@/lib/learn/lessons";
+import { forAddress, recommendLesson } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { AnswerForm, RetryFeedbackForm } from "../forms";
@@ -121,12 +121,13 @@ async function SessionContent({
 
   const feedback = questions.map((q) => readFeedback(savedAnswer(q)?.scores));
   const scored = feedback.every(Boolean);
-  const lesson = scored
+  const recommended = scored
     ? recommendLesson(
         feedback.filter((f) => f !== null),
         (attempts ?? []).map((a) => a.lesson_slug as string),
       )
     : undefined;
+  const lesson = recommended && forAddress(recommended, user.address);
 
   return (
     <section className="flex flex-col gap-8">
@@ -144,8 +145,8 @@ async function SessionContent({
             <span className="text-2xl opacity-80"> / 100</span>
           </p>
           <p className="opacity-90">
-            כל תשובה מקבלת ציון מ־1 עד 5 על תוכן, מבנה ובהירות. קרא את הטיפים
-            למטה, ונסה תרגול נוסף כדי לראות את ההתקדמות.
+            כל תשובה מקבלת ציון מ־1 עד 5 על תוכן, מבנה ובהירות. הטיפים למטה,
+            ותרגול נוסף יראה את ההתקדמות.
           </p>
         </Card>
       ) : (

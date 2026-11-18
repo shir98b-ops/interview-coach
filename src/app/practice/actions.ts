@@ -2,6 +2,7 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import type { Address } from "@/lib/address";
 import { AiError } from "@/lib/ai/client";
 import { evaluateInterview } from "@/lib/interview/evaluate";
 import { overallScore, readFeedback } from "@/lib/interview/feedback";
@@ -16,17 +17,17 @@ import { getSignedInUser } from "@/lib/supabase/user";
 export type FormState = { error: string | null };
 
 const aiMessages: Record<AiError["reason"], string> = {
-  config: "התרגול עדיין לא מוגדר. נסה שוב מאוחר יותר.",
+  config: "התרגול עדיין לא מוגדר. אפשר לנסות שוב מאוחר יותר.",
   auth: "התרגול לא זמין כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
   billing: "התרגול לא זמין כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
-  unreadable: "לא הצלחנו להכין שאלות לתפקיד הזה. נסה שוב.",
-  service: "משהו השתבש בהכנת השאלות. נסה שוב.",
+  unreadable: "לא הצלחנו להכין שאלות לתפקיד הזה. אפשר לנסות שוב.",
+  service: "משהו השתבש בהכנת השאלות. אפשר לנסות שוב.",
 };
 
 const feedbackMessages: Record<AiError["reason"], string> = {
   ...aiMessages,
-  unreadable: "לא הצלחנו לתת ציון לתשובות. נסה שוב.",
-  service: "משהו השתבש בזמן מתן הציונים. נסה שוב.",
+  unreadable: "לא הצלחנו לתת ציון לתשובות. אפשר לנסות שוב.",
+  service: "משהו השתבש בזמן מתן הציונים. אפשר לנסות שוב.",
 };
 
 async function requireUser() {
@@ -64,11 +65,16 @@ export async function startPractice(
   if (!resume.success) {
     return { error: "קודם צריך להוסיף קורות חיים בעמוד הפרופיל." };
   }
-  if (!role) return { error: "בחר אחד מהתפקידים שלך." };
+  if (!role) return { error: "צריך לבחור אחד מהתפקידים שלך." };
 
   let questions;
   try {
-    questions = await generateQuestions(role, resume.data, language);
+    questions = await generateQuestions(
+      role,
+      resume.data,
+      language,
+      user.address,
+    );
   } catch (error) {
     if (error instanceof AiError) {
       console.error("Question generation failed:", error.reason, error.message);
@@ -86,7 +92,7 @@ export async function startPractice(
     .single();
   if (sessionError || !session) {
     console.error("Creating session failed:", sessionError?.message);
-    return { error: "לא הצלחנו לשמור את התרגול. נסה שוב." };
+    return { error: "לא הצלחנו לשמור את התרגול. אפשר לנסות שוב." };
   }
 
   const { error: questionsError } = await supabase.from("questions").insert(
@@ -101,7 +107,7 @@ export async function startPractice(
   if (questionsError) {
     console.error("Saving questions failed:", questionsError.message);
     await supabase.from("sessions").delete().eq("id", session.id);
-    return { error: "לא הצלחנו לשמור את התרגול. נסה שוב." };
+    return { error: "לא הצלחנו לשמור את התרגול. אפשר לנסות שוב." };
   }
 
   redirect(`/practice/${session.id}`);
@@ -124,7 +130,7 @@ export async function submitAnswer(
   // 23505 means this question was already answered, e.g. after a double click.
   if (error && error.code !== "23505") {
     console.error("Saving answer failed:", error.message);
-    return { error: "לא הצלחנו לשמור את התשובה. נסה שוב." };
+    return { error: "לא הצלחנו לשמור את התשובה. אפשר לנסות שוב." };
   }
 
   // Row level security limits both reads to the user's own rows.
@@ -144,7 +150,7 @@ export async function submitAnswer(
       .eq("id", sessionId)
       .is("completed_at", null);
     // If scoring fails, the summary page offers to try again.
-    await scoreSession(supabase, sessionId);
+    await scoreSession(supabase, sessionId, user.address);
   }
 
   refresh();
@@ -157,8 +163,8 @@ export async function retryFeedback(
   formData: FormData,
 ): Promise<FormState> {
   const sessionId = String(formData.get("sessionId") ?? "");
-  const { supabase } = await requireUser();
-  const result = await scoreSession(supabase, sessionId);
+  const { supabase, user } = await requireUser();
+  const result = await scoreSession(supabase, sessionId, user.address);
   if (result.error) return result;
   refresh();
   return { error: null };
@@ -173,6 +179,7 @@ const one = <T>(value: T | T[] | null): T | null =>
 async function scoreSession(
   supabase: Supabase,
   sessionId: string,
+  address: Address | null,
 ): Promise<FormState> {
   const [{ data: session }, { data: rows }] = await Promise.all([
     supabase
@@ -222,6 +229,7 @@ async function scoreSession(
     feedback = await evaluateInterview(
       roleName,
       items.map((item) => ({ ...item, answer: item.answer!.text })),
+      address,
     );
   } catch (error) {
     if (error instanceof AiError) {
@@ -245,7 +253,7 @@ async function scoreSession(
   const failed = results.find((r) => r.error);
   if (failed?.error) {
     console.error("Saving feedback failed:", failed.error.message);
-    return { error: "לא הצלחנו לשמור את המשוב. נסה שוב." };
+    return { error: "לא הצלחנו לשמור את המשוב. אפשר לנסות שוב." };
   }
 
   await supabase

@@ -17,7 +17,7 @@ export const reviewRubric = [
   {
     key: "relevance",
     label: "התאמה לתפקיד",
-    description: "הניסיון, הכישורים והמילים מתאימים לתפקיד שאליו אתה מכוון.",
+    description: "הניסיון, הכישורים והמילים מתאימים לתפקיד המבוקש.",
     prompt:
       "Relevance: experience, skills and keywords match the target role (or a clear direction when no role is given).",
   },

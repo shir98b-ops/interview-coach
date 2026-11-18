@@ -13,11 +13,11 @@ import { getSignedInUser } from "@/lib/supabase/user";
 export type ReviewState = { error: string | null };
 
 const aiMessages: Record<AiError["reason"], string> = {
-  config: "הדירוג עדיין לא מוגדר. נסה שוב מאוחר יותר.",
+  config: "הדירוג עדיין לא מוגדר. אפשר לנסות שוב מאוחר יותר.",
   auth: "הדירוג לא זמין כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
   billing: "הדירוג לא זמין כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
-  unreadable: "לא הצלחנו לדרג את קורות החיים. נסה שוב.",
-  service: "משהו השתבש בדירוג. נסה שוב.",
+  unreadable: "לא הצלחנו לדרג את קורות החיים. אפשר לנסות שוב.",
+  service: "משהו השתבש בדירוג. אפשר לנסות שוב.",
 };
 
 /** Rates the saved resume, for the chosen target role or in general. */
@@ -71,7 +71,7 @@ export async function rateResume(
     : null;
   let review;
   try {
-    review = await reviewResume(resume.data, roleTitle);
+    review = await reviewResume(resume.data, roleTitle, user.address);
   } catch (error) {
     if (error instanceof AiError) {
       console.error("Resume review failed:", error.reason, error.message);
@@ -91,7 +91,7 @@ export async function rateResume(
   });
   if (error) {
     console.error("Saving resume review failed:", error.message);
-    return { error: "לא הצלחנו לשמור את הדירוג. נסה שוב." };
+    return { error: "לא הצלחנו לשמור את הדירוג. אפשר לנסות שוב." };
   }
   refresh();
   return { error: null };

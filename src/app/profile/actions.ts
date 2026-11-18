@@ -2,6 +2,8 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { parseAddress } from "@/lib/address";
+import { safeNextPath } from "@/lib/auth/redirect";
 import { ExtractionError, extractResume } from "@/lib/resume/extract";
 import {
   resumeSchema,
@@ -17,13 +19,13 @@ export type ExtractState =
   | { status: "review"; data: ResumeData };
 
 const extractionMessages: Record<ExtractionError["reason"], string> = {
-  config: "קריאת קורות חיים עדיין לא מוגדרת. נסה שוב מאוחר יותר.",
+  config: "קריאת קורות חיים עדיין לא מוגדרת. אפשר לנסות שוב מאוחר יותר.",
   auth: "קריאת קורות חיים לא זמינה כרגע: שירות הבינה המלאכותית לא קיבל את מפתח הגישה.",
   billing:
     "קריאת קורות חיים לא זמינה כרגע: נגמר הקרדיט בחשבון שירות הבינה המלאכותית.",
   unreadable:
-    "לא הצלחנו לקרוא את הקובץ. נסה קובץ PDF אחר, עדיף כזה שיוצא ישירות מהמסמך ולא סרוק.",
-  service: "משהו השתבש בקריאת הקובץ. נסה שוב.",
+    "לא הצלחנו לקרוא את הקובץ. אפשר לנסות קובץ PDF אחר, עדיף כזה שיוצא ישירות מהמסמך ולא סרוק.",
+  service: "משהו השתבש בקריאת הקובץ. אפשר לנסות שוב.",
 };
 
 async function requireUser() {
@@ -74,7 +76,7 @@ export async function saveProfile(
   });
   if (error) {
     console.error("Saving profile failed:", error.message);
-    return { error: "לא הצלחנו לשמור את הפרופיל. נסה שוב." };
+    return { error: "לא הצלחנו לשמור את הפרופיל. אפשר לנסות שוב." };
   }
   redirect("/profile?saved=1");
 }
@@ -102,4 +104,22 @@ export async function removeTargetRole(formData: FormData) {
   const { error } = await supabase.from("target_roles").delete().eq("id", id);
   if (error) console.error("Removing target role failed:", error.message);
   refresh();
+}
+
+/** Saves how the app should address the user in Hebrew. */
+export async function setAddress(formData: FormData) {
+  const address = parseAddress(formData.get("address"));
+  const next = safeNextPath(String(formData.get("next") ?? "/profile"));
+  const { supabase } = await requireUser();
+  if (!address) redirect(next);
+
+  // Kept in the account's own settings, so it works before a resume exists.
+  const { error } = await supabase.auth.updateUser({ data: { address } });
+  if (error) {
+    console.error("Saving address failed:", error.message);
+  } else {
+    // A new session token carries the choice to every page right away.
+    await supabase.auth.refreshSession();
+  }
+  redirect(next);
 }

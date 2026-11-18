@@ -4,7 +4,7 @@ import { ButtonLink, Card, Chip } from "@/components/ui";
 const steps = [
   {
     title: "מעלים קורות חיים",
-    body: "המערכת קוראת אותם, נותנת להם ציון והצעות לשיפור, ואתה בוחר לאיזה תפקיד אתה מתכונן.",
+    body: "המערכת קוראת אותם, נותנת להם ציון והצעות לשיפור, ובוחרים לאיזה תפקיד מתכוננים.",
   },
   {
     title: "מתאמנים על ראיון",
@@ -64,7 +64,7 @@ export default function Home() {
             <div className="rounded-2xl bg-white/10 p-4">
               <p className="text-sm opacity-90">הטיפ שלך</p>
               <p className="font-medium">
-                הוסף מספר אחד לסיפור, והתשובה תישמע הרבה יותר משכנעת.
+                עם מספר אחד בסיפור, התשובה תישמע הרבה יותר משכנעת.
               </p>
             </div>
           </Card>
@@ -90,9 +90,9 @@ export default function Home() {
         </section>
 
         <Card tone="orange" className="items-start gap-4 p-8">
-          <h2 className="text-2xl font-extrabold">מוכן לסיבוב הראשון?</h2>
+          <h2 className="text-2xl font-extrabold">יוצאים לסיבוב הראשון?</h2>
           <p className="text-muted text-lg">
-            נכנסים עם חשבון גוגל, ותוך שתי דקות אתה כבר עונה על השאלה הראשונה.
+            נכנסים עם חשבון גוגל, ותוך שתי דקות כבר עונים על השאלה הראשונה.
           </p>
           <ButtonLink href="/dashboard">להתחיל עכשיו</ButtonLink>
         </Card>
