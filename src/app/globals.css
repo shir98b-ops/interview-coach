@@ -1,28 +1,41 @@
 @import "tailwindcss";
 
+/*
+ * The "energetic" look: deep violet, lime and orange on a soft lilac
+ * background, big rounded cards and chunky buttons. Light only, so the
+ * colors stay as designed.
+ */
 :root {
-  /* Lets native controls (dropdown lists, file pickers) follow dark mode. */
-  color-scheme: light dark;
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: var(--font-rubik), system-ui, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-ink: #17112e;
+  --color-muted: #4a4366;
+  --color-canvas: #f6f4ff;
+  --color-line: #e7e2ff;
+  --color-violet: #6d28ff;
+  --color-violet-dark: #4a13c9;
+  --color-violet-soft: #efe9ff;
+  --color-lime: #c6f432;
+  --color-lime-dark: #9bc31f;
+  --color-orange: #ff8a3d;
+  --color-orange-soft: #fff1e7;
+  --color-orange-ink: #a8430f;
+  --color-success-soft: #ecfbd0;
+  --color-success-ink: #3d5a00;
+  --color-danger: #c81e3a;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+/* Keeps keyboard focus visible on every control. */
+:focus-visible {
+  outline: 3px solid var(--color-violet);
+  outline-offset: 2px;
 }

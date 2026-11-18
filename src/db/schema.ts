@@ -111,3 +111,17 @@ export const answers = pgTable(
   },
   () => [ownRowsOnly("answers")],
 ).enableRLS();
+
+/** The user's answer to a lesson's exercise, with its feedback. */
+export const lessonAttempts = pgTable(
+  "lesson_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: userId(),
+    lessonSlug: text("lesson_slug").notNull(),
+    answer: text("answer").notNull(),
+    feedback: jsonb("feedback"),
+    createdAt: createdAt(),
+  },
+  () => [ownRowsOnly("lesson_attempts")],
+).enableRLS();

@@ -1,14 +1,12 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { splitList, type ResumeData } from "@/lib/resume/schema";
 import { extractResumeAction, saveProfile, type ExtractState } from "./actions";
 
-const input =
-  "w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700";
-const button =
-  "rounded-md bg-zinc-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900";
-const linkButton = "text-sm text-zinc-600 underline dark:text-zinc-400";
+const input = inputStyles;
+const linkButton = "text-sm font-bold text-violet hover:text-violet-dark";
 
 /** Upload a resume, then review and save the extracted details. */
 export function ResumeFlow({ hasProfile }: { hasProfile: boolean }) {
@@ -29,8 +27,8 @@ export function ResumeFlow({ hasProfile }: { hasProfile: boolean }) {
 
   return (
     <form action={action} className="flex flex-col gap-3">
-      <label htmlFor="resume" className="font-medium">
-        {hasProfile ? "Upload a new resume" : "Upload your resume"}
+      <label htmlFor="resume" className="font-bold">
+        {hasProfile ? "להעלות קורות חיים חדשים" : "להעלות את קורות החיים שלך"}
       </label>
       <input
         id="resume"
@@ -38,24 +36,18 @@ export function ResumeFlow({ hasProfile }: { hasProfile: boolean }) {
         type="file"
         accept="application/pdf,.pdf"
         required
-        className={input}
+        className={`${input} file:bg-violet-soft file:text-violet-dark file:me-4 file:rounded-xl file:border-0 file:px-4 file:py-2 file:font-bold`}
       />
-      <p className="text-sm text-zinc-500">
-        PDF, up to 4 MB. The file is read once and not stored. Only the details
-        you approve are saved.
+      <p className="text-muted text-sm">
+        קובץ PDF עד 4 מגה. הקובץ נקרא פעם אחת ולא נשמר. נשמרים רק הפרטים שאתה
+        מאשר.
       </p>
-      {state.status === "error" && (
-        <p role="alert" className="text-sm text-red-600">
-          {state.error}
-        </p>
-      )}
-      <div>
-        <button type="submit" disabled={pending} className={button}>
-          {pending
-            ? "Reading your resume, this takes a few seconds..."
-            : "Read resume"}
-        </button>
-      </div>
+      {state.status === "error" && <ErrorText>{state.error}</ErrorText>}
+      <Button type="submit" disabled={pending} className="w-full sm:w-fit">
+        {pending
+          ? "קורא את קורות החיים, זה לוקח כמה שניות..."
+          : "לקרוא את הקובץ"}
+      </Button>
     </form>
   );
 }
@@ -89,35 +81,38 @@ function ReviewForm({
         });
       }}
     >
-      <p className="text-zinc-600 dark:text-zinc-400">
-        Check the details we found and fix anything that is wrong. Nothing is
-        saved until you confirm.
+      <p className="text-muted">
+        בדוק את הפרטים שמצאנו ותקן מה שלא מדויק. שום דבר לא נשמר עד שתאשר.
       </p>
 
-      <Field label="Full name">
+      <Field label="שם מלא">
         <input
+          dir="auto"
           className={input}
           value={data.fullName}
           onChange={(e) => set({ fullName: e.target.value })}
         />
       </Field>
-      <Field label="Headline">
+      <Field label="תיאור קצר">
         <input
+          dir="auto"
           className={input}
           value={data.headline}
           onChange={(e) => set({ headline: e.target.value })}
         />
       </Field>
-      <Field label="Summary">
+      <Field label="תקציר">
         <textarea
+          dir="auto"
           className={input}
           rows={3}
           value={data.summary}
           onChange={(e) => set({ summary: e.target.value })}
         />
       </Field>
-      <Field label="Skills (comma separated)">
+      <Field label="כישורים (מופרדים בפסיקים)">
         <textarea
+          dir="auto"
           className={input}
           rows={2}
           defaultValue={data.skills.join(", ")}
@@ -126,16 +121,17 @@ function ReviewForm({
       </Field>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Experience</h2>
+        <h2 className="text-xl font-extrabold">ניסיון</h2>
         {data.experience.map((job, i) => (
           <fieldset
             key={jobKeys[i]}
-            className="flex flex-col gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
+            className="bg-canvas flex flex-col gap-2 rounded-2xl p-4"
           >
             <div className="grid gap-2 sm:grid-cols-3">
               <input
-                aria-label="Title"
-                placeholder="Title"
+                aria-label="תפקיד"
+                placeholder="תפקיד"
+                dir="auto"
                 className={input}
                 value={job.title}
                 onChange={(e) =>
@@ -143,8 +139,9 @@ function ReviewForm({
                 }
               />
               <input
-                aria-label="Company"
-                placeholder="Company"
+                aria-label="חברה"
+                placeholder="חברה"
+                dir="auto"
                 className={input}
                 value={job.company}
                 onChange={(e) =>
@@ -152,8 +149,9 @@ function ReviewForm({
                 }
               />
               <input
-                aria-label="Period"
-                placeholder="Period"
+                aria-label="תקופה"
+                placeholder="תקופה"
+                dir="auto"
                 className={input}
                 value={job.period}
                 onChange={(e) =>
@@ -162,9 +160,10 @@ function ReviewForm({
               />
             </div>
             <textarea
-              aria-label="Highlights, one per line"
-              placeholder="Highlights, one per line"
+              aria-label="הישגים, אחד בכל שורה"
+              placeholder="הישגים, אחד בכל שורה"
               rows={3}
+              dir="auto"
               className={input}
               defaultValue={job.highlights.join("\n")}
               onChange={(e) =>
@@ -181,22 +180,23 @@ function ReviewForm({
               className={`${linkButton} self-start`}
               onClick={() => removeAt("experience", i)}
             >
-              Remove
+              הסרה
             </button>
           </fieldset>
         ))}
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Education</h2>
+        <h2 className="text-xl font-extrabold">השכלה</h2>
         {data.education.map((item, i) => (
           <fieldset
             key={i}
             className="grid gap-2 sm:grid-cols-[1fr_1fr_8rem_auto]"
           >
             <input
-              aria-label="Degree"
-              placeholder="Degree"
+              aria-label="תואר"
+              placeholder="תואר"
+              dir="auto"
               className={input}
               value={item.degree}
               onChange={(e) =>
@@ -204,8 +204,9 @@ function ReviewForm({
               }
             />
             <input
-              aria-label="Institution"
-              placeholder="Institution"
+              aria-label="מוסד"
+              placeholder="מוסד"
+              dir="auto"
               className={input}
               value={item.institution}
               onChange={(e) =>
@@ -213,8 +214,9 @@ function ReviewForm({
               }
             />
             <input
-              aria-label="Year"
-              placeholder="Year"
+              aria-label="שנה"
+              placeholder="שנה"
+              dir="auto"
               className={input}
               value={item.year}
               onChange={(e) =>
@@ -226,24 +228,20 @@ function ReviewForm({
               className={linkButton}
               onClick={() => removeAt("education", i)}
             >
-              Remove
+              הסרה
             </button>
           </fieldset>
         ))}
       </section>
 
-      {error && (
-        <p role="alert" className="text-sm text-red-600">
-          {error}
-        </p>
-      )}
-      <div className="flex items-center gap-4">
-        <button type="submit" disabled={saving} className={button}>
-          {saving ? "Saving..." : "Save profile"}
-        </button>
-        <button type="button" className={linkButton} onClick={onCancel}>
-          Cancel
-        </button>
+      {error && <ErrorText>{error}</ErrorText>}
+      <div className="flex flex-wrap items-center gap-4">
+        <Button type="submit" variant="lime" disabled={saving}>
+          {saving ? "שומר..." : "לשמור פרופיל"}
+        </Button>
+        <Button type="button" variant="quiet" onClick={onCancel}>
+          ביטול
+        </Button>
       </div>
     </form>
   );
@@ -281,7 +279,7 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="font-medium">{label}</span>
+      <span className="font-bold">{label}</span>
       {children}
     </label>
   );

@@ -8,9 +8,9 @@ export const questionKinds = ["behavioral", "role", "resume"] as const;
 export type QuestionKind = (typeof questionKinds)[number];
 
 export const kindLabels: Record<QuestionKind, string> = {
-  behavioral: "Behavioral",
-  role: "Role skills",
-  resume: "Your experience",
+  behavioral: "התנהגותית",
+  role: "מקצועית",
+  resume: "על הניסיון שלך",
 };
 
 /** What the AI returns: the questions for one practice interview. */
@@ -51,11 +51,11 @@ export function validateAnswer(
   value: unknown,
 ): { ok: true; text: string } | { ok: false; error: string } {
   const text = typeof value === "string" ? value.trim() : "";
-  if (!text) return { ok: false, error: "Write an answer before moving on." };
+  if (!text) return { ok: false, error: "כתוב תשובה לפני שממשיכים." };
   if (text.length > MAX_ANSWER_LENGTH) {
     return {
       ok: false,
-      error: `Answers can be up to ${MAX_ANSWER_LENGTH} characters.`,
+      error: `תשובה יכולה להיות עד ${MAX_ANSWER_LENGTH} תווים.`,
     };
   }
   return { ok: true, text };

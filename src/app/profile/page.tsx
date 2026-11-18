@@ -1,31 +1,39 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { Loading } from "@/components/app-shell";
+import { Button, Card, PageHeading, inputStyles } from "@/components/ui";
 import type { ResumeData } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
+import { getSignedInUser } from "@/lib/supabase/user";
 import { addTargetRole, removeTargetRole } from "./actions";
 import { ResumeFlow } from "./resume-flow";
-import { getSignedInUser } from "@/lib/supabase/user";
 
-export const metadata: Metadata = { title: "Your profile · Interview Coach" };
+export const metadata: Metadata = { title: "פרופיל · Interview Coach" };
+
+/** Stored in English, because the question bank matches on these values. */
+const seniorityLevels = [
+  { value: "Entry level", label: "התחלתי" },
+  { value: "Mid level", label: "ביניים" },
+  { value: "Senior", label: "בכיר" },
+  { value: "Manager", label: "מנהל" },
+];
+
+function seniorityLabel(value: string): string {
+  return seniorityLevels.find((s) => s.value === value)?.label ?? value;
+}
 
 export default function ProfilePage({ searchParams }: PageProps<"/profile">) {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-10 px-6 py-16">
-      <header className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold">Your profile</h1>
-        <Link
-          href="/dashboard"
-          className="text-sm text-zinc-600 underline dark:text-zinc-400"
-        >
-          Back to dashboard
-        </Link>
-      </header>
-      <Suspense fallback={<p className="text-zinc-500">Loading...</p>}>
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
+      <PageHeading
+        title="הפרופיל שלי"
+        subtitle="קורות החיים והתפקידים שלך. מהם נבנות השאלות בתרגול."
+      />
+      <Suspense fallback={<Loading />}>
         <ProfileContent searchParams={searchParams} />
       </Suspense>
-    </main>
+    </div>
   );
 }
 
@@ -53,43 +61,50 @@ async function ProfileContent({
   return (
     <>
       {saved && (
-        <p role="status" className="rounded-md bg-green-50 p-3 text-green-800">
-          Your profile was saved.
+        <p
+          role="status"
+          className="bg-success-soft text-success-ink rounded-2xl p-4 font-bold"
+        >
+          הפרופיל נשמר.
         </p>
       )}
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Resume</h2>
+      <Card className="gap-5 p-6 sm:p-8">
+        <h2 className="text-2xl font-extrabold">קורות חיים</h2>
         {resume && <ResumeSummary resume={resume} />}
         <ResumeFlow hasProfile={Boolean(resume)} />
-      </section>
+      </Card>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Target roles</h2>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          The roles you are preparing for. Interview questions will be tailored
-          to them.
-        </p>
+      <Card className="gap-5 p-6 sm:p-8">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-extrabold">התפקידים שלי</h2>
+          <p className="text-muted">
+            התפקידים שאליהם אתה מתכונן. השאלות בתרגול יותאמו אליהם.
+          </p>
+        </div>
         {roles && roles.length > 0 && (
           <ul className="flex flex-col gap-2">
             {roles.map((role) => (
               <li
                 key={role.id}
-                className="flex items-center justify-between rounded-md border border-zinc-200 px-4 py-2 dark:border-zinc-800"
+                className="bg-violet-soft flex items-center justify-between gap-3 rounded-2xl px-4 py-3"
               >
-                <span>
-                  {role.title}
+                <span className="font-bold">
+                  <span dir="auto">{role.title}</span>
                   {role.seniority && (
-                    <span className="text-zinc-500"> · {role.seniority}</span>
+                    <span className="text-muted font-normal">
+                      {" "}
+                      · {seniorityLabel(role.seniority)}
+                    </span>
                   )}
                 </span>
                 <form action={removeTargetRole}>
                   <input type="hidden" name="id" value={role.id} />
                   <button
                     type="submit"
-                    className="text-sm text-zinc-600 underline dark:text-zinc-400"
+                    className="text-violet hover:text-violet-dark text-sm font-bold"
                   >
-                    Remove
+                    הסרה
                   </button>
                 </form>
               </li>
@@ -98,54 +113,49 @@ async function ProfileContent({
         )}
         <form
           action={addTargetRole}
-          className="grid gap-2 sm:grid-cols-[1fr_10rem_auto]"
+          className="grid gap-3 sm:grid-cols-[1fr_10rem_auto]"
         >
           <input
             name="title"
             required
             maxLength={120}
-            placeholder="e.g. Product Manager"
-            aria-label="Role title"
-            className="rounded-md border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+            dir="auto"
+            placeholder="למשל: מנהל מוצר"
+            aria-label="שם התפקיד"
+            className={inputStyles}
           />
-          <select
-            name="seniority"
-            aria-label="Seniority"
-            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-          >
-            <option value="">Any level</option>
-            <option>Entry level</option>
-            <option>Mid level</option>
-            <option>Senior</option>
-            <option>Manager</option>
+          <select name="seniority" aria-label="דרגה" className={inputStyles}>
+            <option value="">כל דרגה</option>
+            {seniorityLevels.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
           </select>
-          <button
-            type="submit"
-            className="rounded-md bg-zinc-900 px-4 py-2 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
-          >
-            Add role
-          </button>
+          <Button type="submit">להוסיף</Button>
         </form>
-      </section>
+      </Card>
     </>
   );
 }
 
 function ResumeSummary({ resume }: { resume: ResumeData }) {
   return (
-    <div className="flex flex-col gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
-      <p className="font-medium">
-        {resume.fullName || "Unnamed"}
+    <div className="bg-canvas flex flex-col gap-2 rounded-2xl p-4">
+      <p dir="auto" className="font-bold">
+        {resume.fullName || "ללא שם"}
         {resume.headline && (
-          <span className="text-zinc-500"> · {resume.headline}</span>
+          <span className="text-muted font-normal"> · {resume.headline}</span>
         )}
       </p>
       {resume.summary && (
-        <p className="text-zinc-600 dark:text-zinc-400">{resume.summary}</p>
+        <p dir="auto" className="text-muted">
+          {resume.summary}
+        </p>
       )}
-      <p className="text-sm text-zinc-500">
-        {resume.experience.length} roles · {resume.education.length} degrees ·{" "}
-        {resume.skills.length} skills
+      <p className="text-muted text-sm">
+        {resume.experience.length} תפקידים · {resume.education.length} תארים ·{" "}
+        {resume.skills.length} כישורים
       </p>
     </div>
   );

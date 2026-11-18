@@ -37,6 +37,10 @@ with another person.
 5. Get a score per answer against a fixed rubric (content, structure,
    clarity), with what worked, what to improve and an outline of a stronger
    answer. Every interview is saved, with a chart of scores over time.
+6. Learn: six five-minute lessons (STAR, introducing yourself, specifics,
+   being concise, failures, thinking out loud), each ending with one practice
+   question and instant feedback. The app recommends the lesson for the
+   user's weakest rubric criterion.
 
 ## Key product decisions
 
@@ -54,6 +58,8 @@ with another person.
 | All answers are **scored together** at the end                   | One scoring pass per interview is cheaper and keeps scores consistent with each other, and the user is not interrupted between questions, like in a real interview.                                             |
 | The app runs **next to its database**, in Europe                 | Every page makes several database calls, and most users are in Israel. Running the app and the database together in Frankfurt keeps each call local and both close to users.                                    |
 | Each user can start **five interviews a day**                    | Every interview costs a few cents of AI usage. A daily limit protects against surprise bills when the site is shared, without getting in the way of real practice. Paid plans can raise it later.               |
+| The interface is in **Hebrew**, with a young, energetic design   | Most users prepare in Israel. Practice anxiety is real, so the app should feel like an encouraging coach, not a form. Answers and questions can still be in English.                                            |
+| **Learning** is part of the MVP, not only practice               | A score alone does not tell people how to improve. Short lessons with one exercise each turn feedback into a next step, and the weakest criterion picks the lesson.                                             |
 | Job links and gamified exercises come **after** the MVP          | A small product that works end to end is more useful, and easier to validate, than four half-built areas.                                                                                                       |
 | Practice exercises are **original**, "in the style of" a company | Real take-home tests are often confidential. Generating original exercises by type and difficulty avoids copying them.                                                                                          |
 
@@ -61,17 +67,17 @@ with another person.
 
 Stages 1 to 6 make up the MVP.
 
-| #   | Stage                        | Outcome                                                       |
-| --- | ---------------------------- | ------------------------------------------------------------- |
-| 1   | Project foundation           | Repository, app skeleton, automated checks, first deployment  |
-| 2   | Accounts and data            | Google sign-in and a database for profiles and sessions       |
-| 3   | Resume and profile           | Resume upload, reviewed extraction, target roles              |
-| 4   | Written interview simulation | Tailored questions answered in writing                        |
-| 5   | Scoring and feedback         | Rubric scores, tips and progress history                      |
-| 6   | MVP polish and launch        | End-to-end tests, error handling, usage limits, documentation |
-| 7   | Jobs I applied to            | Job link in, company summary and job-specific practice out    |
-| 8   | Voice answers                | Recorded answers, transcription, feedback on delivery         |
-| 9   | Learn by playing             | Short take-home style exercises with points and streaks       |
+| #   | Stage                        | Outcome                                                      |
+| --- | ---------------------------- | ------------------------------------------------------------ |
+| 1   | Project foundation           | Repository, app skeleton, automated checks, first deployment |
+| 2   | Accounts and data            | Google sign-in and a database for profiles and sessions      |
+| 3   | Resume and profile           | Resume upload, reviewed extraction, target roles             |
+| 4   | Written interview simulation | Tailored questions answered in writing                       |
+| 5   | Scoring and feedback         | Rubric scores, tips and progress history                     |
+| 6   | MVP polish and launch        | Hebrew redesign, lessons with exercises, limits, tests       |
+| 7   | Jobs I applied to            | Job link in, company summary and job-specific practice out   |
+| 8   | Voice answers                | Recorded answers, transcription, feedback on delivery        |
+| 9   | Learn by playing             | Points, streaks and more lessons on top of the learning area |
 
 ## How it is built
 

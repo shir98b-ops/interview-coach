@@ -17,7 +17,7 @@ describe("usageStatus", () => {
     const starts = [hoursAgo(20), hoursAgo(5), hoursAgo(4)];
     const status = usageStatus(starts, now, 3);
     expect(status).toEqual({ limit: 3, remaining: 0, hoursUntilNext: 4 });
-    expect(limitMessage(status)).toContain("about 4 hours");
+    expect(limitMessage(status)).toContain("בעוד כ־4 שעות");
   });
 
   it("never reports less than an hour", () => {

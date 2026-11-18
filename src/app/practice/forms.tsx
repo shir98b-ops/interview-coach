@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { MAX_ANSWER_LENGTH, interviewLanguages } from "@/lib/interview/schema";
 import {
   retryFeedback,
@@ -9,8 +10,10 @@ import {
   type FormState,
 } from "./actions";
 
-const button =
-  "rounded-md bg-zinc-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900";
+const optionStyles =
+  "flex cursor-pointer items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 font-medium transition hover:border-violet has-[:checked]:border-violet has-[:checked]:bg-violet-soft";
+
+const languageNames: Record<string, string> = { en: "English", he: "עברית" };
 
 /** Choose a target role and start a practice interview for it. */
 export function StartPracticeForm({
@@ -24,66 +27,57 @@ export function StartPracticeForm({
   );
 
   return (
-    <form action={action} className="flex flex-col gap-3">
-      <fieldset className="flex flex-col gap-2" disabled={pending}>
-        <legend className="mb-2 font-medium">
-          Which role are you practicing for?
+    <form action={action} className="flex flex-col gap-6">
+      <fieldset className="flex flex-col gap-3" disabled={pending}>
+        <legend className="mb-3 text-xl font-extrabold">
+          לאיזה תפקיד מתאמנים?
         </legend>
         {roles.map((role, index) => (
-          <label
-            key={role.id}
-            className="flex items-center gap-3 rounded-md border border-zinc-200 px-4 py-2 dark:border-zinc-800"
-          >
+          <label key={role.id} className={optionStyles}>
             <input
               type="radio"
               name="roleId"
               value={role.id}
               defaultChecked={index === 0}
               required
+              className="accent-violet size-5"
             />
-            <span>
+            <span dir="auto">
               {role.title}
               {role.seniority && (
-                <span className="text-zinc-500"> · {role.seniority}</span>
+                <span className="text-muted"> · {role.seniority}</span>
               )}
             </span>
           </label>
         ))}
       </fieldset>
-      <fieldset className="flex flex-col gap-2" disabled={pending}>
-        <legend className="mb-2 font-medium">Interview language</legend>
-        <div className="flex gap-3">
-          {Object.entries(interviewLanguages).map(([code, name], index) => (
-            <label
-              key={code}
-              className="flex items-center gap-2 rounded-md border border-zinc-200 px-4 py-2 dark:border-zinc-800"
-            >
+      <fieldset className="flex flex-col gap-3" disabled={pending}>
+        <legend className="mb-3 text-xl font-extrabold">באיזו שפה?</legend>
+        <div className="flex flex-wrap gap-3">
+          {Object.keys(interviewLanguages).map((code, index) => (
+            <label key={code} className={optionStyles}>
               <input
                 type="radio"
                 name="language"
                 value={code}
                 defaultChecked={index === 0}
+                className="accent-violet size-5"
               />
-              <span lang={code}>{code === "he" ? "עברית" : name}</span>
+              <span lang={code}>{languageNames[code] ?? code}</span>
             </label>
           ))}
         </div>
-        <p className="text-sm text-zinc-500">
-          Questions and feedback will be in this language.
-        </p>
+        <p className="text-muted text-sm">השאלות והמשוב יהיו בשפה הזאת.</p>
       </fieldset>
-      {state.error && (
-        <p role="alert" className="text-sm text-red-600">
-          {state.error}
-        </p>
-      )}
-      <div>
-        <button type="submit" disabled={pending} className={button}>
-          {pending
-            ? "Preparing your questions, this takes a few seconds..."
-            : "Start practice interview"}
-        </button>
-      </div>
+      {state.error && <ErrorText>{state.error}</ErrorText>}
+      <Button
+        type="submit"
+        variant="lime"
+        disabled={pending}
+        className="w-full sm:w-fit"
+      >
+        {pending ? "מכין לך שאלות, זה לוקח כמה שניות..." : "להתחיל תרגול"}
+      </Button>
     </form>
   );
 }
@@ -107,8 +101,8 @@ export function AnswerForm({
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="sessionId" value={sessionId} />
       <input type="hidden" name="questionId" value={questionId} />
-      <label htmlFor="answer" className="sr-only">
-        Your answer
+      <label htmlFor="answer" className="text-muted font-medium">
+        התשובה שלך
       </label>
       <textarea
         dir="auto"
@@ -117,23 +111,22 @@ export function AnswerForm({
         required
         rows={10}
         maxLength={MAX_ANSWER_LENGTH}
-        placeholder="Write your answer as you would say it in the interview."
-        className="w-full rounded-md border border-zinc-300 bg-transparent px-3 py-2 dark:border-zinc-700"
+        placeholder="כתוב את התשובה כמו שהיית אומר אותה בראיון."
+        className={`${inputStyles} min-h-56`}
       />
-      {state.error && (
-        <p role="alert" className="text-sm text-red-600">
-          {state.error}
-        </p>
-      )}
-      <div>
-        <button type="submit" disabled={pending} className={button}>
-          {pending
-            ? "Saving..."
-            : isLast
-              ? "Finish interview"
-              : "Next question"}
-        </button>
-      </div>
+      <p className="text-muted text-sm">
+        טיפ: מצב, משימה, פעולה ותוצאה. ככה קל לעקוב אחרי הסיפור שלך.
+      </p>
+      {state.error && <ErrorText>{state.error}</ErrorText>}
+      <Button type="submit" disabled={pending} className="w-full sm:w-fit">
+        {pending
+          ? isLast
+            ? "בודק את התשובות שלך, זה יכול לקחת עד דקה..."
+            : "שומר..."
+          : isLast
+            ? "לסיים ולקבל ציון"
+            : "לשאלה הבאה"}
+      </Button>
     </form>
   );
 }
@@ -148,21 +141,11 @@ export function RetryFeedbackForm({ sessionId }: { sessionId: string }) {
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="sessionId" value={sessionId} />
-      <p className="text-zinc-600 dark:text-zinc-400">
-        Your answers are saved, but we couldn&apos;t score them yet.
-      </p>
-      {state.error && (
-        <p role="alert" className="text-sm text-red-600">
-          {state.error}
-        </p>
-      )}
-      <div>
-        <button type="submit" disabled={pending} className={button}>
-          {pending
-            ? "Scoring your answers, this can take up to a minute..."
-            : "Get my feedback"}
-        </button>
-      </div>
+      <p>התשובות שלך נשמרו, אבל עוד לא הצלחנו לתת להן ציון.</p>
+      {state.error && <ErrorText>{state.error}</ErrorText>}
+      <Button type="submit" variant="lime" disabled={pending} className="w-fit">
+        {pending ? "בודק את התשובות שלך, זה יכול לקחת עד דקה..." : "לקבל משוב"}
+      </Button>
     </form>
   );
 }
