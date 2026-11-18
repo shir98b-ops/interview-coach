@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { limitMessage } from "@/lib/interview/limits";
+import { getUsage } from "@/lib/interview/usage";
 import { StartPracticeForm } from "./forms";
 
 export const metadata: Metadata = { title: "Practice · Interview Coach" };
@@ -32,7 +34,7 @@ async function PracticeContent() {
   const user = await getSignedInUser(supabase);
   if (!user) redirect("/login?next=/practice");
 
-  const [{ data: profile }, { data: roles }, { data: sessions }] =
+  const [{ data: profile }, { data: roles }, { data: sessions }, usage] =
     await Promise.all([
       supabase
         .from("profiles")
@@ -50,6 +52,7 @@ async function PracticeContent() {
         )
         .order("created_at", { ascending: false })
         .limit(20),
+      getUsage(supabase),
     ]);
 
   if (!profile || !roles?.length) {
@@ -78,7 +81,22 @@ async function PracticeContent() {
           your resume. Answer each in writing, as you would in the interview.
           Then you get a score and tips for every answer.
         </p>
-        <StartPracticeForm roles={roles} />
+        {usage.remaining > 0 ? (
+          <>
+            <StartPracticeForm roles={roles} />
+            <p className="text-sm text-zinc-500">
+              {usage.remaining} of {usage.limit} practice interviews left in the
+              next 24 hours.
+            </p>
+          </>
+        ) : (
+          <p
+            role="status"
+            className="rounded-md bg-amber-50 p-3 text-amber-900"
+          >
+            {limitMessage(usage)}
+          </p>
+        )}
       </section>
 
       {sessions && sessions.length > 0 && (
