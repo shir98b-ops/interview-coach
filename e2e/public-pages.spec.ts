@@ -17,6 +17,18 @@ test("the sign-in page offers Google sign-in", async ({ page }) => {
   await expect(page.getByRole("button", { name: /google/i })).toBeVisible();
 });
 
+test("the privacy page is public", async ({ page }) => {
+  await page.goto("/privacy");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("פרטיות");
+  await expect(page.getByRole("heading", { name: "מחיקה" })).toBeVisible();
+});
+
+test("the sign-in page links to the privacy page", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByRole("link", { name: "מדיניות הפרטיות" }).click();
+  await expect(page).toHaveURL("/privacy");
+});
+
 for (const path of [
   "/dashboard",
   "/profile",

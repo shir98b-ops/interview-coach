@@ -163,3 +163,16 @@ export const resumeReviews = pgTable(
   },
   () => [ownRowsOnly("resume_reviews")],
 ).enableRLS();
+
+/** A short message users send from the feedback button. */
+export const feedback = pgTable(
+  "feedback",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: userId(),
+    message: text("message").notNull(),
+    page: text("page"),
+    createdAt: createdAt(),
+  },
+  () => [ownRowsOnly("feedback")],
+).enableRLS();

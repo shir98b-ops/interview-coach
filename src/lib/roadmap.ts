@@ -53,16 +53,17 @@ export const roadmap: Stage[] = [
     number: 6,
     title: "MVP polish and launch",
     summary:
-      "A fresh Hebrew design, short lessons with exercises, usage limits and tests.",
+      "A fresh Hebrew design, lessons, take-home practice, resume rating, privacy and account deletion.",
     mvp: true,
-    status: "in-progress",
+    status: "done",
   },
   {
     number: 7,
-    title: "Jobs I applied to",
-    summary: "Add a job link, get a company summary and job-specific practice.",
+    title: "Jobs and interview tracker",
+    summary:
+      "Track jobs applied to and upcoming interviews, with prep plans, time tips and calendar sync.",
     mvp: false,
-    status: "planned",
+    status: "in-progress",
   },
   {
     number: 8,

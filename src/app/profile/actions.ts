@@ -123,3 +123,22 @@ export async function setAddress(formData: FormData) {
   }
   redirect(next);
 }
+
+/** Deletes the account and every saved row, then signs out. */
+export async function deleteAccount(
+  _prev: { error: string | null },
+  formData: FormData,
+): Promise<{ error: string | null }> {
+  if (String(formData.get("confirm") ?? "").trim() !== "מחיקה") {
+    return { error: "צריך לכתוב את מילת האישור." };
+  }
+  const { supabase } = await requireUser();
+  // The database function deletes only the caller's own account.
+  const { error } = await supabase.rpc("delete_my_account");
+  if (error) {
+    console.error("Deleting account failed:", error.message);
+    return { error: "לא הצלחנו למחוק את החשבון. אפשר לנסות שוב." };
+  }
+  await supabase.auth.signOut();
+  redirect("/login?deleted=1");
+}

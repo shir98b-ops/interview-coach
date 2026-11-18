@@ -6,7 +6,7 @@ feedback, then track how you improve over time.
 
 **Live demo:** https://interview-coach-lemon.vercel.app
 
-> Status: stage 6 of 9 (MVP polish and launch) in progress. Stages 1-5 are done. See the [roadmap](#roadmap).
+> Status: the MVP (stages 1-6) is done. Stage 7 of 9 (jobs and interview tracker) is next. See the [roadmap](#roadmap).
 
 ## The problem
 
@@ -85,8 +85,8 @@ Stages 1 to 6 make up the MVP.
 | 3   | Resume and profile           | Resume upload, reviewed extraction, target roles             |
 | 4   | Written interview simulation | Tailored questions answered in writing                       |
 | 5   | Scoring and feedback         | Rubric scores, tips and progress history                     |
-| 6   | MVP polish and launch        | Hebrew redesign, lessons with exercises, limits, tests       |
-| 7   | Jobs I applied to            | Job link in, company summary and job-specific practice out   |
+| 6   | MVP polish and launch        | Hebrew redesign, lessons, take-homes, resume rating, privacy |
+| 7   | Jobs and interview tracker   | Applied jobs, upcoming interviews, prep plans, calendar sync |
 | 8   | Voice answers                | Recorded answers, transcription, feedback on delivery        |
 | 9   | Learn by playing             | Points, streaks and more lessons on top of the learning area |
 
