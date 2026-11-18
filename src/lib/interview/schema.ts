@@ -60,3 +60,15 @@ export function validateAnswer(
   }
   return { ok: true, text };
 }
+
+/** Languages a practice interview can be held in. */
+export const interviewLanguages = {
+  en: "English",
+  he: "Hebrew",
+} as const;
+
+export type InterviewLanguage = keyof typeof interviewLanguages;
+
+export function parseLanguage(value: unknown): InterviewLanguage {
+  return value === "he" ? "he" : "en";
+}

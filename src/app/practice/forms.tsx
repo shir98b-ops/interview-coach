@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { MAX_ANSWER_LENGTH } from "@/lib/interview/schema";
+import { MAX_ANSWER_LENGTH, interviewLanguages } from "@/lib/interview/schema";
 import {
   retryFeedback,
   startPractice,
@@ -49,6 +49,28 @@ export function StartPracticeForm({
             </span>
           </label>
         ))}
+      </fieldset>
+      <fieldset className="flex flex-col gap-2" disabled={pending}>
+        <legend className="mb-2 font-medium">Interview language</legend>
+        <div className="flex gap-3">
+          {Object.entries(interviewLanguages).map(([code, name], index) => (
+            <label
+              key={code}
+              className="flex items-center gap-2 rounded-md border border-zinc-200 px-4 py-2 dark:border-zinc-800"
+            >
+              <input
+                type="radio"
+                name="language"
+                value={code}
+                defaultChecked={index === 0}
+              />
+              <span lang={code}>{code === "he" ? "עברית" : name}</span>
+            </label>
+          ))}
+        </div>
+        <p className="text-sm text-zinc-500">
+          Questions and feedback will be in this language.
+        </p>
       </fieldset>
       {state.error && (
         <p role="alert" className="text-sm text-red-600">

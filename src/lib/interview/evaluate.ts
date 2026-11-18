@@ -26,8 +26,8 @@ consistent: a short or vague answer cannot score above 2 on content.
 
 For each answer, also give what worked, the most useful improvements, and a
 short outline of a stronger answer built from the candidate's own experience.
-Speak to the candidate directly ("you"). Write the feedback in the same
-language as the candidate's answers.`;
+Speak to the candidate directly ("you"). Write the feedback in the language
+the interview was held in, the language of the questions.`;
 
 /** Scores every answer in an interview with one call. */
 export async function evaluateInterview(

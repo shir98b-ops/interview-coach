@@ -6,7 +6,7 @@ import { AiError } from "@/lib/ai/client";
 import { evaluateInterview } from "@/lib/interview/evaluate";
 import { overallScore, readFeedback } from "@/lib/interview/feedback";
 import { generateQuestions } from "@/lib/interview/generate";
-import { validateAnswer } from "@/lib/interview/schema";
+import { parseLanguage, validateAnswer } from "@/lib/interview/schema";
 import { resumeSchema } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
@@ -42,6 +42,7 @@ export async function startPractice(
   formData: FormData,
 ): Promise<FormState> {
   const roleId = String(formData.get("roleId") ?? "");
+  const language = parseLanguage(formData.get("language"));
   const { supabase, user } = await requireUser();
 
   const [{ data: profile }, { data: role }] = await Promise.all([
@@ -64,7 +65,7 @@ export async function startPractice(
 
   let questions;
   try {
-    questions = await generateQuestions(role, resume.data);
+    questions = await generateQuestions(role, resume.data, language);
   } catch (error) {
     if (error instanceof AiError) {
       console.error("Question generation failed:", error.reason, error.message);

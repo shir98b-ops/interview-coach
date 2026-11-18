@@ -76,6 +76,7 @@ async function PracticeContent() {
         <p className="text-zinc-600 dark:text-zinc-400">
           You will get five questions, one at a time, tailored to the role and
           your resume. Answer each in writing, as you would in the interview.
+          Then you get a score and tips for every answer.
         </p>
         <StartPracticeForm roles={roles} />
       </section>

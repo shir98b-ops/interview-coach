@@ -111,7 +111,9 @@ async function SessionContent({
             style={{ width: `${((number - 1) / questions.length) * 100}%` }}
           />
         </div>
-        <h2 className="text-xl font-medium">{current.text}</h2>
+        <h2 dir="auto" className="text-xl font-medium">
+          {current.text}
+        </h2>
         <AnswerForm
           key={current.id}
           sessionId={session.id}
@@ -172,7 +174,9 @@ async function SessionContent({
             <p className="text-sm text-zinc-500">
               Question {index + 1} · {kindLabel(q.kind)}
             </p>
-            <p className="font-medium">{q.text}</p>
+            <p dir="auto" className="font-medium">
+              {q.text}
+            </p>
             <p
               dir="auto"
               className="rounded-md bg-zinc-50 p-3 whitespace-pre-wrap text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
