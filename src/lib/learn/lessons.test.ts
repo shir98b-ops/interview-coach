@@ -49,6 +49,15 @@ describe("recommendLesson", () => {
     expect(lesson?.focus).toBe("structure");
   });
 
+  it("recommends only interview lessons", () => {
+    const interview = lessons.filter((l) => l.track === "interview");
+    const lesson = recommendLesson(
+      [],
+      interview.slice(0, -1).map((l) => l.slug),
+    );
+    expect(lesson?.track).toBe("interview");
+  });
+
   it("returns nothing when every lesson is done", () => {
     expect(
       recommendLesson(

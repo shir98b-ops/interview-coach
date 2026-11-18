@@ -41,6 +41,11 @@ with another person.
    being concise, failures, thinking out loud), each ending with one practice
    question and instant feedback. The app recommends the lesson for the
    user's weakest rubric criterion.
+7. Practice take-home assignments: four lessons on handling take-homes, then
+   an original assignment written for the target role at a chosen difficulty.
+   The written submission is scored on understanding, solution, structure
+   and actionability, with improvements and the questions to expect in the
+   follow-up interview.
 
 ## Key product decisions
 
@@ -60,6 +65,7 @@ with another person.
 | Each user can start **five interviews a day**                    | Every interview costs a few cents of AI usage. A daily limit protects against surprise bills when the site is shared, without getting in the way of real practice. Paid plans can raise it later.               |
 | The interface is in **Hebrew**, with a young, energetic design   | Most users prepare in Israel. Practice anxiety is real, so the app should feel like an encouraging coach, not a form. Answers and questions can still be in English.                                            |
 | **Learning** is part of the MVP, not only practice               | A score alone does not tell people how to improve. Short lessons with one exercise each turn feedback into a next step, and the weakest criterion picks the lesson.                                             |
+| **Take-home** practice is scored on its own rubric               | A take-home is judged differently from an interview answer: understanding the problem, the quality of the solution, a readable write-up and actionable recommendations. Three per day keep AI costs small.      |
 | Job links and gamified exercises come **after** the MVP          | A small product that works end to end is more useful, and easier to validate, than four half-built areas.                                                                                                       |
 | Practice exercises are **original**, "in the style of" a company | Real take-home tests are often confidential. Generating original exercises by type and difficulty avoids copying them.                                                                                          |
 

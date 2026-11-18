@@ -28,8 +28,8 @@ export default async function LessonPage({
 }: PageProps<"/learn/[slug]">) {
   const lesson = getLesson((await params).slug);
   if (!lesson) notFound();
-  const index = lessons.indexOf(lesson);
-  const next = lessons[index + 1];
+  const track = lessons.filter((l) => l.track === lesson.track);
+  const next = track[track.indexOf(lesson) + 1];
 
   return (
     <article className="mx-auto flex w-full max-w-3xl flex-col gap-8">
@@ -39,11 +39,13 @@ export default async function LessonPage({
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           <Chip tone="violet">
-            שיעור {index + 1} מתוך {lessons.length}
+            שיעור {track.indexOf(lesson) + 1} מתוך {track.length}
           </Chip>
           <Chip>
             {lesson.minutes} דקות ·{" "}
-            {rubric.find((r) => r.key === lesson.focus)?.label}
+            {lesson.track === "take-home"
+              ? "מבחן בית"
+              : rubric.find((r) => r.key === lesson.focus)?.label}
           </Chip>
         </div>
         <h1 className="text-3xl font-extrabold sm:text-4xl">{lesson.title}</h1>

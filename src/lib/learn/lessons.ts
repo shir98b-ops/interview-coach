@@ -19,7 +19,9 @@ export interface Lesson {
   /** One line shown on the lesson card. */
   summary: string;
   minutes: number;
-  /** The rubric criterion this lesson improves most. */
+  /** Interview lessons are recommended from interview scores. */
+  track: "interview" | "take-home";
+  /** The interview rubric criterion this lesson improves most. */
   focus: RubricKey;
   sections: LessonSection[];
   exercise: {
@@ -36,6 +38,7 @@ export const lessons: Lesson[] = [
     title: "שיטת STAR: לספר סיפור שעובד",
     summary: 'המבנה שהופך כל שאלת "ספר על פעם ש..." לתשובה ברורה.',
     minutes: 5,
+    track: "interview",
     focus: "structure",
     sections: [
       {
@@ -68,6 +71,7 @@ export const lessons: Lesson[] = [
     title: '"ספר לי על עצמך" בדקה וחצי',
     summary: "השאלה שפותחת כמעט כל ראיון, והדרך לענות עליה בביטחון.",
     minutes: 5,
+    track: "interview",
     focus: "content",
     sections: [
       {
@@ -96,6 +100,7 @@ export const lessons: Lesson[] = [
     title: "פרטים ומספרים שמשכנעים",
     summary: "איך להפוך תשובה כללית לתשובה שזוכרים.",
     minutes: 4,
+    track: "interview",
     focus: "content",
     sections: [
       {
@@ -124,6 +129,7 @@ export const lessons: Lesson[] = [
     title: "לענות קצר וברור",
     summary: "איך לא לאבד את המראיין באמצע התשובה.",
     minutes: 4,
+    track: "interview",
     focus: "clarity",
     sections: [
       {
@@ -152,6 +158,7 @@ export const lessons: Lesson[] = [
     title: "חולשות וכישלונות בלי לפחד",
     summary: "השאלות הלא נעימות, והדרך להפוך אותן לנקודת חוזק.",
     minutes: 5,
+    track: "interview",
     focus: "content",
     sections: [
       {
@@ -180,6 +187,7 @@ export const lessons: Lesson[] = [
     title: "שאלות מקצועיות: לחשוב בקול",
     summary: "איך לענות על שאלה שאין לה תשובה אחת נכונה.",
     minutes: 5,
+    track: "interview",
     focus: "structure",
     sections: [
       {
@@ -204,6 +212,126 @@ export const lessons: Lesson[] = [
       hint: "פרק לשיקולים, בחר כיוון ואמור למה, וסכם במשפט אחד.",
     },
   },
+  {
+    slug: "take-home-brief",
+    track: "take-home",
+    title: "לפרק את המשימה לפני שמתחילים",
+    summary: "איך לקרוא מבחן בית ולהבין מה באמת מצפים לקבל.",
+    minutes: 5,
+    focus: "content",
+    sections: [
+      {
+        heading: "מה בודקים במבחן בית",
+        body: 'מבחן בית הוא לא מבחן ידע. החברה רוצה לראות איך אתה חושב: איך אתה מבין בעיה עמומה, מה אתה בוחר לעשות קודם, ואיך אתה מסביר את ההחלטות שלך. התשובה ה"נכונה" פחות חשובה מהדרך.',
+      },
+      {
+        heading: "שלוש שאלות לפני שכותבים מילה",
+        body: "מה המטרה העסקית? מאחורי כל משימה יש בעיה של החברה, כמו לקוחות שעוזבים או מכירות שנתקעו.\nמה בדיוק צריך להגיש? כמה עמודים, באיזה פורמט, ולמי.\nמה חסר? רשום את מה שלא כתוב במשימה, והחלט איזו הנחה תניח.",
+      },
+      {
+        heading: "לכתוב את ההנחות",
+        body: "כשמשהו לא ברור, אל תיתקע ואל תנחש בשקט. כתוב בתחילת ההגשה את ההנחות שלך. זה מראה בגרות מקצועית, וגם מגן עליך אם המראיין חשב על משהו אחר.",
+        example:
+          'הנחות:\n1. התקציב לרבעון הוא 50 אלף ש"ח, כפי שמופיע בטבלה.\n2. היעד הוא לקוחות קיימים, לא לקוחות חדשים.\n3. אין צורך בפיתוח טכני חדש בשלב הראשון.',
+      },
+    ],
+    exercise: {
+      question:
+        'קיבלת מבחן בית: "אפליקציית משלוחי אוכל רואה ירידה של 20% בהזמנות חוזרות. הצע תוכנית לשיפור." כתוב מה לדעתך המטרה העסקית, שלוש שאלות שהיית רוצה לשאול, ושלוש הנחות שתניח.',
+      goal: "The answer identifies the business goal (bringing back repeat customers and the revenue behind it), asks sharp clarifying questions about the data and scope, and states reasonable explicit assumptions.",
+      hint: "שלושה חלקים קצרים: המטרה, שאלות, הנחות.",
+    },
+  },
+  {
+    slug: "take-home-time",
+    track: "take-home",
+    title: "לנהל את הזמן במבחן בית",
+    summary: "איך לא לשקוע בפרטים ולהגיש בזמן משהו שלם.",
+    minutes: 4,
+    focus: "structure",
+    sections: [
+      {
+        heading: "יותר זמן זה לא יותר טוב",
+        body: 'אם כתוב "עד שלוש שעות", החברה לא מצפה לעבודה של שבוע. הגשה ענקית אומרת שקשה לך לתעדף. עדיף פתרון שלם וממוקד מאשר פתרון מושלם בחצי מהמשימות.',
+      },
+      {
+        heading: "חלוקה פשוטה",
+        body: "עשרה אחוזים מהזמן: לקרוא, לפרק ולכתוב הנחות.\nשישים אחוזים: לעבוד על הפתרון, מהחלק החשוב ביותר.\nעשרים אחוזים: לכתוב את ההגשה בצורה מסודרת.\nעשרה אחוזים: לקרוא הכל שוב ולתקן.",
+      },
+      {
+        heading: "מה עושים כשאין זמן",
+        body: "כתוב בסוף מה היית עושה עם עוד זמן. זה הופך חוסר זמן להזדמנות להראות שאתה רואה את התמונה המלאה.",
+        example:
+          "עם עוד זמן הייתי:\n- בודק את הנתונים לפי עיר, כדי לראות אם הירידה מקומית.\n- מראיין חמישה לקוחות שהפסיקו להזמין.",
+      },
+    ],
+    exercise: {
+      question:
+        "יש לך שעתיים למבחן בית: לנתח טבלה של מכירות ולהמליץ על שלושה צעדים לרבעון הבא. כתוב איך תחלק את הזמן ומה תעשה בכל שלב.",
+      goal: "The answer gives a realistic time plan that fits two hours, starts with understanding the task, puts most time on the analysis that matters most, and keeps time for writing and review.",
+      hint: "כתוב שלבים עם דקות לכל שלב, וסכום שמגיע לשעתיים.",
+    },
+  },
+  {
+    slug: "take-home-writeup",
+    track: "take-home",
+    title: "הגשה שקל לקרוא",
+    summary: "איך לכתוב מסמך שהמראיין מבין בדקה הראשונה.",
+    minutes: 5,
+    focus: "clarity",
+    sections: [
+      {
+        heading: "התקציר קודם",
+        body: "המראיין קורא הרבה הגשות. פתח בתקציר של שלוש עד חמש שורות: מה הבעיה, מה ההמלצה שלך, ומה התוצאה הצפויה. אם הוא יקרא רק את זה, הוא כבר יבין את העיקר.",
+        example:
+          "תקציר: הירידה בהזמנות החוזרות מגיעה בעיקר מלקוחות שחוו איחור במשלוח הראשון. אני ממליץ על פיצוי אוטומטי אחרי איחור ועל שיפור הזמנים בשעות העומס. הצפי: החזרה של חצי מהירידה תוך רבעון.",
+      },
+      {
+        heading: "מבנה קבוע",
+        body: "תקציר, הנחות, ניתוח, המלצות, איך נמדוד הצלחה, ומה הייתי עושה עם עוד זמן. כותרות ברורות ורשימות קצרות עוזרות לסרוק את המסמך.",
+      },
+      {
+        heading: "להסביר את הבחירות",
+        body: "בכל המלצה, כתוב משפט על למה דווקא היא ומה ויתרת עליו. ההסבר הזה הוא בדיוק מה שבודקים.",
+      },
+    ],
+    exercise: {
+      question:
+        'כתוב תקציר של עד חמש שורות להגשה על הנושא: "איך להגדיל את מספר המשתמשים הפעילים באפליקציית כושר ב־15% בחצי שנה". אפשר להמציא את הממצאים.',
+      goal: "The answer is an executive summary of at most five lines that states the problem, the main recommendation and the expected result with a number, clear enough to understand without the rest of the document.",
+      hint: "שלושה משפטים: הבעיה, ההמלצה, והתוצאה הצפויה.",
+    },
+  },
+  {
+    slug: "take-home-present",
+    track: "take-home",
+    title: "להציג את מבחן הבית בראיון",
+    summary: "איך להגן על ההחלטות שלך כשהמראיין מקשה.",
+    minutes: 4,
+    focus: "content",
+    sections: [
+      {
+        heading: "הראיון שאחרי",
+        body: "ברוב החברות, מבחן הבית ממשיך לשיחה שבה מציגים אותו. שם בודקים אם אתה מבין לעומק את מה שכתבת, ואיך אתה מגיב לביקורת.",
+      },
+      {
+        heading: "להתכונן לשאלות קשות",
+        body: "לפני הראיון, כתוב לעצמך את שלוש השאלות הכי קשות על ההגשה. למשל: למה לא בחרת בחלופה אחרת? מה אם ההנחה שלך לא נכונה? מה הסיכון הגדול בהמלצה?",
+      },
+      {
+        heading: "לקבל ביקורת בלי להתגונן",
+        body: "אם המראיין מעיר על משהו, אל תתווכח ואל תוותר מיד. הקשב, הסבר את השיקול שלך, ואם הוא צודק אמור איך היית משנה. זה מה שעושים בעבודה אמיתית.",
+        example:
+          '"זו נקודה טובה. בחרתי להתחיל מלקוחות קיימים כי הנתונים הראו שם את הירידה הגדולה, אבל אם יש לכם מידע שהבעיה דווקא אצל לקוחות חדשים, הייתי מתחיל מבדיקה קטנה שם."',
+      },
+    ],
+    exercise: {
+      question:
+        'המראיין אומר לך: "ההמלצה שלך יקרה מדי, ואין לנו תקציב לזה." איך תגיב?',
+      goal: "The answer acknowledges the concern without getting defensive, explains the reasoning behind the original recommendation, and offers a cheaper alternative or a small first step to test it.",
+      hint: "הקשבה, הסבר קצר, וחלופה זולה יותר.",
+    },
+  },
 ];
 
 export function getLesson(slug: string): Lesson | undefined {
@@ -222,7 +350,9 @@ export function recommendLesson(
   completed: Iterable<string>,
 ): Lesson | undefined {
   const done = new Set(completed);
-  const open = lessons.filter((lesson) => !done.has(lesson.slug));
+  const open = lessons.filter(
+    (lesson) => lesson.track === "interview" && !done.has(lesson.slug),
+  );
   if (open.length === 0) return undefined;
   if (recentScores.length === 0) return open[0];
 

@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { Loading } from "@/components/app-shell";
 import { ButtonLink, Card, Chip, PageHeading } from "@/components/ui";
 import { rubric } from "@/lib/interview/feedback";
-import { lessons } from "@/lib/learn/lessons";
+import { lessons, type Lesson } from "@/lib/learn/lessons";
 import { getLearningState } from "@/lib/learn/progress";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
@@ -70,8 +70,50 @@ async function LessonList() {
         </Card>
       )}
 
+      <Card tone="orange" className="gap-3 p-7">
+        <Chip>חדש</Chip>
+        <h2 className="text-2xl font-extrabold">מבחן בית לתרגול</h2>
+        <p className="text-lg">
+          מקבלים משימה בסגנון של מבחני בית אמיתיים לפי התפקיד שלך, מגישים בכתב
+          ומקבלים ציון ומשוב.
+        </p>
+        <ButtonLink
+          href="/learn/take-home"
+          variant="primary"
+          className="w-full sm:w-fit"
+        >
+          לקבל מבחן בית
+        </ButtonLink>
+      </Card>
+
+      <LessonGrid
+        title="שיעורים על מבחני בית"
+        items={lessons.filter((l) => l.track === "take-home")}
+        completed={completed}
+      />
+      <LessonGrid
+        title="שיעורים על הראיון"
+        items={lessons.filter((l) => l.track === "interview")}
+        completed={completed}
+      />
+    </>
+  );
+}
+
+function LessonGrid({
+  title,
+  items,
+  completed,
+}: {
+  title: string;
+  items: Lesson[];
+  completed: Set<string>;
+}) {
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-2xl font-extrabold">{title}</h2>
       <ul className="grid gap-5 md:grid-cols-2">
-        {lessons.map((lesson, index) => {
+        {items.map((lesson, index) => {
           const done = completed.has(lesson.slug);
           return (
             <li key={lesson.slug}>
@@ -90,7 +132,11 @@ async function LessonList() {
                     {done ? "✓" : index + 1}
                   </span>
                   <Chip tone={done ? "lime" : "orange"}>
-                    {done ? "סיימת" : focusLabel(lesson.focus)}
+                    {done
+                      ? "סיימת"
+                      : lesson.track === "take-home"
+                        ? "מבחן בית"
+                        : focusLabel(lesson.focus)}
                   </Chip>
                 </div>
                 <h2 className="text-xl font-bold">{lesson.title}</h2>
@@ -103,6 +149,6 @@ async function LessonList() {
           );
         })}
       </ul>
-    </>
+    </section>
   );
 }

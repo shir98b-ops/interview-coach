@@ -125,3 +125,24 @@ export const lessonAttempts = pgTable(
   },
   () => [ownRowsOnly("lesson_attempts")],
 ).enableRLS();
+
+/** A practice take-home assignment, the user's submission and its feedback. */
+export const takeHomes = pgTable(
+  "take_homes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: userId(),
+    targetRoleId: uuid("target_role_id").references(() => targetRoles.id, {
+      onDelete: "set null",
+    }),
+    difficulty: text("difficulty").notNull(),
+    language: text("language").notNull(),
+    brief: jsonb("brief").notNull(),
+    submission: text("submission"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    feedback: jsonb("feedback"),
+    score: smallint("score"),
+    createdAt: createdAt(),
+  },
+  () => [ownRowsOnly("take_homes")],
+).enableRLS();
