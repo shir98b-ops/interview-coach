@@ -51,7 +51,9 @@ export function ResumeFlow({ hasProfile }: { hasProfile: boolean }) {
       )}
       <div>
         <button type="submit" disabled={pending} className={button}>
-          {pending ? "Reading your resume..." : "Read resume"}
+          {pending
+            ? "Reading your resume, this takes a few seconds..."
+            : "Read resume"}
         </button>
       </div>
     </form>
