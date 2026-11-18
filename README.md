@@ -6,7 +6,7 @@ feedback, then track how you improve over time.
 
 **Live demo:** https://interview-coach-lemon.vercel.app
 
-> Status: stage 2 of 9 (accounts and data) in progress. See the [roadmap](#roadmap).
+> Status: stage 3 of 9 (resume and profile) in progress. Stages 1-2 are done. See the [roadmap](#roadmap).
 
 ## The problem
 
@@ -38,15 +38,17 @@ with another person.
 
 ## Key product decisions
 
-| Decision                                                         | Why                                                                                                                                                                    |
-| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sign in with **Google** only                                     | Most candidates already have a Google account, so there is no new password to create, forget or leak.                                                                  |
-| Each user can only ever see **their own data**                   | Resumes and interview answers are personal. The database itself enforces this rule (row-level security), so a bug in the app cannot expose another user's data.        |
-| Start with **written** answers; add voice later                  | Written answers deliver the core value (tailored questions and feedback) with fewer moving parts. Voice adds transcription and audio handling, so it comes in stage 8. |
-| Score against a **fixed rubric** instead of a free-form grade    | A rubric (content, structure, clarity) makes scores consistent between sessions and explainable to the user, so "3 out of 5" always means the same thing.              |
-| The user **confirms** what the AI extracts from the resume       | AI extraction is fast but sometimes wrong. A quick review step keeps the profile accurate, and everything after it depends on that profile.                            |
-| Job links and gamified exercises come **after** the MVP          | A small product that works end to end is more useful, and easier to validate, than four half-built areas.                                                              |
-| Practice exercises are **original**, "in the style of" a company | Real take-home tests are often confidential. Generating original exercises by type and difficulty avoids copying them.                                                 |
+| Decision                                                         | Why                                                                                                                                                                      |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sign in with **Google** only                                     | Most candidates already have a Google account, so there is no new password to create, forget or leak.                                                                    |
+| Each user can only ever see **their own data**                   | Resumes and interview answers are personal. The database itself enforces this rule (row-level security), so a bug in the app cannot expose another user's data.          |
+| Start with **written** answers; add voice later                  | Written answers deliver the core value (tailored questions and feedback) with fewer moving parts. Voice adds transcription and audio handling, so it comes in stage 8.   |
+| Score against a **fixed rubric** instead of a free-form grade    | A rubric (content, structure, clarity) makes scores consistent between sessions and explainable to the user, so "3 out of 5" always means the same thing.                |
+| The user **confirms** what the AI extracts from the resume       | AI extraction is fast but sometimes wrong. A quick review step keeps the profile accurate, and everything after it depends on that profile.                              |
+| The original resume file is **not stored**                       | Only the details the user approves are saved. Data we never keep cannot leak, and the product only needs the details, not the file.                                      |
+| A **small, fast AI model** reads resumes                         | Copying facts from a resume is a simple task. The smallest Claude model does it in seconds for about a tenth of a cent; stronger models are kept for interview feedback. |
+| Job links and gamified exercises come **after** the MVP          | A small product that works end to end is more useful, and easier to validate, than four half-built areas.                                                                |
+| Practice exercises are **original**, "in the style of" a company | Real take-home tests are often confidential. Generating original exercises by type and difficulty avoids copying them.                                                   |
 
 ## Roadmap
 
@@ -70,7 +72,7 @@ Stages 1 to 6 make up the MVP.
 | ----------------- | ---------------------------------------- |
 | App (UI + server) | Next.js with TypeScript                  |
 | Styling           | Tailwind CSS                             |
-| Data and sign-in  | Supabase (Postgres, Auth, Storage)       |
+| Data and sign-in  | Supabase (Postgres, Auth)                |
 | AI                | Claude API                               |
 | Hosting           | Vercel                                   |
 | Quality checks    | ESLint, Prettier, Vitest, GitHub Actions |
@@ -92,6 +94,9 @@ rules are in `supabase/migrations`; run them once in the Supabase SQL editor.
 
 For deployment, add the same two variables in Vercel under Settings,
 Environment Variables, as type Config for all environments, then redeploy.
+
+Resume reading also needs `ANTHROPIC_API_KEY` (from console.anthropic.com).
+Add it to `.env.local`, and in Vercel as type Secret for all environments.
 
 Then open http://localhost:3000.
 

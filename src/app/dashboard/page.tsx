@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { signOut } from "@/app/login/actions";
@@ -34,10 +35,30 @@ async function AccountSummary() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   return (
-    <p className="text-zinc-600 dark:text-zinc-400">
-      Signed in as {user.email}. Resume upload and interview practice arrive in
-      the next stages.
-    </p>
+    <div className="flex flex-col gap-6">
+      <p className="text-zinc-600 dark:text-zinc-400">
+        Signed in as {user.email}.
+      </p>
+      <div className="flex flex-col gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+        <h2 className="font-semibold">
+          {profile ? "Your profile is ready" : "Start with your resume"}
+        </h2>
+        <p className="text-zinc-600 dark:text-zinc-400">
+          {profile
+            ? "Update your resume details or the roles you are preparing for."
+            : "Upload your resume and choose the roles you are preparing for. Interview practice arrives in the next stage."}
+        </p>
+        <Link href="/profile" className="font-medium underline">
+          {profile ? "Edit profile" : "Set up your profile"}
+        </Link>
+      </div>
+    </div>
   );
 }

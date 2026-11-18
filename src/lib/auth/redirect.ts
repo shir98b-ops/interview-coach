@@ -1,5 +1,5 @@
 /** Pages that require a signed-in user. */
-export const protectedPrefixes = ["/dashboard"];
+export const protectedPrefixes = ["/dashboard", "/profile"];
 
 export function isProtectedPath(pathname: string): boolean {
   return protectedPrefixes.some(
