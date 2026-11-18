@@ -52,12 +52,23 @@ async function AccountSummary() {
         <p className="text-zinc-600 dark:text-zinc-400">
           {profile
             ? "Update your resume details or the roles you are preparing for."
-            : "Upload your resume and choose the roles you are preparing for. Interview practice arrives in the next stage."}
+            : "Upload your resume and choose the roles you are preparing for."}
         </p>
         <Link href="/profile" className="font-medium underline">
           {profile ? "Edit profile" : "Set up your profile"}
         </Link>
       </div>
+      {profile && (
+        <div className="flex flex-col gap-2 rounded-md border border-zinc-200 p-4 dark:border-zinc-800">
+          <h2 className="font-semibold">Practice an interview</h2>
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Answer five questions tailored to your target role and resume.
+          </p>
+          <Link href="/practice" className="font-medium underline">
+            Start practicing
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

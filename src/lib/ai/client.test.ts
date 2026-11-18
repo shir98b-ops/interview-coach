@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
-const { describeKey } = await import("./extract");
+const { describeKey } = await import("./client");
 
 describe("describeKey", () => {
   it("reports a well-formed key without revealing it", () => {
