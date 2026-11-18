@@ -6,6 +6,7 @@ describe("isProtectedPath", () => {
     expect(isProtectedPath("/dashboard")).toBe(true);
     expect(isProtectedPath("/dashboard/history")).toBe(true);
     expect(isProtectedPath("/profile")).toBe(true);
+    expect(isProtectedPath("/practice/abc")).toBe(true);
   });
 
   it("leaves public pages open", () => {
