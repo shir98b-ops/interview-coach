@@ -10,6 +10,7 @@ import {
   normalizeQuestions,
   questionSetSchema,
   type InterviewLanguage,
+  type InterviewMode,
   type QuestionKind,
 } from "./schema";
 
@@ -22,6 +23,8 @@ export interface PracticeTarget {
   stage?: { name: string; focus: string; history: string } | null;
   /** Questions already asked in earlier practice for this role or job. */
   previousQuestions?: string[];
+  /** A general, technical or system design interview. */
+  mode?: InterviewMode;
 }
 
 /** How many examples from the question bank each interview starts from. */
@@ -40,6 +43,47 @@ interview. Write ${QUESTION_COUNT} questions for the candidate below.
   candidate's background; do not invent unusual or trick questions.
 - Ask one thing per question, the way a real interviewer would say it.`;
 
+const technicalInstructions = `You are a senior engineer running the technical
+round of an interview. Write ${QUESTION_COUNT} technical questions for the
+candidate below.
+
+- Cover different ground: core concepts of the role's stack, solving a
+  concrete problem, debugging or troubleshooting a realistic failure, and the
+  trade-offs between two approaches. Use kind "technical" for these.
+- Include exactly one question about a technical decision or project on the
+  candidate's resume (kind "resume").
+- When a job posting is given, use the technologies and problems it names.
+  Otherwise use the stack the role and resume suggest.
+- Match the seniority level: fundamentals and clear reasoning for juniors,
+  architecture, scale and ownership for seniors.
+- Every question must be answerable out loud in a few minutes, without a
+  computer: the candidate explains an approach, an algorithm or pseudo-code in
+  words, not a full program.
+- Ask the kind of questions real technical interviewers ask; no trivia or
+  trick questions.`;
+
+const designInstructions = `You are a senior engineer running a system design
+interview. Choose ONE realistic design problem that fits the role, the job
+posting if given, and the seniority level (smaller in scope for juniors,
+larger and more ambiguous for seniors). Then write it as ${QUESTION_COUNT}
+questions, asked in this order, each of kind "design":
+
+1. State the problem and ask the candidate to clarify the requirements,
+   users and expected scale before designing.
+2. Ask for the high-level architecture: the main parts and how they talk.
+3. Ask about the data: what is stored, how, and why that storage fits.
+4. Ask how the design handles growth, bottlenecks and failures.
+5. Ask for the main trade-offs made and what they would do differently with
+   more time or a different constraint.
+
+Each question after the first must make sense on its own while building on
+the same problem, the way an interviewer moves the discussion forward.`;
+
+const instructionsFor: Record<InterviewMode, string> = {
+  general: instructions,
+  technical: technicalInstructions,
+  "system-design": designInstructions,
+};
 /** Asks Claude for interview questions tailored to the role and resume. */
 export async function generateQuestions(
   target: PracticeTarget,
@@ -50,6 +94,7 @@ export async function generateQuestions(
   const role = target.seniority
     ? `${target.title} (${target.seniority})`
     : target.title;
+  const mode = target.mode ?? "general";
 
   let response;
   try {
@@ -65,7 +110,7 @@ export async function generateQuestions(
       messages: [
         {
           role: "user",
-          content: `${instructions}
+          content: `${instructionsFor[mode]}
 
 Write the questions in ${interviewLanguages[language]}, phrased the way a
 native-speaking interviewer would ask them (translate the listed questions
@@ -96,14 +141,18 @@ ${target.stage.history}
 `
               : ""
           }
-<commonly_asked_questions>
+${
+  mode === "general"
+    ? `<commonly_asked_questions>
 ${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
   .map((q) => `- ${q}`)
   .join("\n")}
 </commonly_asked_questions>
-${
-  target.previousQuestions?.length
-    ? `
+`
+    : ""
+}${
+            target.previousQuestions?.length
+              ? `
 The candidate has already practiced for this role and was asked the questions
 below. Do not ask any of them again, not even reworded. Choose different
 situations, skills and parts of the resume, and vary how the questions are
@@ -113,8 +162,8 @@ phrased, so every practice interview feels new.
 ${target.previousQuestions.map((q) => `- ${q}`).join("\n")}
 </already_asked>
 `
-    : ""
-}
+              : ""
+          }
 
 <resume>
 ${JSON.stringify(resume, null, 2)}

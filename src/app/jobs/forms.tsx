@@ -5,7 +5,11 @@ import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { startTakeHome } from "@/app/learn/take-home/actions";
 import { startPractice } from "@/app/practice/actions";
 import { difficulties } from "@/lib/take-home/schema";
-import { interviewLanguages } from "@/lib/interview/schema";
+import {
+  interviewLanguages,
+  interviewModes,
+  type InterviewMode,
+} from "@/lib/interview/schema";
 import { MAX_PASTE_LENGTH } from "@/lib/jobs/extract-schema";
 import { MAX_IMPORT_BYTES, importFileText } from "@/lib/jobs/linkedin-import";
 import { MAX_DESCRIPTION_LENGTH } from "@/lib/jobs/prep-schema";
@@ -270,15 +274,30 @@ const languageNames: Record<string, string> = { en: "English", he: "עברית" 
 export function JobPracticeForm({
   jobId,
   stage,
+  technical = false,
 }: {
   jobId: string;
   stage?: string;
+  /** Offer technical and system design practice for this job. */
+  technical?: boolean;
 }) {
   const [state, action, pending] = useActionState(startPractice, initial);
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="jobId" value={jobId} />
       {stage && <input type="hidden" name="stage" value={stage} />}
+      {technical && (
+        <label className="flex flex-col gap-1 font-bold sm:w-60">
+          סוג הראיון
+          <select name="mode" defaultValue="general" className={inputStyles}>
+            {(Object.keys(interviewModes) as InterviewMode[]).map((mode) => (
+              <option key={mode} value={mode}>
+                {interviewModes[mode].label}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label className="flex flex-col gap-1 font-bold sm:w-60">
         שפת הראיון
         <select name="language" defaultValue="en" className={inputStyles}>

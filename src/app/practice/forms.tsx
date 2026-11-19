@@ -1,9 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Button, ErrorText } from "@/components/ui";
 import { VoiceAnswerField } from "@/components/voice-answer";
-import { MAX_ANSWER_LENGTH, interviewLanguages } from "@/lib/interview/schema";
+import { isTechnicalRole } from "@/lib/interview/question-bank";
+import {
+  MAX_ANSWER_LENGTH,
+  interviewLanguages,
+  interviewModes,
+  type InterviewMode,
+} from "@/lib/interview/schema";
 import type { SpeechLanguage } from "@/lib/voice/transcript";
 import {
   retryFeedback,
@@ -27,6 +33,9 @@ export function StartPracticeForm({
     startPractice,
     { error: null },
   );
+  const [roleId, setRoleId] = useState(roles[0]?.id);
+  const selected = roles.find((role) => role.id === roleId);
+  const technical = selected ? isTechnicalRole(selected.title) : false;
 
   return (
     <form action={action} className="flex flex-col gap-6">
@@ -41,6 +50,7 @@ export function StartPracticeForm({
               name="roleId"
               value={role.id}
               defaultChecked={index === 0}
+              onChange={() => setRoleId(role.id)}
               required
               className="accent-violet size-5"
             />
@@ -53,6 +63,7 @@ export function StartPracticeForm({
           </label>
         ))}
       </fieldset>
+      {technical && <ModeChoice disabled={pending} />}
       <fieldset className="flex flex-col gap-3" disabled={pending}>
         <legend className="mb-3 text-xl font-extrabold">באיזו שפה?</legend>
         <div className="flex flex-wrap gap-3">
@@ -81,6 +92,32 @@ export function StartPracticeForm({
         {pending ? "מכין לך שאלות, זה לוקח כמה שניות..." : "להתחיל תרגול"}
       </Button>
     </form>
+  );
+}
+
+/** For technical roles: a general, technical or system design interview. */
+export function ModeChoice({ disabled }: { disabled?: boolean }) {
+  return (
+    <fieldset className="flex flex-col gap-3" disabled={disabled}>
+      <legend className="mb-3 text-xl font-extrabold">איזה סוג ראיון?</legend>
+      {(Object.keys(interviewModes) as InterviewMode[]).map((mode, index) => (
+        <label key={mode} className={`${optionStyles} items-start`}>
+          <input
+            type="radio"
+            name="mode"
+            value={mode}
+            defaultChecked={index === 0}
+            className="accent-violet mt-1 size-5"
+          />
+          <span className="flex flex-col">
+            <span>{interviewModes[mode].label}</span>
+            <span className="text-muted text-sm font-normal">
+              {interviewModes[mode].description}
+            </span>
+          </span>
+        </label>
+      ))}
+    </fieldset>
   );
 }
 

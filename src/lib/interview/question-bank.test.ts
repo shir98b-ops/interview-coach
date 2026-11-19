@@ -3,6 +3,7 @@ import {
   PREVIOUS_QUESTION_LIMIT,
   bankFor,
   commonQuestions,
+  isTechnicalRole,
   matchRoleFamilies,
   previousQuestionList,
   sampleBank,
@@ -83,5 +84,17 @@ describe("previousQuestionList", () => {
       (_, i) => `Question ${i}`,
     );
     expect(previousQuestionList(many)).toHaveLength(PREVIOUS_QUESTION_LIMIT);
+  });
+});
+
+describe("isTechnicalRole", () => {
+  it("is true for engineering and data roles", () => {
+    expect(isTechnicalRole("Backend Developer")).toBe(true);
+    expect(isTechnicalRole("Senior Software Engineer")).toBe(true);
+    expect(isTechnicalRole("Data Analyst")).toBe(true);
+  });
+  it("is false for other roles", () => {
+    expect(isTechnicalRole("Account Executive")).toBe(false);
+    expect(isTechnicalRole("HR Business Partner")).toBe(false);
   });
 });

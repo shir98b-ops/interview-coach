@@ -229,6 +229,16 @@ export function matchRoleFamilies(title: string): RoleFamily[] {
   );
 }
 
+/**
+ * Roles where interviews usually include a technical round, so the app
+ * offers technical and system design practice for them.
+ */
+export function isTechnicalRole(title: string): boolean {
+  return matchRoleFamilies(title).some(
+    (family) => family.id === "engineering" || family.id === "data",
+  );
+}
+
 /** The commonly asked questions to show the AI for a role. */
 export function bankFor(
   title: string,

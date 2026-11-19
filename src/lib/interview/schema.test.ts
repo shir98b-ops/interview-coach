@@ -4,6 +4,7 @@ import {
   QUESTION_COUNT,
   normalizeQuestions,
   parseLanguage,
+  parseMode,
   validateAnswer,
 } from "./schema";
 
@@ -42,5 +43,16 @@ describe("parseLanguage", () => {
     expect(parseLanguage("en")).toBe("en");
     expect(parseLanguage("fr")).toBe("en");
     expect(parseLanguage(null)).toBe("en");
+  });
+});
+
+describe("parseMode", () => {
+  it("accepts the technical modes", () => {
+    expect(parseMode("technical")).toBe("technical");
+    expect(parseMode("system-design")).toBe("system-design");
+  });
+  it("falls back to a general interview", () => {
+    expect(parseMode("other")).toBe("general");
+    expect(parseMode(null)).toBe("general");
   });
 });

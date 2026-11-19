@@ -1,3 +1,4 @@
+import { isTechnicalRole } from "@/lib/interview/question-bank";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -74,6 +75,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
         .limit(10),
     ]);
   if (!job) notFound();
+  const technical = isTechnicalRole(job.title);
   const status = parseStatus(job.status);
   const now = new Date();
   // The newest plan for the job as a whole, and for each stage.
@@ -234,6 +236,10 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                                 <JobPracticeForm
                                   jobId={job.id}
                                   stage={interview.kind}
+                                  technical={
+                                    technical &&
+                                    interview.kind === "professional"
+                                  }
                                 />
                               </>
                             )}
@@ -309,7 +315,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
             <h2 className="text-2xl font-extrabold">תרגול ראיון למשרה</h2>
             <p>חמש שאלות שנבנות מתוך המודעה, ואחריהן ציון ומשוב על כל תשובה.</p>
           </div>
-          <JobPracticeForm jobId={job.id} />
+          <JobPracticeForm jobId={job.id} technical={technical} />
           {practices && practices.length > 0 && (
             <ul className="flex flex-col gap-2">
               {practices.map((p) => (

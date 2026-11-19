@@ -20,7 +20,11 @@ import {
   PREVIOUS_QUESTION_LIMIT,
   previousQuestionList,
 } from "@/lib/interview/question-bank";
-import { parseLanguage, validateAnswer } from "@/lib/interview/schema";
+import {
+  parseLanguage,
+  parseMode,
+  validateAnswer,
+} from "@/lib/interview/schema";
 import { resumeSchema } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
@@ -60,6 +64,7 @@ export async function startPractice(
     ? parseKind(formData.get("stage"))
     : null;
   const language = parseLanguage(formData.get("language"));
+  const mode = parseMode(formData.get("mode"));
   const { supabase, user } = await requireUser();
 
   const [{ data: profile }, { data: savedRole }, { data: job }] =
@@ -147,7 +152,7 @@ export async function startPractice(
   let questions;
   try {
     questions = await generateQuestions(
-      { ...role, previousQuestions },
+      { ...role, previousQuestions, mode },
       resume.data,
       language,
       user.address,

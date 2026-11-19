@@ -27,6 +27,12 @@ Scale: 1 = missing or off topic, 2 = weak, 3 = acceptable but generic,
 consistent: a short or vague answer cannot score above 2 on content.
 ${dictationNote}
 
+Answers to technical and design questions (kind "technical" or "design") are
+judged differently: content is technical accuracy, depth and the trade-offs
+considered; structure is a logical approach (clarify, propose, justify), not
+a STAR story. Point out any technical mistake plainly, and make the stronger
+answer outline technically correct.
+
 For each answer, also give what worked, the most useful improvements, and a
 short outline of a stronger answer built from the candidate's own experience.
 Speak to the candidate directly ("you"). Write the feedback in the language

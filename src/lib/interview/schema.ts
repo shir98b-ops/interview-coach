@@ -4,14 +4,47 @@ import { z } from "zod";
 export const QUESTION_COUNT = 5;
 export const MAX_ANSWER_LENGTH = 5000;
 
-export const questionKinds = ["behavioral", "role", "resume"] as const;
+export const questionKinds = [
+  "behavioral",
+  "role",
+  "resume",
+  "technical",
+  "design",
+] as const;
 export type QuestionKind = (typeof questionKinds)[number];
 
 export const kindLabels: Record<QuestionKind, string> = {
   behavioral: "התנהגותית",
   role: "מקצועית",
   resume: "על הניסיון שלך",
+  technical: "טכנית",
+  design: "תכנון מערכות",
 };
+
+/**
+ * The kind of interview to practice. Technical roles can also practice a
+ * technical interview, or one system design discussion split into steps.
+ */
+export const interviewModes = {
+  general: {
+    label: "ראיון כללי",
+    description: "שאלות התנהגותיות, מקצועיות ועל הניסיון שלך.",
+  },
+  technical: {
+    label: "ראיון טכני",
+    description: "מושגים, פתרון בעיות, איתור תקלות ושיקולים בין פתרונות.",
+  },
+  "system-design": {
+    label: "תכנון מערכות",
+    description: "בעיית תכנון אחת, שלב אחרי שלב, כמו בראיון אמיתי.",
+  },
+} as const;
+
+export type InterviewMode = keyof typeof interviewModes;
+
+export function parseMode(value: unknown): InterviewMode {
+  return value === "technical" || value === "system-design" ? value : "general";
+}
 
 /** What the AI returns: the questions for one practice interview. */
 export const questionSetSchema = z.object({
@@ -21,7 +54,7 @@ export const questionSetSchema = z.object({
         kind: z
           .enum(questionKinds)
           .describe(
-            "behavioral: past behavior (a time when...); role: skills and judgment the role needs; resume: digs into a specific item on the candidate's resume.",
+            "behavioral: past behavior (a time when...); role: skills and judgment the role needs; resume: digs into a specific item on the candidate's resume; technical: technical knowledge, problem solving or debugging; design: one step of a system design discussion.",
           ),
         text: z
           .string()
