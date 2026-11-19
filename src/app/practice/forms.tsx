@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState } from "react";
-import { Button, ErrorText, inputStyles } from "@/components/ui";
+import { Button, ErrorText } from "@/components/ui";
+import { VoiceAnswerField } from "@/components/voice-answer";
 import { MAX_ANSWER_LENGTH, interviewLanguages } from "@/lib/interview/schema";
+import type { SpeechLanguage } from "@/lib/voice/transcript";
 import {
   retryFeedback,
   startPractice,
@@ -82,15 +84,17 @@ export function StartPracticeForm({
   );
 }
 
-/** Answer one question in writing. */
+/** Answer one question, by typing or by speaking. */
 export function AnswerForm({
   sessionId,
   questionId,
   isLast,
+  language,
 }: {
   sessionId: string;
   questionId: string;
   isLast: boolean;
+  language: SpeechLanguage;
 }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
     submitAnswer,
@@ -104,15 +108,15 @@ export function AnswerForm({
       <label htmlFor="answer" className="text-muted font-medium">
         התשובה שלך
       </label>
-      <textarea
-        dir="auto"
+      <VoiceAnswerField
         id="answer"
         name="answer"
-        required
         rows={10}
         maxLength={MAX_ANSWER_LENGTH}
         placeholder="התשובה, כמו שהיית עונה בראיון."
-        className={`${inputStyles} min-h-56`}
+        className="min-h-56"
+        language={language}
+        disabled={pending}
       />
       <p className="text-muted text-sm">
         טיפ: מצב, משימה, פעולה ותוצאה. ככה קל לעקוב אחרי הסיפור שלך.

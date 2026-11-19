@@ -63,14 +63,15 @@ export const roadmap: Stage[] = [
     summary:
       "Track jobs applied to and upcoming interviews, with prep plans, time tips and calendar sync.",
     mvp: false,
-    status: "in-progress",
+    status: "done",
   },
   {
     number: 8,
     title: "Voice answers",
-    summary: "Record answers, transcribe them and get feedback on delivery.",
+    summary:
+      "Answer by speaking: the words appear in the answer box, ready to fix before sending.",
     mvp: false,
-    status: "planned",
+    status: "in-progress",
   },
   {
     number: 9,
