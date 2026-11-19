@@ -13,8 +13,23 @@ export class AiError extends Error {
   }
 }
 
-/** Creates a client from the ANTHROPIC_API_KEY environment variable. */
-export function createAiClient(): Anthropic {
+/** What an AI call is for, so its cost can be counted per feature. */
+export type AiAction =
+  | "resume.extract"
+  | "resume.review"
+  | "interview.questions"
+  | "interview.score"
+  | "lesson.score"
+  | "take_home.write"
+  | "take_home.score"
+  | "job.extract"
+  | "job.prep";
+
+/**
+ * Creates a client from the ANTHROPIC_API_KEY environment variable. With an
+ * action, each call's token counts and cost are recorded for analytics.
+ */
+export function createAiClient(action?: AiAction): Anthropic {
   // Keys are plain ASCII. Pasting one from a right-to-left page can add
   // invisible direction marks or spaces, which break the request header.
   const apiKey = (process.env.ANTHROPIC_API_KEY ?? "").replace(
@@ -22,7 +37,21 @@ export function createAiClient(): Anthropic {
     "",
   );
   if (!apiKey) throw new AiError("ANTHROPIC_API_KEY is not set", "config");
-  return new Anthropic({ apiKey });
+  const client = new Anthropic({ apiKey });
+  if (action) recordUsageOf(client, action);
+  return client;
+}
+
+/** Wraps messages.parse so every call reports the tokens it used. */
+function recordUsageOf(client: Anthropic, action: AiAction) {
+  const parse = client.messages.parse.bind(client.messages);
+  client.messages.parse = (async (...args: Parameters<typeof parse>) => {
+    const response = await parse(...args);
+    // Loaded on use, so this file stays free of request-only imports.
+    const { recordAiUsage } = await import("@/lib/analytics/record");
+    recordAiUsage(action, response.model ?? args[0].model, response.usage);
+    return response;
+  }) as typeof parse;
 }
 
 export function toAiError(error: unknown): AiError {

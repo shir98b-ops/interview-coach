@@ -26,6 +26,7 @@ import { daysUntil, fromLocalInput } from "@/lib/jobs/time";
 import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { track } from "@/lib/analytics/record";
 
 export type JobFormState = { error: string | null };
 
@@ -76,6 +77,7 @@ export async function addJob(
     DAILY_JOB_LIMIT,
   );
   if (usage.remaining === 0 && !hasNoLimits(user.email)) {
+    track("limit_reached", { feature: "job" }, { supabase, user });
     return { error: `הגעת למגבלה של ${usage.limit} משרות חדשות ביום.` };
   }
 
@@ -136,6 +138,11 @@ export async function addJob(
     console.error("Adding job failed:", error?.message);
     return { error: "לא הצלחנו לשמור את המשרה. אפשר לנסות שוב." };
   }
+  track(
+    "job_added",
+    { source: pasted?.ok ? "paste" : "link" },
+    { supabase, user },
+  );
   redirect(`/jobs/${data.id}`);
 }
 
@@ -306,6 +313,7 @@ export async function createPrepPlan(
     DAILY_PREP_LIMIT,
   );
   if (usage.remaining === 0 && !hasNoLimits(user.email)) {
+    track("limit_reached", { feature: "job_prep" }, { supabase, user });
     const hours = usage.hoursUntilNext ?? 1;
     return {
       error: `הגעת למגבלה של ${usage.limit} תוכניות ביום. אפשר שוב בעוד כ־${hours === 1 ? "שעה" : `${hours} שעות`}.`,
@@ -347,6 +355,7 @@ export async function createPrepPlan(
     console.error("Saving prep plan failed:", error.message);
     return { error: "לא הצלחנו לשמור את התוכנית. אפשר לנסות שוב." };
   }
+  track("job_prep_created", { stage: Boolean(stage) }, { supabase, user });
   refresh();
   return { error: null };
 }

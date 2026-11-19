@@ -49,7 +49,7 @@ export async function writePrepPlan(
 ): Promise<PrepPlan> {
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("job.prep").messages.parse({
       // Matching a posting to a resume needs judgment, so this uses the
       // mid-tier model (about two cents per plan).
       model: "claude-sonnet-5-5",

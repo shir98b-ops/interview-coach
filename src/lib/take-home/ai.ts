@@ -61,7 +61,7 @@ export async function generateTakeHome(
   const code = format === "code";
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("take_home.write").messages.parse({
       model: "claude-sonnet-5-5",
       max_tokens: 8000,
       output_config: {
@@ -131,7 +131,7 @@ export async function evaluateTakeHome(
   const code = brief.format === "code";
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("take_home.score").messages.parse({
       model: "claude-sonnet-5-5",
       max_tokens: 8000,
       output_config: {

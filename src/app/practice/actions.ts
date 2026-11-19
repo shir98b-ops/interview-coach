@@ -33,6 +33,8 @@ import { resumeSchema } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { track } from "@/lib/analytics/record";
+import { parseAnswerMethod } from "@/lib/analytics/events";
 
 export type FormState = { error: string | null };
 
@@ -117,8 +119,10 @@ export async function startPractice(
       }
     : savedRole;
   const usage = await getUsage(supabase);
-  if (usage.remaining === 0 && !hasNoLimits(user.email))
+  if (usage.remaining === 0 && !hasNoLimits(user.email)) {
+    track("limit_reached", { feature: "interview" }, { supabase, user });
     return { error: limitMessage(usage) };
+  }
 
   const resume = resumeSchema.safeParse(profile?.resume_data);
   if (!resume.success) {
@@ -210,6 +214,11 @@ export async function startPractice(
     return { error: "לא הצלחנו לשמור את התרגול. אפשר לנסות שוב." };
   }
 
+  track(
+    "interview_started",
+    { mode, stage: job ? stageKind : null, fromJob: Boolean(job), language },
+    { supabase, user },
+  );
   redirect(`/practice/${session.id}`);
 }
 
@@ -243,6 +252,12 @@ export async function submitAnswer(
     console.error("Saving answer failed:", error.message);
     return { error: "לא הצלחנו לשמור את התשובה. אפשר לנסות שוב." };
   }
+  if (!error) {
+    const method = formData.has("code")
+      ? "code"
+      : parseAnswerMethod(formData.get("inputMethod"));
+    track("answer_submitted", { method }, { supabase, user });
+  }
 
   // Row level security limits both reads to the user's own rows.
   const { data: questions } = await supabase
@@ -255,11 +270,15 @@ export async function submitAnswer(
   const allAnswered =
     Boolean(questions?.length) && questions!.every((q) => answered(q.answers));
   if (allAnswered) {
-    await supabase
+    const { data: completed } = await supabase
       .from("sessions")
       .update({ completed_at: new Date().toISOString() })
       .eq("id", sessionId)
-      .is("completed_at", null);
+      .is("completed_at", null)
+      .select("id");
+    if (completed?.length) {
+      track("interview_completed", {}, { supabase, user });
+    }
     // If scoring fails, the summary page offers to try again.
     await scoreSession(supabase, sessionId, user.address);
   }

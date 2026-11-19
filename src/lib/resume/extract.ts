@@ -13,7 +13,7 @@ resume does not state it. Keep the resume's original language.`;
 export async function extractResume(pdf: ArrayBuffer): Promise<ResumeData> {
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("resume.extract").messages.parse({
       // Copying facts from a resume is a simple task, so the fastest and
       // cheapest model is enough (about a tenth of a cent per resume).
       model: "claude-haiku-5-5",

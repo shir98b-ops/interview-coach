@@ -19,6 +19,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { track } from "@/lib/analytics/record";
 
 export type TakeHomeState = { error: string | null };
 
@@ -96,6 +97,7 @@ export async function startTakeHome(
     DAILY_TAKE_HOME_LIMIT,
   );
   if (usage.remaining === 0 && !hasNoLimits(user.email)) {
+    track("limit_reached", { feature: "take_home" }, { supabase, user });
     const hours = usage.hoursUntilNext ?? 1;
     return {
       error: `הגעת למגבלה של ${usage.limit} מבחני בית ביום. אפשר להתחיל חדש בעוד כ־${hours === 1 ? "שעה" : `${hours} שעות`}.`,
@@ -139,6 +141,11 @@ export async function startTakeHome(
     console.error("Saving take-home failed:", error?.message);
     return { error: "לא הצלחנו לשמור את מבחן הבית. אפשר לנסות שוב." };
   }
+  track(
+    "take_home_started",
+    { format: brief.format ?? "document", difficulty, fromJob: Boolean(job) },
+    { supabase, user },
+  );
   redirect(`/learn/take-home/${created.id}`);
 }
 
@@ -203,6 +210,11 @@ export async function submitTakeHome(
     console.error("Saving take-home feedback failed:", error.message);
     return { error: "לא הצלחנו לשמור את המשוב. אפשר לנסות שוב." };
   }
+  track(
+    "take_home_submitted",
+    { format: brief.format ?? "document" },
+    { supabase, user },
+  );
   refresh();
   return { error: null };
 }

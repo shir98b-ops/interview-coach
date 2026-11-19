@@ -18,7 +18,7 @@ export async function evaluateExercise(
 ): Promise<ExerciseFeedback> {
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("lesson.score").messages.parse({
       model: "claude-sonnet-5-5",
       max_tokens: 4000,
       output_config: {
