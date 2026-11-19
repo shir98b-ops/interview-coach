@@ -23,6 +23,7 @@ import {
 import {
   parseLanguage,
   parseMode,
+  parseOrganizationType,
   validateAnswer,
 } from "@/lib/interview/schema";
 import { resumeSchema } from "@/lib/resume/schema";
@@ -65,6 +66,7 @@ export async function startPractice(
     : null;
   const language = parseLanguage(formData.get("language"));
   const mode = parseMode(formData.get("mode"));
+  const organization = parseOrganizationType(formData.get("organization"));
   const { supabase, user } = await requireUser();
 
   const [{ data: profile }, { data: savedRole }, { data: job }] =
@@ -152,7 +154,7 @@ export async function startPractice(
   let questions;
   try {
     questions = await generateQuestions(
-      { ...role, previousQuestions, mode },
+      { ...role, previousQuestions, mode, organization },
       resume.data,
       language,
       user.address,

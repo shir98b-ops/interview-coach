@@ -230,12 +230,14 @@ export function matchRoleFamilies(title: string): RoleFamily[] {
 }
 
 /**
- * Roles where interviews usually include a technical round, so the app
- * offers technical and system design practice for them.
+ * Software roles, whose professional round draws on core
+ * engineering topics and whose case round is a system design interview.
  */
 export function isTechnicalRole(title: string): boolean {
-  return matchRoleFamilies(title).some(
-    (family) => family.id === "engineering" || family.id === "data",
+  // Not every engineer writes software: an electrical or civil engineer gets
+  // the questions of their own field.
+  return /\b(software|developer|programmer|devops|sre|backend|back-end|frontend|front-end|full[- ]?stack|qa|automation|web|mobile|ios|android|cloud|platform|data engineer|machine learning|ml engineer|ai engineer)\b/i.test(
+    title,
   );
 }
 

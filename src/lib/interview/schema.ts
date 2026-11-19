@@ -17,33 +17,76 @@ export const kindLabels: Record<QuestionKind, string> = {
   behavioral: "התנהגותית",
   role: "מקצועית",
   resume: "על הניסיון שלך",
-  technical: "טכנית",
-  design: "תכנון מערכות",
+  technical: "ידע מקצועי",
+  design: "ניתוח מקרה",
 };
 
 /**
- * The kind of interview to practice. Technical roles can also practice a
- * technical interview, or one system design discussion split into steps.
+ * The kind of interview to practice, for every profession: a general
+ * interview, a professional knowledge round, or one realistic work case
+ * worked through step by step (system design, for software roles).
  */
 export const interviewModes = {
   general: {
     label: "ראיון כללי",
     description: "שאלות התנהגותיות, מקצועיות ועל הניסיון שלך.",
   },
-  technical: {
-    label: "ראיון טכני",
-    description: "מושגים, פתרון בעיות, איתור תקלות ושיקולים בין פתרונות.",
+  professional: {
+    label: "ראיון מקצועי",
+    description: "ידע מקצועי, תרחישים מהעבודה ושיקול דעת, ברמה של התפקיד.",
   },
-  "system-design": {
-    label: "תכנון מערכות",
-    description: "בעיית תכנון אחת, שלב אחרי שלב, כמו בראיון אמיתי.",
+  case: {
+    label: "ניתוח מקרה",
+    description: "מקרה אחד מהעבודה, שלב אחרי שלב, כמו בראיון אמיתי.",
   },
 } as const;
 
 export type InterviewMode = keyof typeof interviewModes;
 
+/** Software roles call the case round by its usual name. */
+export function modeLabel(mode: InterviewMode, technical: boolean): string {
+  return mode === "case" && technical
+    ? "תכנון מערכות"
+    : interviewModes[mode].label;
+}
+
 export function parseMode(value: unknown): InterviewMode {
-  return value === "technical" || value === "system-design" ? value : "general";
+  if (value === "professional" || value === "technical") return "professional";
+  if (value === "case" || value === "system-design") return "case";
+  return "general";
+}
+
+/** The kind of organization the candidate is interviewing at. */
+export const organizationTypes = {
+  any: { label: "לא משנה", prompt: "" },
+  tech: {
+    label: "הייטק וסטארטאפים",
+    prompt: "a technology company or startup",
+  },
+  corporate: {
+    label: "חברה גדולה או תאגיד",
+    prompt: "a large established company",
+  },
+  public: {
+    label: "מגזר ציבורי וממשלתי",
+    prompt: "a public-sector or government organization",
+  },
+  nonprofit: {
+    label: "עמותות ורווחה",
+    prompt: "a nonprofit or social-welfare organization",
+  },
+  small: {
+    label: "עסק קטן או בינוני",
+    prompt: "a small or medium-sized business",
+  },
+} as const;
+
+export type OrganizationType = keyof typeof organizationTypes;
+
+export function parseOrganizationType(value: unknown): OrganizationType {
+  return typeof value === "string" && Object.hasOwn(organizationTypes, value)
+    ? (value as OrganizationType)
+    : "any";
 }
 
 /** What the AI returns: the questions for one practice interview. */
@@ -54,7 +97,7 @@ export const questionSetSchema = z.object({
         kind: z
           .enum(questionKinds)
           .describe(
-            "behavioral: past behavior (a time when...); role: skills and judgment the role needs; resume: digs into a specific item on the candidate's resume; technical: technical knowledge, problem solving or debugging; design: one step of a system design discussion.",
+            "behavioral: past behavior (a time when...); role: skills and judgment the role needs; resume: digs into a specific item on the candidate's resume; technical: professional or technical knowledge, scenarios and problem solving; design: one step of a case or system design discussion.",
           ),
         text: z
           .string()

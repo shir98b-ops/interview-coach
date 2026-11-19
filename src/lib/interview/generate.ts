@@ -6,6 +6,7 @@ import type { ResumeData } from "@/lib/resume/schema";
 import {
   bankFor,
   behavioralThemes,
+  isTechnicalRole,
   sampleBank,
   systemDesignProblems,
   technicalTopics,
@@ -16,7 +17,9 @@ import {
   normalizeQuestions,
   questionSetSchema,
   type InterviewLanguage,
+  organizationTypes,
   type InterviewMode,
+  type OrganizationType,
   type QuestionKind,
 } from "./schema";
 
@@ -29,8 +32,22 @@ export interface PracticeTarget {
   stage?: { name: string; focus: string; history: string } | null;
   /** Questions already asked in earlier practice for this role or job. */
   previousQuestions?: string[];
-  /** A general, technical or system design interview. */
+  /** A general, professional or case interview. */
   mode?: InterviewMode;
+  /** The kind of organization, when practicing without a job posting. */
+  organization?: OrganizationType;
+}
+
+/** Makes the questions fit the kind of organization the user applies to. */
+function organizationLine(target: PracticeTarget): string {
+  const prompt = target.organization
+    ? organizationTypes[target.organization].prompt
+    : "";
+  if (target.job || !prompt) return "";
+  return `
+The candidate is interviewing at ${prompt}. Make the questions, scenarios and
+expectations realistic for that kind of organization.
+`;
 }
 
 /** How many examples from the question bank each interview starts from. */
@@ -52,35 +69,62 @@ interview. Write ${QUESTION_COUNT} questions for the candidate below.
   the commonly asked list.
 - Ask one thing per question, the way a real interviewer would say it.`;
 
-/** Shared by the technical modes: hold the bar of a real tech interview. */
-const technicalBar = `Hold the bar of a real interview at a strong tech
-company for this role and seniority. Do NOT adapt the problems, their domain
-or their difficulty to the candidate's past jobs or industry, and do not
-soften anything because of the candidate's background: the goal is to prepare
-them for the real thing. If no seniority is given, aim for mid-level.`;
+/** Difficulty follows the seniority, in every kind of interview. */
+const levelGuide = `Set the difficulty by the seniority level:
+- Entry level: fundamentals, and how they would handle common situations.
+- Mid level: independent work, real depth and trade-offs.
+- Senior: complex and ambiguous situations, leading others, strategic judgment.
+- Manager: leading teams, priorities, budgets and people decisions.
+If no seniority is given, infer it from the job posting, else aim for mid level.`;
 
-const technicalInstructions = `You are a senior engineer running the technical
-round of an interview at a strong tech company. Write ${QUESTION_COUNT}
-technical questions (kind "technical").
+/** Shared by the professional and case rounds: hold the real-world bar. */
+const professionalBar = `Hold the bar of a real interview in this profession
+for this seniority. Do NOT adapt the topics, scenarios or difficulty to the
+candidate's past jobs or industry, and do not soften anything because of
+their background: the goal is to prepare them for the real thing.`;
 
-- Cover the focus areas listed below, adapted to the role's stack. When a job
-  posting is given, use the technologies and problems it names.
-- Mix the question types: explain a concept in depth, solve a concrete
-  problem, debug a realistic production failure, and compare two approaches
-  with their trade-offs.
-- Match the seniority: solid fundamentals for juniors; architecture, scale,
-  failure modes and ownership for seniors.
+const professionalInstructions = `You are an experienced senior practitioner
+in this profession, running the professional round of an interview. Write
+${QUESTION_COUNT} questions (kind "technical") that test the knowledge,
+methods, tools, regulations and judgment this role really requires, whatever
+the field: a social worker, a business manager, an electrical engineer or a
+software developer each get the questions of their own profession.
+
+- Mix the question types: explain a core concept or method in depth, handle
+  a realistic work scenario, solve a concrete professional problem, and
+  compare two approaches with their trade-offs.
+- When a job posting is given, use the tools, domains and problems it names.
+- When focus areas are listed below, cover them.
 - Every question must be answerable out loud in a few minutes, without a
-  computer: the candidate explains an approach, an algorithm or pseudo-code in
-  words, not a full program.
-- Ask what real technical interviewers ask; no trivia or trick questions.
+  computer (an approach, calculation or pseudo-code explained in words).
+- Ask what real interviewers in this field ask; no trivia or trick questions.
 
-${technicalBar}`;
+${levelGuide}
+
+${professionalBar}`;
+
+const caseInstructions = `You are an experienced senior practitioner in this
+profession, running a case interview. Use the case given below: one
+realistic situation from the daily work of this role. Then write it as
+${QUESTION_COUNT} questions, asked in this order, each of kind "design":
+
+1. Present the case and ask what the candidate needs to understand or ask
+   first, before acting.
+2. Ask for their analysis and overall approach.
+3. Ask for the concrete plan: the steps, tools or methods, and who is involved.
+4. Ask how they handle a complication, a risk or something going wrong.
+5. Ask about priorities and trade-offs, and how they would measure success.
+
+Each question after the first must make sense on its own while building on
+the same case, the way an interviewer moves the discussion forward.
+
+${levelGuide}
+
+${professionalBar}`;
 
 const designInstructions = `You are a senior engineer running a system design
-interview at a strong tech company. Use the design problem given below. Then
-write it as ${QUESTION_COUNT} questions, asked in this order, each of kind
-"design":
+interview. Use the design problem given below. Then write it as
+${QUESTION_COUNT} questions, asked in this order, each of kind "design":
 
 1. State the problem and ask the candidate to clarify the requirements,
    users and expected scale before designing.
@@ -90,18 +134,69 @@ write it as ${QUESTION_COUNT} questions, asked in this order, each of kind
 5. Ask for the main trade-offs made and what they would do differently with
    more time or a different constraint.
 
-Scale the expected depth to the seniority (a junior still gets a real
-problem, with less expected on scale). Each question after the first must make
-sense on its own while building on the same problem, the way an interviewer
-moves the discussion forward.
+Each question after the first must make sense on its own while building on
+the same problem, the way an interviewer moves the discussion forward.
 
-${technicalBar}`;
+${levelGuide}
 
-const instructionsFor: Record<InterviewMode, string> = {
-  general: instructions,
-  technical: technicalInstructions,
-  "system-design": designInstructions,
-};
+${professionalBar}`;
+
+function instructionsFor(mode: InterviewMode, technical: boolean): string {
+  if (mode === "professional") return professionalInstructions;
+  if (mode === "case") return technical ? designInstructions : caseInstructions;
+  return `${instructions}
+
+${levelGuide}`;
+}
+
+/** The material each kind of interview starts from. */
+function startingPoint(
+  target: PracticeTarget,
+  mode: InterviewMode,
+  technical: boolean,
+): string {
+  if (mode === "general") {
+    return `This time, build the behavioral questions around these themes:
+${sampleBank(behavioralThemes, 2)
+  .map((theme) => `- ${theme}`)
+  .join("\n")}
+
+<commonly_asked_questions>
+${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
+  .map((q) => `- ${q}`)
+  .join("\n")}
+</commonly_asked_questions>
+`;
+  }
+  if (mode === "professional") {
+    return technical
+      ? `<focus_areas>
+${sampleBank(technicalTopics, 4)
+  .map((topic) => `- ${topic}`)
+  .join("\n")}
+</focus_areas>
+`
+      : "";
+  }
+  if (target.job) {
+    return `<case>
+A real situation from the work of this role at the company in the job
+posting, at that company's real scale and context.
+</case>
+`;
+  }
+  return technical
+    ? `<design_problem>
+Design ${sampleBank(systemDesignProblems, 1)[0]}.
+</design_problem>
+`
+    : `<case>
+Choose a realistic, demanding situation that people in this role face, typical
+of the organization type below if one is given. Pick a different case each time.
+</case>
+`;
+}
+
 /** Asks Claude for interview questions tailored to the role and resume. */
 export async function generateQuestions(
   target: PracticeTarget,
@@ -113,6 +208,7 @@ export async function generateQuestions(
     ? `${target.title} (${target.seniority})`
     : target.title;
   const mode = target.mode ?? "general";
+  const technical = isTechnicalRole(target.title);
 
   let response;
   try {
@@ -128,7 +224,7 @@ export async function generateQuestions(
       messages: [
         {
           role: "user",
-          content: `${instructionsFor[mode]}
+          content: `${instructionsFor(mode, technical)}
 
 Write the questions in ${interviewLanguages[language]}, phrased the way a
 native-speaking interviewer would ask them (translate the listed questions
@@ -159,35 +255,7 @@ ${target.stage.history}
 `
               : ""
           }
-${
-  mode === "general"
-    ? `This time, build the behavioral questions around these themes:
-${sampleBank(behavioralThemes, 2)
-  .map((theme) => `- ${theme}`)
-  .join("\n")}
-
-<commonly_asked_questions>
-${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
-  .map((q) => `- ${q}`)
-  .join("\n")}
-</commonly_asked_questions>
-`
-    : mode === "technical"
-      ? `<focus_areas>
-${sampleBank(technicalTopics, 4)
-  .map((topic) => `- ${topic}`)
-  .join("\n")}
-</focus_areas>
-`
-      : `<design_problem>
-${
-  target.job
-    ? "A core system of the company in the job posting, at that company's real scale."
-    : `Design ${sampleBank(systemDesignProblems, 1)[0]}.`
-}
-</design_problem>
-`
-}${
+${startingPoint(target, mode, technical)}${organizationLine(target)}${
             target.previousQuestions?.length
               ? `
 The candidate has already practiced for this role and was asked the questions
@@ -204,8 +272,8 @@ ${target.previousQuestions.map((q) => `- ${q}`).join("\n")}
           }
 
 ${
-  // Technical rounds hold the industry bar, so the resume is left out and
-  // cannot pull the problems toward the candidate's past jobs.
+  // Professional and case rounds hold the real-world bar, so the resume is
+  // left out and cannot pull them toward the candidate's past jobs.
   mode === "general"
     ? `<resume>
 ${JSON.stringify(resume, null, 2)}

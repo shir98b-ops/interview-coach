@@ -8,6 +8,7 @@ import { difficulties } from "@/lib/take-home/schema";
 import {
   interviewLanguages,
   interviewModes,
+  modeLabel,
   type InterviewMode,
 } from "@/lib/interview/schema";
 import { MAX_PASTE_LENGTH } from "@/lib/jobs/extract-schema";
@@ -274,11 +275,14 @@ const languageNames: Record<string, string> = { en: "English", he: "עברית" 
 export function JobPracticeForm({
   jobId,
   stage,
+  modes = false,
   technical = false,
 }: {
   jobId: string;
   stage?: string;
-  /** Offer technical and system design practice for this job. */
+  /** Offer the choice of a general, professional or case interview. */
+  modes?: boolean;
+  /** A software role, where the case round is system design. */
   technical?: boolean;
 }) {
   const [state, action, pending] = useActionState(startPractice, initial);
@@ -286,13 +290,13 @@ export function JobPracticeForm({
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="jobId" value={jobId} />
       {stage && <input type="hidden" name="stage" value={stage} />}
-      {technical && (
+      {modes && (
         <label className="flex flex-col gap-1 font-bold sm:w-60">
           סוג הראיון
           <select name="mode" defaultValue="general" className={inputStyles}>
             {(Object.keys(interviewModes) as InterviewMode[]).map((mode) => (
               <option key={mode} value={mode}>
-                {interviewModes[mode].label}
+                {modeLabel(mode, technical)}
               </option>
             ))}
           </select>

@@ -1,14 +1,17 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Button, ErrorText } from "@/components/ui";
+import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { VoiceAnswerField } from "@/components/voice-answer";
 import { isTechnicalRole } from "@/lib/interview/question-bank";
 import {
   MAX_ANSWER_LENGTH,
   interviewLanguages,
   interviewModes,
+  modeLabel,
+  organizationTypes,
   type InterviewMode,
+  type OrganizationType,
 } from "@/lib/interview/schema";
 import type { SpeechLanguage } from "@/lib/voice/transcript";
 import {
@@ -63,7 +66,28 @@ export function StartPracticeForm({
           </label>
         ))}
       </fieldset>
-      {technical && <ModeChoice disabled={pending} />}
+      <ModeChoice disabled={pending} technical={technical} />
+      <label className="flex flex-col gap-2">
+        <span className="text-xl font-extrabold">באיזה סוג ארגון?</span>
+        <select
+          name="organization"
+          defaultValue="any"
+          disabled={pending}
+          className={`${inputStyles} sm:w-80`}
+        >
+          {(Object.keys(organizationTypes) as OrganizationType[]).map(
+            (type) => (
+              <option key={type} value={type}>
+                {organizationTypes[type].label}
+              </option>
+            ),
+          )}
+        </select>
+        <span className="text-muted text-sm">
+          השאלות והתרחישים יתאימו לסוג הארגון. רמת הקושי נקבעת לפי הבכירות של
+          התפקיד.
+        </span>
+      </label>
       <fieldset className="flex flex-col gap-3" disabled={pending}>
         <legend className="mb-3 text-xl font-extrabold">באיזו שפה?</legend>
         <div className="flex flex-wrap gap-3">
@@ -95,8 +119,14 @@ export function StartPracticeForm({
   );
 }
 
-/** For technical roles: a general, technical or system design interview. */
-export function ModeChoice({ disabled }: { disabled?: boolean }) {
+/** A general, professional or case interview, for every profession. */
+export function ModeChoice({
+  disabled,
+  technical,
+}: {
+  disabled?: boolean;
+  technical: boolean;
+}) {
   return (
     <fieldset className="flex flex-col gap-3" disabled={disabled}>
       <legend className="mb-3 text-xl font-extrabold">איזה סוג ראיון?</legend>
@@ -110,9 +140,11 @@ export function ModeChoice({ disabled }: { disabled?: boolean }) {
             className="accent-violet mt-1 size-5"
           />
           <span className="flex flex-col">
-            <span>{interviewModes[mode].label}</span>
+            <span>{modeLabel(mode, technical)}</span>
             <span className="text-muted text-sm font-normal">
-              {interviewModes[mode].description}
+              {mode === "case" && technical
+                ? "בעיית תכנון אחת, שלב אחרי שלב, כמו בראיון אמיתי."
+                : interviewModes[mode].description}
             </span>
           </span>
         </label>
