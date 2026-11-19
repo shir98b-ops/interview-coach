@@ -6,7 +6,8 @@ feedback, then track how you improve over time.
 
 **Live demo:** https://interview-coach-lemon.vercel.app
 
-> Status: the MVP (stages 1-6) is done. Stage 7 of 9 (jobs and interview tracker) is next. See the [roadmap](#roadmap).
+> Status: stages 1 to 8 are live: the MVP, the jobs and interview tracker,
+> and spoken answers. Stage 9 (learn by playing) is next. See the [roadmap](#roadmap).
 
 ## The problem
 
@@ -26,7 +27,7 @@ Candidates preparing for interviews on their own, especially for their first
 or next role, who want realistic practice without booking a mock interview
 with another person.
 
-## What the MVP does
+## What it does
 
 1. Sign in with Google and upload a resume (PDF).
 2. Review the details the app extracts and choose a target role.
@@ -70,6 +71,18 @@ with another person.
     correctness, efficiency and code quality with a sample solution. Take-homes
     can be a small coding project with starter code, handed in as code and
     reviewed like a code review (requirements, correctness, structure, tests).
+12. Jobs and interview tracker: add a job by pasting the posting or a link,
+    follow each stage of its hiring process, schedule interviews (shown in
+    Israel time, with a calendar link or an .ics file), and get a prep plan
+    and a practice interview for each stage, built from the posting.
+13. Fields with their own content: besides office and tech roles, social
+    work, teaching, nursing and health, law, retail and hospitality, the
+    public sector, cyber security, office administration and engineering
+    outside software each have their own commonly asked questions, the
+    topics of their professional round (with the Israeli laws and standards
+    behind them, such as the Youth Law, the Patient's Rights Law or the
+    Mandatory Tenders Law) and a take-home that fits the field. Role titles
+    are recognized in Hebrew and English.
 
 ## Key product decisions
 
@@ -77,7 +90,7 @@ with another person.
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Sign in with **Google** only                                     | Most candidates already have a Google account, so there is no new password to create, forget or leak.                                                                                                                                                                                                                                                                    |
 | Each user can only ever see **their own data**                   | Resumes and interview answers are personal. The database itself enforces this rule (row-level security), so a bug in the app cannot expose another user's data.                                                                                                                                                                                                          |
-| Start with **written** answers; add voice later                  | Written answers deliver the core value (tailored questions and feedback) with fewer moving parts. Voice adds transcription and audio handling, so it comes in stage 8.                                                                                                                                                                                                   |
+| Start with **written** answers; add voice later                  | Written answers deliver the core value (tailored questions and feedback) with fewer moving parts. Voice adds transcription and audio handling, so it came in stage 8, after the core worked.                                                                                                                                                                             |
 | Voice through the **browser's own speech recognition**           | It is free, needs no new service, keys or audio storage, and supports Hebrew. The app never receives or stores audio, only the text the user chooses to send (the browser's speech service, Google's in Chrome, hears the audio). Browsers without it (such as Firefox) keep the typing box, and the coach is told to ignore missing punctuation in spoken answers.      |
 | **No repeated questions** across practice for the same role      | Job searches can take months. Each new interview sees the questions already asked for that role or job and must cover new ground, and it starts from a random sample of the question bank, so practice stays fresh.                                                                                                                                                      |
 | **Professional rounds for every profession**                     | A social worker, a business manager and an electrical engineer each need the real questions of their field, at their level. Reasoning out loud works by voice or text on any phone; developers and data roles also get coding rounds and code take-homes. The code is reviewed by reading and tracing it, not by running it, which keeps the app free of a code sandbox. |
@@ -95,24 +108,29 @@ with another person.
 | **Take-home** practice is scored on its own rubric               | A take-home is judged differently from an interview answer: understanding the problem, the quality of the solution, a readable write-up and actionable recommendations. Three per day keep AI costs small.                                                                                                                                                               |
 | Resume rating uses the **approved details**, not the file        | The original file is never stored, so the rating judges content, which is what recruiters read first. Suggested rewrites use only facts from the resume and leave placeholders for unknown numbers, so nothing is invented.                                                                                                                                              |
 | Users **choose how to be addressed** in Hebrew                   | Hebrew verbs and adjectives change with gender, and guessing gets it wrong for many users. The choice shapes AI questions and feedback and the lessons; interface text is written gender-neutral. Until users choose, both forms are shown.                                                                                                                              |
-| Job links and gamified exercises come **after** the MVP          | A small product that works end to end is more useful, and easier to validate, than four half-built areas.                                                                                                                                                                                                                                                                |
+| Field topics are anchored in **Israeli law and practice**        | Without an anchor, AI questions for fields like social work, nursing or law drift toward generic or foreign rules. A short list of the real topics of each field, naming the Israeli laws behind them, keeps the professional round at the bar of a real local interview.                                                                                                |
+| The jobs tracker and gamified exercises come **after** the MVP   | A small product that works end to end is more useful, and easier to validate, than four half-built areas.                                                                                                                                                                                                                                                                |
 | Practice exercises are **original**, "in the style of" a company | Real take-home tests are often confidential. Generating original exercises by type and difficulty avoids copying them.                                                                                                                                                                                                                                                   |
 
 ## Roadmap
 
 Stages 1 to 6 make up the MVP.
 
-| #   | Stage                        | Outcome                                                      |
-| --- | ---------------------------- | ------------------------------------------------------------ |
-| 1   | Project foundation           | Repository, app skeleton, automated checks, first deployment |
-| 2   | Accounts and data            | Google sign-in and a database for profiles and sessions      |
-| 3   | Resume and profile           | Resume upload, reviewed extraction, target roles             |
-| 4   | Written interview simulation | Tailored questions answered in writing                       |
-| 5   | Scoring and feedback         | Rubric scores, tips and progress history                     |
-| 6   | MVP polish and launch        | Hebrew redesign, lessons, take-homes, resume rating, privacy |
-| 7   | Jobs and interview tracker   | Applied jobs, upcoming interviews, prep plans, calendar sync |
-| 8   | Voice answers                | Speak answers instead of typing, in Hebrew or English        |
-| 9   | Learn by playing             | Points, streaks and more lessons on top of the learning area |
+| #   | Stage                        | Outcome                                                      | Status |
+| --- | ---------------------------- | ------------------------------------------------------------ | ------ |
+| 1   | Project foundation           | Repository, app skeleton, automated checks, first deployment | Done   |
+| 2   | Accounts and data            | Google sign-in and a database for profiles and sessions      | Done   |
+| 3   | Resume and profile           | Resume upload, reviewed extraction, target roles             | Done   |
+| 4   | Written interview simulation | Tailored questions answered in writing                       | Done   |
+| 5   | Scoring and feedback         | Rubric scores, tips and progress history                     | Done   |
+| 6   | MVP polish and launch        | Hebrew redesign, lessons, take-homes, resume rating, privacy | Done   |
+| 7   | Jobs and interview tracker   | Applied jobs, upcoming interviews, prep plans, calendar sync | Done   |
+| 8   | Voice answers                | Speak answers instead of typing, in Hebrew or English        | Done   |
+| 9   | Learn by playing             | Points, streaks and more lessons on top of the learning area | Next   |
+
+After stage 8, practice was widened beyond the plan: professional and case
+rounds for every profession, coding rounds and code take-homes, and content
+for fields outside tech.
 
 ## How it is built
 
@@ -146,7 +164,8 @@ Environment Variables, as type Config for all environments, then redeploy.
 Resume reading, interview questions and feedback also need `ANTHROPIC_API_KEY` (from console.anthropic.com).
 Add it to `.env.local`, and in Vercel as type Secret for all environments.
 
-To skip the daily usage limits on your own account while testing, set
+Daily limits per user: 5 practice interviews, 3 take-homes, 5 resume ratings,
+10 prep plans, 30 added jobs and 20 lesson exercises. To skip them on your own account while testing, set
 `UNLIMITED_EMAILS` to your sign-in email (comma separated for several).
 
 Then open http://localhost:3000.

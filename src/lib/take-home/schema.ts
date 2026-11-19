@@ -71,6 +71,22 @@ const taskTypes: Record<string, string> = {
     "a written technical design: approach, architecture, trade-offs and a test plan, without writing full code",
   hardware:
     "an engineering design review with a small table of requirements, specs or loads in the brief: propose a design, check it against the constraints and standards, and list the risks and tests",
+  social:
+    "a case file: a short referral and background on a client or family, asking for an assessment, a risk evaluation and a treatment plan with goals",
+  education:
+    "a teaching plan: a lesson or unit plan for a described class with mixed levels, including activities, differentiation and how learning is assessed",
+  health:
+    "a clinical case: a patient's history, vital signs and results in the brief, asking for priorities, a care plan, what to monitor and when to escalate",
+  legal:
+    "a legal memo: a short set of facts and a contract clause in the brief, asking for the issues, the risks, the relevant Israeli law and a recommendation to a non-lawyer client",
+  service:
+    "a service improvement plan: a described branch with complaints and numbers, asking for the causes, a plan for the team and how success is measured",
+  public:
+    "a policy or tender brief: a public problem with data in the brief, asking for options, costs, who is affected and a recommendation to a decision maker",
+  security:
+    "an incident report: logs and a timeline in the brief, asking for what happened, the impact, containment steps and how to prevent it",
+  admin:
+    "an office organization task: a week of requests, meetings and an event to plan, asking for a prioritized plan and the messages to send",
   management:
     "a leadership case: plan the first 90 days of a team, or handle a team conflict and a missed goal",
 };
