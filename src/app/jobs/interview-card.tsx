@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Chip } from "@/components/ui";
+import { durationLabel } from "@/lib/format";
 import { googleCalendarLink } from "@/lib/jobs/calendar";
 import { interviewEvent } from "@/lib/jobs/event";
 import type { InterviewRow } from "@/lib/jobs/queries";
@@ -46,7 +47,8 @@ export function InterviewCard({
         </Link>
       )}
       <p className="text-muted">
-        {formatInterviewTime(interview.startsAt)} · {interview.minutes} דקות
+        {formatInterviewTime(interview.startsAt)} ·{" "}
+        {durationLabel(interview.minutes)}
       </p>
       {interview.location && (
         <p dir="auto" className="text-muted text-right break-words">

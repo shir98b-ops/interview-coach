@@ -75,7 +75,6 @@ async function LessonList() {
       )}
 
       <Card tone="orange" className="gap-3 p-7">
-        <Chip>חדש</Chip>
         <h2 className="text-2xl font-extrabold">מבחן בית לתרגול</h2>
         <p className="text-lg">
           מקבלים משימה בסגנון של מבחני בית אמיתיים לפי התפקיד שלך, מגישים בכתב

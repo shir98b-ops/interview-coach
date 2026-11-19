@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { formatDate } from "@/lib/format";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -83,7 +84,7 @@ async function TakeHomes() {
                     </span>
                     <span className="text-muted text-sm">
                       {difficulties[parseDifficulty(t.difficulty)].label} ·{" "}
-                      {new Date(t.created_at).toLocaleDateString("he-IL")}
+                      {formatDate(t.created_at)}
                     </span>
                   </span>
                   {t.score !== null ? (

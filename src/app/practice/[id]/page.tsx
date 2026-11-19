@@ -11,6 +11,7 @@ import {
   type AnswerFeedback,
 } from "@/lib/interview/feedback";
 import { kindLabels, type QuestionKind } from "@/lib/interview/schema";
+import { seniorityLabel } from "@/lib/format";
 import { forAddress, recommendLesson } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
@@ -98,7 +99,7 @@ async function SessionContent({
   const roleName = job
     ? `${job.title} · ${job.company}`
     : role
-      ? `${role.title}${role.seniority ? ` · ${role.seniority}` : ""}`
+      ? `${role.title}${role.seniority ? ` · ${seniorityLabel(role.seniority)}` : ""}`
       : "תפקיד שנמחק";
   const current = questions.find((q) => answerText(q) === null);
 
@@ -124,6 +125,7 @@ async function SessionContent({
           questionId={current.id}
           isLast={number === questions.length}
           language={languageFor(current.text)}
+          kind={current.kind}
         />
       </section>
     );

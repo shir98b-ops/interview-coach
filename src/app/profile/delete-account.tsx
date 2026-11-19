@@ -17,7 +17,7 @@ export function DeleteAccount() {
   return (
     <form action={action} className="flex flex-col gap-3">
       <label htmlFor="confirm-delete" className="font-bold">
-        כדי לאשר, כתבו כאן את המילה &quot;{CONFIRM_WORD}&quot;
+        כדי לאשר, צריך לכתוב כאן את המילה &quot;{CONFIRM_WORD}&quot;
       </label>
       <input
         id="confirm-delete"

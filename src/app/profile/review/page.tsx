@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { formatDate, localizeSeniority } from "@/lib/format";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -102,10 +103,12 @@ async function Reviews() {
               >
                 <span className="flex flex-col">
                   <span dir="auto" className="font-bold">
-                    {r.role_title ?? "דירוג כללי"}
+                    {r.role_title
+                      ? localizeSeniority(r.role_title)
+                      : "דירוג כללי"}
                   </span>
                   <span className="text-muted text-sm">
-                    {new Date(r.created_at).toLocaleDateString("he-IL")}
+                    {formatDate(r.created_at)}
                   </span>
                 </span>
                 <span className="text-violet text-2xl font-extrabold">
@@ -135,7 +138,7 @@ function ReviewDetails({
     <section className="flex flex-col gap-5">
       <Card tone="violet" className="gap-3 p-7">
         <p dir="auto" className="opacity-90">
-          {role ?? "דירוג כללי"}
+          {role ? localizeSeniority(role) : "דירוג כללי"}
         </p>
         <p
           dir="ltr"

@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { VoiceAnswerField } from "@/components/voice-answer";
+import { seniorityLabel } from "@/lib/format";
 import { isTechnicalRole } from "@/lib/interview/question-bank";
 import {
   MAX_ANSWER_LENGTH,
@@ -55,12 +56,15 @@ export function StartPracticeForm({
               defaultChecked={index === 0}
               onChange={() => setRoleId(role.id)}
               required
-              className="accent-violet size-5"
+              className="accent-violet size-5 shrink-0"
             />
             <span dir="auto">
               {role.title}
               {role.seniority && (
-                <span className="text-muted"> · {role.seniority}</span>
+                <span className="text-muted">
+                  {" "}
+                  · {seniorityLabel(role.seniority)}
+                </span>
               )}
             </span>
           </label>
@@ -98,7 +102,7 @@ export function StartPracticeForm({
                 name="language"
                 value={code}
                 defaultChecked={index === 0}
-                className="accent-violet size-5"
+                className="accent-violet size-5 shrink-0"
               />
               <span lang={code}>{languageNames[code] ?? code}</span>
             </label>
@@ -137,7 +141,7 @@ export function ModeChoice({
             name="mode"
             value={mode}
             defaultChecked={index === 0}
-            className="accent-violet mt-1 size-5"
+            className="accent-violet mt-1 size-5 shrink-0"
           />
           <span className="flex flex-col">
             <span>{modeLabel(mode, technical)}</span>
@@ -153,17 +157,31 @@ export function ModeChoice({
   );
 }
 
+/** A short tip under the answer box, matching the kind of question. */
+const answerTips: Record<string, string> = {
+  behavioral: "מצב, משימה, פעולה ותוצאה. ככה קל לעקוב אחרי הסיפור שלך.",
+  resume: "מצב, משימה, פעולה ותוצאה. ככה קל לעקוב אחרי הסיפור שלך.",
+  role: "לפתוח במשפט שעונה על השאלה, ואז להסביר עם דוגמה מהניסיון.",
+  technical:
+    "להסביר את ההיגיון ואת השיקולים, לא רק את התשובה הסופית. אם משהו לא ברור, לומר איזו הנחה מניחים.",
+  design:
+    "לפרק לשלבים, לומר אילו הנחות מניחים, ולהסביר כל החלטה ומה מוותרים בגללה.",
+};
+
 /** Answer one question, by typing or by speaking. */
 export function AnswerForm({
   sessionId,
   questionId,
   isLast,
   language,
+  kind,
 }: {
   sessionId: string;
   questionId: string;
   isLast: boolean;
   language: SpeechLanguage;
+  /** The question's kind, which decides the tip under the answer box. */
+  kind: string;
 }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
     submitAnswer,
@@ -188,7 +206,7 @@ export function AnswerForm({
         disabled={pending}
       />
       <p className="text-muted text-sm">
-        טיפ: מצב, משימה, פעולה ותוצאה. ככה קל לעקוב אחרי הסיפור שלך.
+        טיפ: {answerTips[kind] ?? answerTips.behavioral}
       </p>
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button type="submit" disabled={pending} className="w-full sm:w-fit">

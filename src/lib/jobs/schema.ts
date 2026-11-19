@@ -19,7 +19,7 @@ export const activeStatuses: JobStatus[] = [
 ];
 
 export function parseStatus(value: unknown): JobStatus {
-  return typeof value === "string" && value in jobStatuses
+  return typeof value === "string" && Object.hasOwn(jobStatuses, value)
     ? (value as JobStatus)
     : "applied";
 }
@@ -38,7 +38,7 @@ export const interviewKinds = {
 export type InterviewKind = keyof typeof interviewKinds;
 
 export function parseKind(value: unknown): InterviewKind {
-  return typeof value === "string" && value in interviewKinds
+  return typeof value === "string" && Object.hasOwn(interviewKinds, value)
     ? (value as InterviewKind)
     : "other";
 }

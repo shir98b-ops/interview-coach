@@ -1,5 +1,6 @@
 "use client";
 
+import { durationLabel } from "@/lib/format";
 import { useActionState } from "react";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { interviewLanguages } from "@/lib/interview/schema";
@@ -34,7 +35,7 @@ export function StartTakeHomeForm({
               value={role.id}
               defaultChecked={index === 0}
               required
-              className="accent-violet size-5"
+              className="accent-violet size-5 shrink-0"
             />
             <span dir="auto">{role.title}</span>
           </label>
@@ -50,14 +51,12 @@ export function StartTakeHomeForm({
                 name="difficulty"
                 value={key}
                 defaultChecked={key === "medium"}
-                className="accent-violet size-5"
+                className="accent-violet size-5 shrink-0"
               />
               <span className="flex flex-col">
                 <span className="font-bold">{d.label}</span>
                 <span className="text-muted text-sm">
-                  {d.minutes < 60
-                    ? `${d.minutes} דקות`
-                    : `${d.minutes / 60} שעות`}
+                  {durationLabel(d.minutes)}
                 </span>
               </span>
             </label>
@@ -74,7 +73,7 @@ export function StartTakeHomeForm({
                 name="language"
                 value={code}
                 defaultChecked={index === 0}
-                className="accent-violet size-5"
+                className="accent-violet size-5 shrink-0"
               />
               <span lang={code}>{languageNames[code] ?? code}</span>
             </label>

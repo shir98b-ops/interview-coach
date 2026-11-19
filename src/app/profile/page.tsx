@@ -10,6 +10,7 @@ import {
   PageHeading,
   inputStyles,
 } from "@/components/ui";
+import { seniorityLabel, seniorityLevels } from "@/lib/format";
 import type { ResumeData } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
@@ -18,18 +19,6 @@ import { DeleteAccount } from "./delete-account";
 import { ResumeFlow } from "./resume-flow";
 
 export const metadata: Metadata = { title: "פרופיל · Interview Coach" };
-
-/** Stored in English, because the question bank matches on these values. */
-const seniorityLevels = [
-  { value: "Entry level", label: "התחלתי" },
-  { value: "Mid level", label: "ביניים" },
-  { value: "Senior", label: "בכיר" },
-  { value: "Manager", label: "מנהל" },
-];
-
-function seniorityLabel(value: string): string {
-  return seniorityLevels.find((s) => s.value === value)?.label ?? value;
-}
 
 export default function ProfilePage({ searchParams }: PageProps<"/profile">) {
   return (
@@ -173,8 +162,8 @@ async function ProfileContent({
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-extrabold">מחיקת החשבון</h2>
           <p className="text-muted">
-            נמחקים לצמיתות קורות החיים, התפקידים, התרגולים, התשובות והציונים. אי
-            אפשר לשחזר אותם אחר כך.
+            נמחקים לצמיתות קורות החיים, התפקידים, המשרות והראיונות, התרגולים,
+            התשובות והציונים. אי אפשר לשחזר אותם אחר כך.
           </p>
         </div>
         <DeleteAccount />
