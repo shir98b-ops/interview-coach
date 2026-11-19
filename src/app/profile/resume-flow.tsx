@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import { FileField } from "@/components/file-field";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { splitList, type ResumeData } from "@/lib/resume/schema";
 import { extractResumeAction, saveProfile, type ExtractState } from "./actions";
@@ -27,19 +28,17 @@ export function ResumeFlow({ hasProfile }: { hasProfile: boolean }) {
 
   return (
     <form action={action} className="flex flex-col gap-3">
-      <label htmlFor="resume" className="font-bold">
-        {hasProfile ? "להעלות קורות חיים חדשים" : "להעלות את קורות החיים שלך"}
-      </label>
-      <input
-        id="resume"
+      <FileField
         name="resume"
-        type="file"
         accept="application/pdf,.pdf"
         required
-        className={`${input} file:bg-violet-soft file:text-violet-dark file:me-4 file:rounded-xl file:border-0 file:px-4 file:py-2 file:font-bold`}
+        label={
+          hasProfile ? "להעלות קורות חיים חדשים" : "להעלות את קורות החיים שלך"
+        }
       />
       <p className="text-muted text-sm">
-        קובץ PDF עד 4 מגה. הקובץ נקרא פעם אחת ולא נשמר. נשמרים רק הפרטים מאשר.
+        קובץ PDF עד 4 מגה. הקובץ נקרא פעם אחת ולא נשמר. נשמרים רק הפרטים
+        שמאשרים.
       </p>
       {state.status === "error" && <ErrorText>{state.error}</ErrorText>}
       <Button type="submit" disabled={pending} className="w-full sm:w-fit">

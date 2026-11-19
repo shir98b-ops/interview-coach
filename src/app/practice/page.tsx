@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { formatDate } from "@/lib/format";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -9,6 +10,7 @@ import { getUsage } from "@/lib/interview/usage";
 import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { JobName } from "@/app/jobs/interview-card";
 import { StartPracticeForm } from "./forms";
 
 export const metadata: Metadata = { title: "תרגול · Interview Coach" };
@@ -123,15 +125,15 @@ async function PracticeContent() {
                     className="hover:bg-violet-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
                   >
                     <span className="flex flex-col">
-                      <span dir="auto" className="font-bold">
-                        {job
-                          ? `${job.title} · ${job.company}`
-                          : (role?.title ?? "תפקיד שנמחק")}
+                      <span className="font-bold">
+                        {job ? (
+                          <JobName company={job.company} title={job.title} />
+                        ) : (
+                          <bdi>{role?.title ?? "תפקיד שנמחק"}</bdi>
+                        )}
                       </span>
                       <span className="text-muted text-sm">
-                        {new Date(session.created_at).toLocaleDateString(
-                          "he-IL",
-                        )}
+                        {formatDate(session.created_at)}
                       </span>
                     </span>
                     {session.overall_score !== null ? (

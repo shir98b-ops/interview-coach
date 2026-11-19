@@ -1,9 +1,11 @@
 "use client";
 
 import { useActionState, useRef, useState, useTransition } from "react";
+import { FileField } from "@/components/file-field";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { startTakeHome } from "@/app/learn/take-home/actions";
 import { startPractice } from "@/app/practice/actions";
+import { durationLabel } from "@/lib/format";
 import { difficulties } from "@/lib/take-home/schema";
 import {
   interviewLanguages,
@@ -37,7 +39,7 @@ export function PasteJobForm() {
         rows={6}
         required
         maxLength={MAX_PASTE_LENGTH}
-        dir="rtl"
+        dir="auto"
         aria-label="עמוד המשרה"
         placeholder="מלינקדאין: פותחים את המשרה, מסמנים הכל, מעתיקים ומדביקים כאן. מאתר של חברה: מספיק להדביק את הקישור."
         className={inputStyles}
@@ -156,13 +158,7 @@ export function AddInterviewForm({ jobId }: { jobId: string }) {
         <select name="duration" defaultValue="60" className={inputStyles}>
           {durations.map((minutes) => (
             <option key={minutes} value={minutes}>
-              {minutes < 60
-                ? `${minutes} דקות`
-                : minutes === 60
-                  ? "שעה"
-                  : minutes === 90
-                    ? "שעה וחצי"
-                    : "שעתיים"}
+              {durationLabel(minutes)}
             </option>
           ))}
         </select>
@@ -361,16 +357,12 @@ export function ImportLinkedInForm() {
   const busy = pending || reading;
   return (
     <div className="flex flex-col gap-3">
-      <label className="flex flex-col gap-2 font-bold">
-        הקובץ מלינקדאין
-        <input
-          type="file"
-          accept=".zip,.csv,application/zip,text/csv"
-          disabled={busy}
-          onChange={(e) => onFile(e.target.files?.[0])}
-          className="file:bg-violet text-sm file:me-3 file:min-h-11 file:rounded-full file:border-0 file:px-4 file:font-bold file:text-white"
-        />
-      </label>
+      <FileField
+        accept=".zip,.csv,application/zip,text/csv"
+        disabled={busy}
+        label="הקובץ מלינקדאין"
+        onFile={onFile}
+      />
       {busy && <p className="text-muted">מייבא...</p>}
       {(fileError || state.error) && (
         <ErrorText>{fileError ?? state.error}</ErrorText>

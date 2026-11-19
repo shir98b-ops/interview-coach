@@ -33,7 +33,7 @@ export const difficulties = {
 export type Difficulty = keyof typeof difficulties;
 
 export function parseDifficulty(value: unknown): Difficulty {
-  return typeof value === "string" && value in difficulties
+  return typeof value === "string" && Object.hasOwn(difficulties, value)
     ? (value as Difficulty)
     : "medium";
 }

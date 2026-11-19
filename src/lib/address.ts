@@ -33,10 +33,10 @@ export const hebrewScriptRule = `When writing in Hebrew, keep names of tools, pr
 /** The instruction that tells the AI how to address the user in Hebrew. */
 export function addressInstruction(address: Address | null): string {
   if (address === "m") {
-    return `When writing in Hebrew, address the candidate in the masculine second person (אתה). ${hebrewScriptRule}`;
+    return `When writing in Hebrew, address the candidate in the masculine second person (אתה), and write example answers in the candidate's voice in the masculine first person (הייתי אחראי, אני מחפש). ${hebrewScriptRule}`;
   }
   if (address === "f") {
-    return `When writing in Hebrew, address the candidate in the feminine second person (את). ${hebrewScriptRule}`;
+    return `When writing in Hebrew, address the candidate in the feminine second person (את), and write example answers in the candidate's voice in the feminine first person (הייתי אחראית, אני מחפשת). ${hebrewScriptRule}`;
   }
   return `When writing in Hebrew, the candidate's gender is unknown: use gender-neutral phrasing (infinitives, or plural forms), and never assume a gender. ${hebrewScriptRule}`;
 }

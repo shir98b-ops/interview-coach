@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { formatDate } from "@/lib/format";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -146,9 +147,7 @@ function PastAttempts({
             <li key={attempt.id}>
               <details className="rounded-[28px] bg-white p-5 shadow-[0_6px_20px_rgba(77,40,200,0.06)]">
                 <summary className="flex cursor-pointer items-center justify-between gap-3 font-bold">
-                  <span>
-                    {new Date(attempt.created_at).toLocaleDateString("he-IL")}
-                  </span>
+                  <span>{formatDate(attempt.created_at)}</span>
                   {feedback && (
                     <span className="text-violet">{feedback.score}/5</span>
                   )}

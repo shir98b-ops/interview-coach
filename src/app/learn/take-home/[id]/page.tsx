@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { durationLabel } from "@/lib/format";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -58,12 +59,7 @@ async function TakeHome({
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           <Chip tone="violet">מבחן בית · {difficulty.label}</Chip>
-          <Chip>
-            זמן מומלץ:{" "}
-            {difficulty.minutes < 60
-              ? `${difficulty.minutes} דקות`
-              : `${difficulty.minutes / 60} שעות`}
-          </Chip>
+          <Chip>זמן מומלץ: {durationLabel(difficulty.minutes)}</Chip>
         </div>
         <h1 dir="auto" className="text-3xl font-extrabold sm:text-4xl">
           {brief.title}

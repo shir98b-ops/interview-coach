@@ -31,6 +31,7 @@ async function Dashboard() {
     { data: profile },
     { count: roleCount },
     { data: sessions },
+    { count: practiceCount },
     learning,
     interviews,
   ] = await Promise.all([
@@ -45,7 +46,11 @@ async function Dashboard() {
       .select("overall_score")
       .not("overall_score", "is", null)
       .order("created_at", { ascending: false })
-      .limit(50),
+      .limit(2),
+    supabase
+      .from("sessions")
+      .select("id", { count: "exact", head: true })
+      .not("overall_score", "is", null),
     getLearningState(supabase),
     upcomingInterviews(supabase, now, 5),
   ]);
@@ -178,7 +183,7 @@ async function Dashboard() {
               </Card>
             )}
             <div className="grid grid-cols-2 gap-5">
-              <Stat value={scores.length} label="תרגולים" />
+              <Stat value={practiceCount ?? scores.length} label="תרגולים" />
               <Stat
                 value={`${learning.completed.size}/${lessons.length}`}
                 label="שיעורים"

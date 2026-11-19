@@ -1,10 +1,13 @@
 import { isTechnicalRole } from "@/lib/interview/question-bank";
 import type { Metadata } from "next";
+import { formatDate } from "@/lib/format";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Loading } from "@/components/app-shell";
-import { Button, Card, Chip, inputStyles } from "@/components/ui";
+import { Card, Chip, inputStyles } from "@/components/ui";
+import { ConfirmDeleteButton } from "@/components/confirm-delete";
+import { SaveButton } from "@/components/save-button";
 import { readPrepPlan, type PrepPlan } from "@/lib/jobs/prep-schema";
 import { interviewsForJob } from "@/lib/jobs/queries";
 import {
@@ -193,13 +196,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                           placeholder="מה שאלו, מה הלך טוב ומה היה קשה. ההכנה לשלב הבא תתחשב בזה."
                           className={inputStyles}
                         />
-                        <Button
-                          type="submit"
-                          variant="quiet"
-                          className="sm:w-fit"
-                        >
-                          לשמור
-                        </Button>
+                        <SaveButton variant="quiet" className="sm:w-fit" />
                       </form>
                     ) : !job.description ? (
                       <p className="text-muted text-sm">
@@ -249,12 +246,11 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                 >
                   <form action={deleteInterview}>
                     <input type="hidden" name="id" value={interview.id} />
-                    <button
-                      type="submit"
-                      className="text-muted hover:text-danger min-h-11 px-2 text-sm font-medium"
-                    >
-                      למחוק
-                    </button>
+                    <ConfirmDeleteButton
+                      label="למחוק"
+                      confirmLabel="למחוק את השלב"
+                      className="px-2"
+                    />
                   </form>
                 </InterviewCard>
               );
@@ -298,7 +294,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
             </h2>
             <p className="text-muted">
               {plan
-                ? `נבנתה ${new Date(prep!.created_at).toLocaleDateString("he-IL")} לפי המודעה וקורות החיים שלך.`
+                ? `נבנתה ${formatDate(prep!.created_at)} לפי המודעה וקורות החיים שלך.`
                 : "מה הם מחפשים, מה כבר יש לך, אילו שאלות צפויות ואיך להתכונן בזמן שנשאר."}
             </p>
           </div>
@@ -326,7 +322,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                       {p.stage
                         ? interviewKinds[parseKind(p.stage)]
                         : "תרגול כללי"}{" "}
-                      · {new Date(p.created_at).toLocaleDateString("he-IL")}
+                      · {formatDate(p.created_at)}
                     </span>
                     <span className="text-violet font-extrabold">
                       {p.overall_score ?? "בתהליך"}
@@ -365,9 +361,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
               className={inputStyles}
             />
           </label>
-          <Button type="submit" className="sm:w-fit">
-            לשמור
-          </Button>
+          <SaveButton className="sm:w-fit" />
         </form>
       </Card>
 
@@ -384,12 +378,10 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
 
       <form action={deleteJob}>
         <input type="hidden" name="id" value={job.id} />
-        <button
-          type="submit"
-          className="text-muted hover:text-danger min-h-11 text-sm font-medium"
-        >
-          למחוק את המשרה ואת הראיונות שלה
-        </button>
+        <ConfirmDeleteButton
+          label="למחוק את המשרה ואת הראיונות שלה"
+          confirmLabel="כן, למחוק לצמיתות"
+        />
       </form>
     </>
   );

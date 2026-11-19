@@ -138,3 +138,10 @@ describe("historyText", () => {
     expect(text).toContain("professional: (no notes)");
   });
 });
+
+describe("parsing stored values", () => {
+  it("ignores names that only exist on every object", () => {
+    expect(parseStatus("toString")).toBe("applied");
+    expect(parseKind("constructor")).toBe("other");
+  });
+});
