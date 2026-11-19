@@ -35,6 +35,30 @@ export function FeedbackButton() {
               dir="auto"
               className={inputStyles}
             />
+            <fieldset className="flex flex-col gap-2">
+              <legend className="mb-2 font-bold">
+                כמה האפליקציה עוזרת? (לא חובה)
+              </legend>
+              <div className="flex gap-1" dir="ltr">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <label key={star} className="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="rating"
+                      value={star}
+                      className="peer sr-only"
+                    />
+                    <span className="border-line peer-checked:bg-violet peer-focus-visible:outline-violet peer-checked:border-violet flex size-11 items-center justify-center rounded-full border-2 font-bold peer-checked:text-white peer-focus-visible:outline-2">
+                      {star}
+                    </span>
+                    <span className="sr-only">
+                      {star === 1 ? "כוכב אחד" : `${star} כוכבים`}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-muted text-sm">1 = לא עוזרת, 5 = עוזרת מאוד</p>
+            </fieldset>
             {state.status === "error" && <ErrorText>{state.error}</ErrorText>}
             <Button type="submit" disabled={pending}>
               {pending ? "שולח..." : "לשלוח משוב"}

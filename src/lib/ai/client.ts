@@ -23,7 +23,8 @@ export type AiAction =
   | "take_home.write"
   | "take_home.score"
   | "job.extract"
-  | "job.prep";
+  | "job.prep"
+  | "feedback.digest";
 
 /**
  * Creates a client from the ANTHROPIC_API_KEY environment variable. With an
