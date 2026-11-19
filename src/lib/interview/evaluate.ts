@@ -9,6 +9,7 @@ import {
   rubric,
   type AnswerFeedback,
 } from "./feedback";
+import { splitKind } from "./schema";
 
 export interface AnsweredQuestion {
   position: number;
@@ -37,6 +38,21 @@ professionally correct. Score these like a demanding interviewer: do not
 inflate, and a vague, shallow or partly wrong answer scores 2 or lower on
 content.
 
+Answers to coding problems (kind "coding") are judged as a senior engineer
+would judge them in a coding interview. You cannot run the code, so trace it
+by hand on the problem's examples and on edge cases (empty input, one item,
+duplicates, large input). Score content as correctness: does the code solve
+the problem as stated, including edge cases? Score structure as the approach
+and efficiency: a fitting algorithm and data structure, with time and space
+complexity close to what this level is expected to reach. Score clarity as
+code quality: readable names, simple flow, idiomatic use of the language, and
+a clear explanation when one is given. Code that does not solve the problem
+cannot score above 2 on content. In the improvements, name the exact bug or
+missing case and the complexity of the candidate's solution. The stronger
+answer for a coding problem is a correct, clean solution in the same
+programming language, in a fenced code block, followed by one or two lines on
+the approach and its complexity.
+
 For each answer, also give what worked, the most useful improvements, and a
 short outline of a stronger answer built from the candidate's own experience.
 Speak to the candidate directly ("you"). Write the feedback in the language
@@ -50,7 +66,13 @@ export async function evaluateInterview(
 ): Promise<Map<number, AnswerFeedback>> {
   const transcript = items
     .map(
-      (item) => `<answer position="${item.position}" kind="${item.kind}">
+      (
+        item,
+      ) => `<answer position="${item.position}" kind="${splitKind(item.kind).kind}"${
+        splitKind(item.kind).codeLanguage
+          ? ` programming_language="${splitKind(item.kind).codeLanguage}"`
+          : ""
+      }>
 <question>${item.question}</question>
 <candidate_answer>
 ${item.answer}

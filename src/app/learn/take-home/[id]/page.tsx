@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { CodeBlock, RichText } from "@/components/rich-text";
+import { codeLanguages, parseCodeLanguage } from "@/lib/code/languages";
 import { durationLabel } from "@/lib/format";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -10,7 +12,7 @@ import {
   parseDifficulty,
   readBrief,
   readTakeHomeFeedback,
-  takeHomeRubric,
+  rubricFor,
   type TakeHomeFeedback,
 } from "@/lib/take-home/schema";
 import { createClient } from "@/lib/supabase/server";
@@ -53,12 +55,18 @@ async function TakeHome({
 
   const difficulty = difficulties[parseDifficulty(takeHome.difficulty)];
   const feedback = readTakeHomeFeedback(takeHome.feedback);
+  const code = brief.format === "code";
 
   return (
     <>
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
-          <Chip tone="violet">מבחן בית · {difficulty.label}</Chip>
+          <Chip tone="violet">
+            {code ? "פרויקט קוד" : "מבחן בית"} · {difficulty.label}
+            {code && brief.codeLanguage
+              ? ` · ${codeLanguages[parseCodeLanguage(brief.codeLanguage)]}`
+              : ""}
+          </Chip>
           <Chip>זמן מומלץ: {durationLabel(difficulty.minutes)}</Chip>
         </div>
         <h1 dir="auto" className="text-3xl font-extrabold sm:text-4xl">
@@ -70,9 +78,13 @@ async function TakeHome({
       </header>
 
       <Card className="gap-5 p-6 sm:p-8">
-        <p dir="auto" className="text-lg leading-relaxed whitespace-pre-line">
-          {brief.context}
-        </p>
+        {code ? (
+          <RichText text={brief.context} className="text-lg leading-relaxed" />
+        ) : (
+          <p dir="auto" className="text-lg leading-relaxed whitespace-pre-line">
+            {brief.context}
+          </p>
+        )}
         <div className="flex flex-col gap-3">
           <h2 className="text-xl font-extrabold">מה צריך לעשות</h2>
           <ol className="flex flex-col gap-3">
@@ -88,6 +100,12 @@ async function TakeHome({
             ))}
           </ol>
         </div>
+        {code && brief.starterCode?.trim() && (
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xl font-extrabold">קוד התחלתי ונתונים</h2>
+            <CodeBlock code={brief.starterCode} />
+          </div>
+        )}
         <div className="bg-orange-soft rounded-2xl p-4">
           <p className="text-orange-ink font-bold">מה מגישים</p>
           <p dir="auto">{brief.deliverable}</p>
@@ -96,12 +114,22 @@ async function TakeHome({
 
       {feedback && takeHome.score !== null ? (
         <>
-          <Feedback feedback={feedback} score={takeHome.score} />
+          <Feedback
+            feedback={feedback}
+            score={takeHome.score}
+            rubric={rubricFor(brief.format)}
+          />
           <details className="rounded-[28px] bg-white p-6 shadow-[0_12px_40px_rgba(77,40,200,0.08)]">
             <summary className="cursor-pointer font-bold">ההגשה שלך</summary>
-            <p dir="auto" className="mt-3 whitespace-pre-wrap">
-              {takeHome.submission}
-            </p>
+            {code ? (
+              <div className="mt-3">
+                <CodeBlock code={takeHome.submission ?? ""} />
+              </div>
+            ) : (
+              <p dir="auto" className="mt-3 whitespace-pre-wrap">
+                {takeHome.submission}
+              </p>
+            )}
           </details>
           <ButtonLink
             href="/learn/take-home"
@@ -119,6 +147,7 @@ async function TakeHome({
           <SubmitTakeHomeForm
             id={takeHome.id}
             submitted={Boolean(takeHome.submission)}
+            code={code}
           />
         </Card>
       )}
@@ -129,9 +158,11 @@ async function TakeHome({
 function Feedback({
   feedback,
   score,
+  rubric,
 }: {
   feedback: TakeHomeFeedback;
   score: number;
+  rubric: ReturnType<typeof rubricFor>;
 }) {
   return (
     <section className="flex flex-col gap-5">
@@ -146,7 +177,7 @@ function Feedback({
         </p>
       </Card>
       <div className="grid gap-3 sm:grid-cols-2">
-        {takeHomeRubric.map((r) => (
+        {rubric.map((r) => (
           <Card key={r.key} className="gap-1 p-5">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold">{r.label}</p>

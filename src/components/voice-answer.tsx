@@ -95,6 +95,7 @@ export function VoiceAnswerField({
   className = "",
   language: initialLanguage,
   disabled = false,
+  required = true,
 }: {
   id: string;
   name: string;
@@ -104,6 +105,7 @@ export function VoiceAnswerField({
   className?: string;
   language: SpeechLanguage;
   disabled?: boolean;
+  required?: boolean;
 }) {
   const support = useSpeechSupport();
   const [value, setValue] = useState("");
@@ -287,7 +289,7 @@ export function VoiceAnswerField({
         dir="auto"
         id={id}
         name={name}
-        required
+        required={required}
         rows={rows}
         maxLength={maxLength}
         placeholder={placeholder}

@@ -6,14 +6,17 @@ import {
   interviewLanguages,
   type InterviewLanguage,
 } from "@/lib/interview/schema";
+import { codeLanguages, type CodeLanguage } from "@/lib/code/languages";
 import {
   briefSchema,
+  codeBriefSchema,
   difficulties,
+  rubricFor,
   readTakeHomeFeedback,
   takeHomeEvaluationSchema,
-  takeHomeRubric,
   taskTypeFor,
   type Difficulty,
+  type TakeHomeFormat,
   type TakeHomeBrief,
   type TakeHomeFeedback,
 } from "./schema";
@@ -31,19 +34,40 @@ function roleName(target: TakeHomeTarget): string {
     : target.title;
 }
 
+/** How a code take-home is written, in place of a written task. */
+function codeTask(codeLanguage: CodeLanguage): string {
+  return `- Kind of task: a small, realistic coding project in
+  ${codeLanguages[codeLanguage]}, the kind companies send to developers: for
+  example a service endpoint with its logic, a data processing script, a
+  small library, or a UI component's logic. Base it on the work of this role.
+- Give clear functional requirements, the inputs and outputs with an example,
+  and the constraints (scale, invalid input, errors).
+- Ask for automated tests and a short README on how to run it and the choices
+  made. Keep the scope small enough that the code fits in a few files and can
+  be pasted as text.
+- Put any starter code, function signatures, sample input or table rows in
+  starterCode, in English. Never include a solution.`;
+}
+
 /** Writes an original take-home assignment for the role. */
 export async function generateTakeHome(
   target: TakeHomeTarget,
   difficulty: Difficulty,
   language: InterviewLanguage,
   address: Address | null = null,
+  format: TakeHomeFormat = "document",
+  codeLanguage: CodeLanguage = "python",
 ): Promise<TakeHomeBrief> {
+  const code = format === "code";
   let response;
   try {
     response = await createAiClient().messages.parse({
       model: "claude-sonnet-5-5",
       max_tokens: 8000,
-      output_config: { effort: "low", format: zodOutputFormat(briefSchema) },
+      output_config: {
+        effort: "low",
+        format: zodOutputFormat(code ? codeBriefSchema : briefSchema),
+      },
       messages: [
         {
           role: "user",
@@ -51,12 +75,16 @@ export async function generateTakeHome(
 candidates. Write an ORIGINAL assignment in the style companies really send,
 for a fictional company (never copy a real company's test).
 
-- Kind of task: ${taskTypeFor(target.title)}.
-- Difficulty: ${difficulties[difficulty].prompt}.
+${
+  code
+    ? codeTask(codeLanguage)
+    : `- Kind of task: ${taskTypeFor(target.title)}.
 - Make it self-contained: everything the candidate needs is in the brief, and
-  the answer can be written as text (no files, no code to run).
+  the answer can be written as text (no files, no code to run).`
+}
+- Difficulty: ${difficulties[difficulty].prompt}.
 - Give realistic, specific details and numbers so the candidate has something
-  to analyze, and leave room for judgment.
+  to work with, and leave room for judgment.
 - Write it in ${interviewLanguages[language]}, the way a native-speaking
   hiring manager would. Keep professional terms as commonly used.
   ${addressInstruction(address)}
@@ -88,7 +116,9 @@ ${target.job.description}
       "no-take-home",
     );
   }
-  return brief;
+  return code
+    ? { ...brief, format: "code", codeLanguage }
+    : { ...brief, format: "document" };
 }
 
 /** Scores a submission against the take-home rubric. */
@@ -98,6 +128,7 @@ export async function evaluateTakeHome(
   submission: string,
   address: Address | null = null,
 ): Promise<TakeHomeFeedback> {
+  const code = brief.format === "code";
   let response;
   try {
     response = await createAiClient().messages.parse({
@@ -110,10 +141,25 @@ export async function evaluateTakeHome(
       messages: [
         {
           role: "user",
-          content: `You are an experienced hiring manager reviewing a take-home
+          content: `You are an experienced ${code ? "senior engineer" : "hiring manager"} reviewing a take-home
 submission. Score it from 1 to 5 on each criterion:
 
-${takeHomeRubric.map((r) => `- ${r.prompt}`).join("\n")}
+${rubricFor(brief.format)
+  .map((r) => `- ${r.prompt}`)
+  .join("\n")}
+${
+  code
+    ? `
+This is a code submission. Review it as a careful code review: you cannot run
+it, so trace the main paths and the edge cases by hand against the
+requirements. Name concrete bugs, missing requirements, missing tests and
+design problems, pointing to the function or file. Code that does not work for
+the main requirement cannot score above 2 on solution, and a submission
+without tests cannot score above 2 on tests and docs. Keep code, names and
+file names in English inside the feedback.
+`
+    : ""
+}
 
 Scale: 1 = missing, 2 = weak, 3 = acceptable but generic, 4 = strong,
 5 = would move the candidate forward. Be honest and consistent: a submission

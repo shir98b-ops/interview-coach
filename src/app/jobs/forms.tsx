@@ -1,9 +1,12 @@
 "use client";
 
 import { useActionState, useRef, useState, useTransition } from "react";
+import { CodeLanguageSelect } from "@/components/code-editor";
 import { FileField } from "@/components/file-field";
+import type { CodeLanguage } from "@/lib/code/languages";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { startTakeHome } from "@/app/learn/take-home/actions";
+import { TakeHomeFormatChoice } from "@/app/learn/take-home/forms";
 import { startPractice } from "@/app/practice/actions";
 import { durationLabel } from "@/lib/format";
 import { difficulties } from "@/lib/take-home/schema";
@@ -273,6 +276,8 @@ export function JobPracticeForm({
   stage,
   modes = false,
   technical = false,
+  coding = false,
+  codeLanguage = "python",
 }: {
   jobId: string;
   stage?: string;
@@ -280,8 +285,12 @@ export function JobPracticeForm({
   modes?: boolean;
   /** A software role, where the case round is system design. */
   technical?: boolean;
+  /** A role that writes code, which can practice a coding round. */
+  coding?: boolean;
+  codeLanguage?: CodeLanguage;
 }) {
   const [state, action, pending] = useActionState(startPractice, initial);
+  const [mode, setMode] = useState<InterviewMode>("general");
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="jobId" value={jobId} />
@@ -289,14 +298,24 @@ export function JobPracticeForm({
       {modes && (
         <label className="flex flex-col gap-1 font-bold sm:w-60">
           סוג הראיון
-          <select name="mode" defaultValue="general" className={inputStyles}>
-            {(Object.keys(interviewModes) as InterviewMode[]).map((mode) => (
-              <option key={mode} value={mode}>
-                {modeLabel(mode, technical)}
-              </option>
-            ))}
+          <select
+            name="mode"
+            value={mode}
+            onChange={(e) => setMode(e.target.value as InterviewMode)}
+            className={inputStyles}
+          >
+            {(Object.keys(interviewModes) as InterviewMode[])
+              .filter((option) => option !== "coding" || coding)
+              .map((option) => (
+                <option key={option} value={option}>
+                  {modeLabel(option, technical)}
+                </option>
+              ))}
           </select>
         </label>
+      )}
+      {modes && mode === "coding" && (
+        <CodeLanguageSelect defaultValue={codeLanguage} />
       )}
       <label className="flex flex-col gap-1 font-bold sm:w-60">
         שפת הראיון
@@ -382,11 +401,23 @@ export function ImportLinkedInForm() {
 }
 
 /** Starts a practice take-home built around this job's posting. */
-export function JobTakeHomeForm({ jobId }: { jobId: string }) {
+export function JobTakeHomeForm({
+  jobId,
+  coding = false,
+  codeLanguage = "python",
+}: {
+  jobId: string;
+  /** A role that writes code, which can get a coding project. */
+  coding?: boolean;
+  codeLanguage?: CodeLanguage;
+}) {
   const [state, action, pending] = useActionState(startTakeHome, initial);
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="jobId" value={jobId} />
+      {coding && (
+        <TakeHomeFormatChoice disabled={pending} codeLanguage={codeLanguage} />
+      )}
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1 font-bold">
           רמת קושי

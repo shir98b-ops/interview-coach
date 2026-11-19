@@ -2,16 +2,20 @@ import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
+import { codeLanguages, type CodeLanguage } from "@/lib/code/languages";
 import type { ResumeData } from "@/lib/resume/schema";
 import {
   bankFor,
   behavioralThemes,
+  codingTopics,
   isTechnicalRole,
   sampleBank,
+  sqlTopics,
   systemDesignProblems,
   technicalTopics,
 } from "./question-bank";
 import {
+  CODING_QUESTION_COUNT,
   QUESTION_COUNT,
   interviewLanguages,
   normalizeQuestions,
@@ -36,6 +40,8 @@ export interface PracticeTarget {
   mode?: InterviewMode;
   /** The kind of organization, when practicing without a job posting. */
   organization?: OrganizationType;
+  /** The programming language of a coding round. */
+  codeLanguage?: CodeLanguage;
 }
 
 /** Makes the questions fit the kind of organization the user applies to. */
@@ -141,7 +147,38 @@ ${levelGuide}
 
 ${professionalBar}`;
 
+const codingInstructions = `You are a senior engineer running the coding round
+of an interview. Write ${CODING_QUESTION_COUNT} coding problems (kind "coding")
+in the programming language given below: the first a focused warm-up, the
+second the main problem of the round.
+
+Each problem must be a complete statement the candidate can solve without
+asking anything:
+- A short, realistic story from the work of this role (a product, a system or
+  a data set), not an abstract puzzle, and never a famous problem copied word
+  for word.
+- What to write: the function, class or query, with its inputs and output.
+- One or two examples, each on its own lines as "Input:" and "Output:", with a
+  short reason when it is not obvious.
+- The constraints that matter (sizes, ranges, empty input, ordering).
+For SQL, describe the tables with their columns and a few sample rows inside a
+fenced code block, and ask for one query.
+
+Put code, signatures and table rows in fenced code blocks (\`\`\`), and keep
+code, names and values in English even when the statement is in another
+language. Do not include a solution or hints.
+
+Set the difficulty by the seniority level, as in a real coding interview:
+- Entry level: one clear idea, solvable in about 20 minutes.
+- Mid level: needs the right data structure and handling of edge cases.
+- Senior and above: a harder main problem where efficiency and clean design
+  both matter, with a follow-up constraint stated in the problem.
+If no seniority is given, infer it from the job posting, else aim for mid level.
+
+${professionalBar}`;
+
 function instructionsFor(mode: InterviewMode, technical: boolean): string {
+  if (mode === "coding") return codingInstructions;
   if (mode === "professional") return professionalInstructions;
   if (mode === "case") return technical ? designInstructions : caseInstructions;
   return `${instructions}
@@ -167,6 +204,23 @@ ${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
   .join("\n")}
 </commonly_asked_questions>
 `;
+  }
+  if (mode === "coding") {
+    const language = target.codeLanguage ?? "python";
+    const topics = sampleBank(
+      language === "sql" ? sqlTopics : codingTopics,
+      CODING_QUESTION_COUNT,
+    );
+    return `<programming_language>${codeLanguages[language]}</programming_language>
+
+Build the problems around these kinds of problem, one each, and pick a
+different story each time:
+${topics.map((topic) => `- ${topic}`).join("\n")}
+${
+  target.job
+    ? "\nWhen the job posting names a domain or data, set the problems in it.\n"
+    : ""
+}`;
   }
   if (mode === "professional") {
     return technical
@@ -235,7 +289,7 @@ they are commonly used in that language. ${addressInstruction(address)}
 ${
   target.job
     ? `
-This interview is for a specific job. Base at least three questions on the
+This interview is for a specific job. Base most of the questions on the
 requirements and responsibilities in this posting, the way this company's
 interviewer would ask them:
 
@@ -288,7 +342,10 @@ ${JSON.stringify(resume, null, 2)}
   }
 
   const questions = response.parsed_output
-    ? normalizeQuestions(response.parsed_output)
+    ? normalizeQuestions(
+        response.parsed_output,
+        mode === "coding" ? CODING_QUESTION_COUNT : QUESTION_COUNT,
+      )
     : [];
   if (response.stop_reason === "refusal" || questions.length === 0) {
     throw new AiError(

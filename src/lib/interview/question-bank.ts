@@ -236,10 +236,67 @@ export function matchRoleFamilies(title: string): RoleFamily[] {
 export function isTechnicalRole(title: string): boolean {
   // Not every engineer writes software: an electrical or civil engineer gets
   // the questions of their own field.
-  return /\b(software|developer|programmer|devops|sre|backend|back-end|frontend|front-end|full[- ]?stack|qa|automation|web|mobile|ios|android|cloud|platform|data engineer|machine learning|ml engineer|ai engineer)\b/i.test(
-    title,
+  // A business developer is a sales role, not a software one.
+  if (/business develop|פיתוח עסקי|מפתח(ת)? עסקי/i.test(title)) return false;
+  return (
+    /\b(software|developer|programmer|devops|sre|backend|back-end|frontend|front-end|full[- ]?stack|qa|automation|web|mobile|ios|android|cloud|platform|data engineer|machine learning|ml engineer|ai engineer)\b/i.test(
+      title,
+    ) ||
+    // Hebrew titles, such as "מפתח תוכנה" or "מהנדסת בקאנד".
+    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים/.test(
+      title,
+    )
   );
 }
+
+/**
+ * Roles whose interviews usually include writing code: software roles, and
+ * data roles that are tested in SQL or Python.
+ */
+export function isCodingRole(title: string): boolean {
+  return (
+    isTechnicalRole(title) ||
+    /\b(data (analyst|scientist)|analytics engineer|bi (developer|analyst)|business intelligence|quant(itative)?)\b/i.test(
+      title,
+    ) ||
+    /אנליסט(ית)? (דאטה|נתונים)|מדע(ן|נית) נתונים|דאטה סיינטיסט/.test(title)
+  );
+}
+
+/**
+ * Kinds of coding problems real interviews use. Each exercise starts from a
+ * different sample, so the problems vary.
+ */
+export const codingTopics = [
+  "arrays and hash maps: counting, grouping or finding pairs",
+  "strings: parsing, validating or transforming text",
+  "two pointers or a sliding window over a sequence",
+  "sorting with a custom order, and merging sorted data",
+  "stacks and queues: matching, undo, or processing in order",
+  "trees: traversal, depth, or searching a hierarchy",
+  "graphs: reachability, shortest path or dependency order",
+  "recursion and backtracking on a small search space",
+  "dynamic programming on a realistic counting or cost problem",
+  "intervals: merging, overlapping bookings or free time",
+  "designing a small class with clear methods (a cache, a rate limiter, a queue)",
+  "processing a log or event stream and reporting results",
+  "working with dates and times in records",
+  "transforming nested JSON-like data into a flat report",
+  "binary search on sorted data or on an answer range",
+  "heaps: top-k items or scheduling by priority",
+];
+
+/** SQL problems for data roles, over small tables given in the question. */
+export const sqlTopics = [
+  "joins across two or three tables, including rows with no match",
+  "aggregation with GROUP BY and HAVING",
+  "window functions: ranking, running totals or comparing to the previous row",
+  "finding duplicates or gaps in records",
+  "retention or cohort counts by month",
+  "top N per group",
+  "conditional aggregation to pivot rows into columns",
+  "dates: activity per week, first and last events per user",
+];
 
 /** The commonly asked questions to show the AI for a role. */
 export function bankFor(

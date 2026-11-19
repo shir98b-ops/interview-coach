@@ -4,6 +4,7 @@ import {
   bankFor,
   behavioralThemes,
   commonQuestions,
+  isCodingRole,
   isTechnicalRole,
   matchRoleFamilies,
   previousQuestionList,
@@ -118,5 +119,23 @@ describe("technical banks", () => {
       expect(new Set(list).size).toBe(list.length);
       expect(list.length).toBeGreaterThanOrEqual(15);
     }
+  });
+});
+
+describe("isCodingRole", () => {
+  it("includes software and data roles, in English and Hebrew", () => {
+    expect(isCodingRole("Backend Developer")).toBe(true);
+    expect(isCodingRole("Data Analyst")).toBe(true);
+    expect(isCodingRole("מפתח תוכנה")).toBe(true);
+    expect(isCodingRole("אנליסטית נתונים")).toBe(true);
+    expect(isCodingRole("עובדת סוציאלית")).toBe(false);
+    expect(isCodingRole("Electrical Engineer")).toBe(false);
+  });
+
+  it("treats Hebrew software titles as technical", () => {
+    expect(isTechnicalRole("מפתחת Full Stack")).toBe(true);
+    expect(isTechnicalRole("מנהל מוצר")).toBe(false);
+    expect(isTechnicalRole("Business Developer")).toBe(false);
+    expect(isTechnicalRole("מפתח עסקי")).toBe(false);
   });
 });

@@ -4,9 +4,18 @@ import { useActionState, useState } from "react";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { VoiceAnswerField } from "@/components/voice-answer";
 import { seniorityLabel } from "@/lib/format";
-import { isTechnicalRole } from "@/lib/interview/question-bank";
+import { CodeEditor, CodeLanguageSelect } from "@/components/code-editor";
+import {
+  codeLanguages,
+  defaultCodeLanguage,
+  parseCodeLanguage,
+  type CodeLanguage,
+} from "@/lib/code/languages";
+import { isCodingRole, isTechnicalRole } from "@/lib/interview/question-bank";
 import {
   MAX_ANSWER_LENGTH,
+  MAX_CODE_ANSWER_LENGTH,
+  splitKind,
   interviewLanguages,
   interviewModes,
   modeLabel,
@@ -40,6 +49,7 @@ export function StartPracticeForm({
   const [roleId, setRoleId] = useState(roles[0]?.id);
   const selected = roles.find((role) => role.id === roleId);
   const technical = selected ? isTechnicalRole(selected.title) : false;
+  const coding = selected ? isCodingRole(selected.title) : false;
 
   return (
     <form action={action} className="flex flex-col gap-6">
@@ -70,7 +80,12 @@ export function StartPracticeForm({
           </label>
         ))}
       </fieldset>
-      <ModeChoice disabled={pending} technical={technical} />
+      <ModeChoice
+        disabled={pending}
+        technical={technical}
+        coding={coding}
+        codeLanguage={defaultCodeLanguage(selected?.title ?? "")}
+      />
       <label className="flex flex-col gap-2">
         <span className="text-xl font-extrabold">באיזה סוג ארגון?</span>
         <select
@@ -123,36 +138,52 @@ export function StartPracticeForm({
   );
 }
 
-/** A general, professional or case interview, for every profession. */
+/**
+ * A general, professional or case interview, for every profession, and a
+ * coding round for roles that write code.
+ */
 export function ModeChoice({
   disabled,
   technical,
+  coding,
+  codeLanguage,
 }: {
   disabled?: boolean;
   technical: boolean;
+  coding: boolean;
+  codeLanguage: CodeLanguage;
 }) {
+  const [chosen, setChosen] = useState<InterviewMode>("general");
+  const modes = (Object.keys(interviewModes) as InterviewMode[]).filter(
+    (mode) => mode !== "coding" || coding,
+  );
+  const mode = modes.includes(chosen) ? chosen : "general";
   return (
     <fieldset className="flex flex-col gap-3" disabled={disabled}>
       <legend className="mb-3 text-xl font-extrabold">איזה סוג ראיון?</legend>
-      {(Object.keys(interviewModes) as InterviewMode[]).map((mode, index) => (
-        <label key={mode} className={`${optionStyles} items-start`}>
+      {modes.map((option) => (
+        <label key={option} className={`${optionStyles} items-start`}>
           <input
             type="radio"
             name="mode"
-            value={mode}
-            defaultChecked={index === 0}
+            value={option}
+            checked={mode === option}
+            onChange={() => setChosen(option)}
             className="accent-violet mt-1 size-5 shrink-0"
           />
           <span className="flex flex-col">
-            <span>{modeLabel(mode, technical)}</span>
+            <span>{modeLabel(option, technical)}</span>
             <span className="text-muted text-sm font-normal">
-              {mode === "case" && technical
+              {option === "case" && technical
                 ? "בעיית תכנון אחת, שלב אחרי שלב, כמו בראיון אמיתי."
-                : interviewModes[mode].description}
+                : interviewModes[option].description}
             </span>
           </span>
         </label>
       ))}
+      {mode === "coding" && (
+        <CodeLanguageSelect key={codeLanguage} defaultValue={codeLanguage} />
+      )}
     </fieldset>
   );
 }
@@ -187,27 +218,39 @@ export function AnswerForm({
     submitAnswer,
     { error: null },
   );
+  const { kind: base, codeLanguage } = splitKind(kind);
+  const coding = base === "coding" ? { codeLanguage } : null;
 
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="sessionId" value={sessionId} />
       <input type="hidden" name="questionId" value={questionId} />
-      <label htmlFor="answer" className="text-muted font-medium">
-        התשובה שלך
-      </label>
-      <VoiceAnswerField
-        id="answer"
-        name="answer"
-        rows={10}
-        maxLength={MAX_ANSWER_LENGTH}
-        placeholder="התשובה, כמו שהיית עונה בראיון."
-        className="min-h-56"
-        language={language}
-        disabled={pending}
-      />
-      <p className="text-muted text-sm">
-        טיפ: {answerTips[kind] ?? answerTips.behavioral}
-      </p>
+      {coding ? (
+        <CodeAnswerFields
+          language={parseCodeLanguage(coding.codeLanguage)}
+          speech={language}
+          disabled={pending}
+        />
+      ) : (
+        <>
+          <label htmlFor="answer" className="text-muted font-medium">
+            התשובה שלך
+          </label>
+          <VoiceAnswerField
+            id="answer"
+            name="answer"
+            rows={10}
+            maxLength={MAX_ANSWER_LENGTH}
+            placeholder="התשובה, כמו שהיית עונה בראיון."
+            className="min-h-56"
+            language={language}
+            disabled={pending}
+          />
+          <p className="text-muted text-sm">
+            טיפ: {answerTips[base] ?? answerTips.behavioral}
+          </p>
+        </>
+      )}
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button type="submit" disabled={pending} className="w-full sm:w-fit">
         {pending
@@ -219,6 +262,57 @@ export function AnswerForm({
             : "לשאלה הבאה"}
       </Button>
     </form>
+  );
+}
+
+/**
+ * The answer to a coding problem: the code, in a code box, and an optional
+ * short explanation of the approach, typed or spoken.
+ */
+function CodeAnswerFields({
+  language,
+  speech,
+  disabled,
+}: {
+  language: CodeLanguage;
+  speech: SpeechLanguage;
+  disabled: boolean;
+}) {
+  return (
+    <>
+      <CodeLanguageSelect defaultValue={language} disabled={disabled} />
+      <label htmlFor="code" className="text-muted font-medium">
+        הקוד שלך
+      </label>
+      <CodeEditor
+        id="code"
+        name="code"
+        rows={16}
+        required
+        maxLength={MAX_CODE_ANSWER_LENGTH - 2000}
+        placeholder={`// ${codeLanguages[language]}`}
+      />
+      <p className="text-muted text-sm">
+        המקש Tab מזיח שורה פנימה. כדי לצאת מהתיבה עם Tab, לוחצים קודם על Esc.
+      </p>
+      <label htmlFor="explanation" className="text-muted font-medium">
+        הסבר קצר על הגישה (לא חובה)
+      </label>
+      <VoiceAnswerField
+        id="explanation"
+        name="explanation"
+        rows={4}
+        maxLength={2000}
+        placeholder="איך חשבת על הפתרון, ומה הסיבוכיות שלו."
+        language={speech}
+        disabled={disabled}
+        required={false}
+      />
+      <p className="text-muted text-sm">
+        טיפ: כמו בראיון אמיתי, כדאי לבדוק את הקוד על הדוגמאות ועל מקרי קצה לפני
+        ששולחים.
+      </p>
+    </>
   );
 }
 

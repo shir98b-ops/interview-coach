@@ -9,8 +9,16 @@ import {
   readFeedback,
   rubric,
   type AnswerFeedback,
+  type RubricKey,
 } from "@/lib/interview/feedback";
-import { kindLabels, type QuestionKind } from "@/lib/interview/schema";
+import { RichText } from "@/components/rich-text";
+import { codeLanguages, parseCodeLanguage } from "@/lib/code/languages";
+import {
+  isCodingKind,
+  kindLabels,
+  splitKind,
+  type QuestionKind,
+} from "@/lib/interview/schema";
 import { seniorityLabel } from "@/lib/format";
 import { forAddress, recommendLesson } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
@@ -57,8 +65,25 @@ function answerText(question: Question): string | null {
 }
 
 function kindLabel(kind: string): string {
-  return kindLabels[kind as QuestionKind] ?? kind;
+  const { kind: base, codeLanguage } = splitKind(kind);
+  const label = kindLabels[base as QuestionKind] ?? base;
+  return codeLanguage
+    ? `${label} · ${codeLanguages[parseCodeLanguage(codeLanguage)]}`
+    : label;
 }
+
+/** For coding answers, the rubric scores correctness, efficiency and code. */
+const codingLabels: Record<RubricKey, string> = {
+  content: "נכונות",
+  structure: "יעילות",
+  clarity: "איכות קוד",
+};
+
+const codingDescriptions: Record<RubricKey, string> = {
+  content: "הקוד פותר את הבעיה כמו שהיא מנוסחת, כולל מקרי קצה.",
+  structure: "גישה ומבנה נתונים מתאימים, וסיבוכיות שמתאימה לרמת התפקיד.",
+  clarity: "שמות ברורים, קוד פשוט לקריאה, ושימוש נכון בשפה.",
+};
 
 async function SessionContent({
   params,
@@ -116,9 +141,21 @@ async function SessionContent({
             {roleName}
           </span>
         </div>
-        <h1 dir="auto" className="text-2xl leading-snug font-bold sm:text-3xl">
-          {current.text}
-        </h1>
+        {isCodingKind(current.kind) ? (
+          <>
+            <h1 className="sr-only">תרגיל קוד</h1>
+            <Card className="text-lg leading-relaxed">
+              <RichText text={current.text} />
+            </Card>
+          </>
+        ) : (
+          <h1
+            dir="auto"
+            className="text-2xl leading-snug font-bold sm:text-3xl"
+          >
+            {current.text}
+          </h1>
+        )}
         <AnswerForm
           key={current.id}
           sessionId={session.id}
@@ -132,10 +169,14 @@ async function SessionContent({
   }
 
   const feedback = questions.map((q) => readFeedback(savedAnswer(q)?.scores));
+  const hasCoding = questions.some((q) => isCodingKind(q.kind));
+  const hasSpoken = questions.some((q) => !isCodingKind(q.kind));
   const scored = feedback.every(Boolean);
   const recommended = scored
     ? recommendLesson(
-        feedback.filter((f) => f !== null),
+        feedback.filter(
+          (f, i) => f !== null && !isCodingKind(questions[i].kind),
+        ) as AnswerFeedback[],
         (attempts ?? []).map((a) => a.lesson_slug as string),
       )
     : undefined;
@@ -157,8 +198,8 @@ async function SessionContent({
             <span className="text-2xl opacity-80"> / 100</span>
           </p>
           <p className="opacity-90">
-            כל תשובה מקבלת ציון מ־1 עד 5 על תוכן, מבנה ובהירות. הטיפים למטה,
-            ותרגול נוסף יראה את ההתקדמות.
+            כל תשובה מקבלת ציון מ־1 עד 5 על שלושה מדדים. הטיפים למטה, ותרגול
+            נוסף יראה את ההתקדמות.
           </p>
         </Card>
       ) : (
@@ -190,12 +231,23 @@ async function SessionContent({
           איך נותנים ציון לתשובות?
         </summary>
         <ul className="text-muted mt-3 flex flex-col gap-2">
-          {rubric.map((r) => (
-            <li key={r.key}>
-              <span className="text-ink font-bold">{r.label}:</span>{" "}
-              {r.description}
-            </li>
-          ))}
+          {hasSpoken &&
+            rubric.map((r) => (
+              <li key={r.key}>
+                <span className="text-ink font-bold">{r.label}:</span>{" "}
+                {r.description}
+              </li>
+            ))}
+          {hasCoding &&
+            rubric.map((r) => (
+              <li key={`code-${r.key}`}>
+                <span className="text-ink font-bold">
+                  {codingLabels[r.key]}
+                  {hasSpoken ? " (בתרגילי קוד)" : ""}:
+                </span>{" "}
+                {codingDescriptions[r.key]}
+              </li>
+            ))}
           <li>1 = חסר, 3 = סביר אבל כללי, 5 = מוכן לראיון אמיתי.</li>
         </ul>
       </details>
@@ -207,17 +259,37 @@ async function SessionContent({
               <Chip tone="violet">
                 שאלה {index + 1} · {kindLabel(q.kind)}
               </Chip>
-              <h2 dir="auto" className="text-lg font-bold">
-                {q.text}
-              </h2>
-              <p
-                dir="auto"
-                className="bg-canvas rounded-2xl p-4 whitespace-pre-wrap"
-              >
-                {answerText(q)}
-              </p>
+              {isCodingKind(q.kind) ? (
+                <>
+                  <details>
+                    <summary className="cursor-pointer text-lg font-bold">
+                      הבעיה
+                    </summary>
+                    <RichText text={q.text} className="mt-3" />
+                  </details>
+                  <RichText
+                    text={answerText(q) ?? ""}
+                    className="bg-canvas rounded-2xl p-4"
+                  />
+                </>
+              ) : (
+                <>
+                  <h2 dir="auto" className="text-lg font-bold">
+                    {q.text}
+                  </h2>
+                  <p
+                    dir="auto"
+                    className="bg-canvas rounded-2xl p-4 whitespace-pre-wrap"
+                  >
+                    {answerText(q)}
+                  </p>
+                </>
+              )}
               {feedback[index] && (
-                <FeedbackDetails feedback={feedback[index]} />
+                <FeedbackDetails
+                  feedback={feedback[index]}
+                  coding={isCodingKind(q.kind)}
+                />
               )}
             </Card>
           </li>
@@ -230,13 +302,19 @@ async function SessionContent({
   );
 }
 
-function FeedbackDetails({ feedback }: { feedback: AnswerFeedback }) {
+function FeedbackDetails({
+  feedback,
+  coding,
+}: {
+  feedback: AnswerFeedback;
+  coding: boolean;
+}) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-2">
         {rubric.map((r) => (
           <Chip key={r.key} tone="violet">
-            {r.label} {feedback[r.key]}/5
+            {coding ? codingLabels[r.key] : r.label} {feedback[r.key]}/5
           </Chip>
         ))}
         <Chip tone="lime">ממוצע {answerAverage(feedback).toFixed(1)}</Chip>
@@ -250,17 +328,25 @@ function FeedbackDetails({ feedback }: { feedback: AnswerFeedback }) {
       {feedback.improvements && (
         <div className="bg-orange-soft rounded-2xl p-4">
           <p className="text-orange-ink font-bold">מה לשפר</p>
-          <p dir="auto">{feedback.improvements}</p>
+          {coding ? (
+            <RichText text={feedback.improvements} />
+          ) : (
+            <p dir="auto">{feedback.improvements}</p>
+          )}
         </div>
       )}
       {feedback.betterAnswer && (
         <details className="bg-violet-soft rounded-2xl p-4">
           <summary className="text-violet-dark cursor-pointer font-bold">
-            ככה יכולה להישמע תשובה חזקה יותר
+            {coding ? "פתרון לדוגמה" : "ככה יכולה להישמע תשובה חזקה יותר"}
           </summary>
-          <p dir="auto" className="mt-2 whitespace-pre-wrap">
-            {feedback.betterAnswer}
-          </p>
+          {coding ? (
+            <RichText text={feedback.betterAnswer} className="mt-2" />
+          ) : (
+            <p dir="auto" className="mt-2 whitespace-pre-wrap">
+              {feedback.betterAnswer}
+            </p>
+          )}
         </details>
       )}
     </div>

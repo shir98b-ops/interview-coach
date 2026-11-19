@@ -18,9 +18,12 @@ import { limitMessage } from "@/lib/interview/limits";
 import { getUsage } from "@/lib/interview/usage";
 import {
   PREVIOUS_QUESTION_LIMIT,
+  isCodingRole,
   previousQuestionList,
 } from "@/lib/interview/question-bank";
+import { codeAnswerText, parseCodeLanguage } from "@/lib/code/languages";
 import {
+  MAX_CODE_ANSWER_LENGTH,
   parseLanguage,
   parseMode,
   parseOrganizationType,
@@ -65,7 +68,8 @@ export async function startPractice(
     ? parseKind(formData.get("stage"))
     : null;
   const language = parseLanguage(formData.get("language"));
-  const mode = parseMode(formData.get("mode"));
+  const requestedMode = parseMode(formData.get("mode"));
+  const codeLanguage = parseCodeLanguage(formData.get("codeLanguage"));
   const organization = parseOrganizationType(formData.get("organization"));
   const { supabase, user } = await requireUser();
 
@@ -126,6 +130,12 @@ export async function startPractice(
     };
   }
 
+  // Coding rounds are only for roles that write code.
+  const mode =
+    requestedMode === "coding" && !isCodingRole(role.title)
+      ? "general"
+      : requestedMode;
+
   // Earlier questions for the same job or role, so new ones do not repeat
   // them. Row level security limits this to the user's own interviews.
   const earlier = supabase
@@ -154,7 +164,7 @@ export async function startPractice(
   let questions;
   try {
     questions = await generateQuestions(
-      { ...role, previousQuestions, mode, organization },
+      { ...role, previousQuestions, mode, organization, codeLanguage },
       resume.data,
       language,
       user.address,
@@ -189,7 +199,8 @@ export async function startPractice(
       user_id: user.id,
       session_id: session.id,
       position: index + 1,
-      kind: q.kind,
+      // A coding question keeps its language, such as "coding:python".
+      kind: mode === "coding" ? `coding:${codeLanguage}` : q.kind,
       text: q.text,
     })),
   );
@@ -209,7 +220,18 @@ export async function submitAnswer(
 ): Promise<FormState> {
   const questionId = String(formData.get("questionId") ?? "");
   const sessionId = String(formData.get("sessionId") ?? "");
-  const answer = validateAnswer(formData.get("answer"));
+  // A coding answer arrives as code plus an optional explanation.
+  const answer = formData.has("code")
+    ? validateAnswer(
+        String(formData.get("code") ?? "").trim() &&
+          codeAnswerText(
+            parseCodeLanguage(formData.get("codeLanguage")),
+            String(formData.get("code") ?? ""),
+            String(formData.get("explanation") ?? ""),
+          ),
+        MAX_CODE_ANSWER_LENGTH,
+      )
+    : validateAnswer(formData.get("answer"));
   if (!answer.ok) return { error: answer.error };
 
   const { supabase, user } = await requireUser();
