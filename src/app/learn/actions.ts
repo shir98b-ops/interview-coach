@@ -14,6 +14,8 @@ import { getLesson } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { track } from "@/lib/analytics/record";
+import { parseAnswerMethod } from "@/lib/analytics/events";
 
 export type ExerciseState =
   | { status: "idle" }
@@ -54,6 +56,7 @@ export async function submitExercise(
     DAILY_EXERCISE_LIMIT,
   );
   if (usage.remaining === 0 && !hasNoLimits(user.email)) {
+    track("limit_reached", { feature: "lesson" }, { supabase, user });
     const hours = usage.hoursUntilNext ?? 1;
     return {
       status: "error",
@@ -89,6 +92,14 @@ export async function submitExercise(
     };
   }
 
+  track(
+    "lesson_answered",
+    {
+      lesson: lesson.slug,
+      method: parseAnswerMethod(formData.get("inputMethod")),
+    },
+    { supabase, user },
+  );
   refresh();
   return { status: "done", feedback };
 }

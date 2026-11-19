@@ -12,6 +12,7 @@ import {
 } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { track } from "@/lib/analytics/record";
 
 export type ExtractState =
   | { status: "idle" }
@@ -78,6 +79,7 @@ export async function saveProfile(
     console.error("Saving profile failed:", error.message);
     return { error: "לא הצלחנו לשמור את הפרופיל. אפשר לנסות שוב." };
   }
+  track("resume_saved", {}, { supabase, user });
   redirect("/profile?saved=1");
 }
 
@@ -94,6 +96,7 @@ export async function addTargetRole(formData: FormData) {
     seniority: seniority || null,
   });
   if (error) console.error("Adding target role failed:", error.message);
+  else track("role_added", {}, { supabase, user });
   refresh();
 }
 

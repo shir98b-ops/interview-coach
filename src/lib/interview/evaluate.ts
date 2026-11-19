@@ -83,7 +83,7 @@ ${item.answer}
 
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("interview.score").messages.parse({
       // Feedback is what the user learns from, so it uses the same mid-tier
       // model as the questions (a few cents per interview).
       model: "claude-sonnet-5-5",

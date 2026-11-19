@@ -2,8 +2,10 @@ import { sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
   index,
+  boolean,
   integer,
   jsonb,
+  numeric,
   pgPolicy,
   pgTable,
   smallint,
@@ -252,3 +254,67 @@ export const jobPreps = pgTable(
   },
   () => [ownRowsOnly("job_preps")],
 ).enableRLS();
+
+/**
+ * Usage analytics. Users can only add rows about themselves and cannot read
+ * them back; only the owner reads them, as totals, through analytics_report().
+ * No answers, resumes or other content are stored here, only what was used.
+ */
+const insertOwnRowsOnly = (table: string) =>
+  pgPolicy(`${table}_insert_own`, {
+    for: "insert",
+    to: authenticatedRole,
+    withCheck: sql`${authUid} = user_id`,
+  });
+
+/** One call to the AI service: which action, which model, tokens and cost. */
+export const aiUsage = pgTable(
+  "ai_usage",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** Cleared when the account is deleted, so cost totals stay correct. */
+    userId: uuid("user_id").references(() => authUsers.id, {
+      onDelete: "set null",
+    }),
+    action: text("action").notNull(),
+    model: text("model").notNull(),
+    inputTokens: integer("input_tokens").notNull(),
+    outputTokens: integer("output_tokens").notNull(),
+    cacheReadTokens: integer("cache_read_tokens").notNull().default(0),
+    cacheWriteTokens: integer("cache_write_tokens").notNull().default(0),
+    costUsd: numeric("cost_usd", { precision: 12, scale: 6 }).notNull(),
+    /** The owner's own test accounts, kept out of the totals. */
+    isInternal: boolean("is_internal").notNull().default(false),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    insertOwnRowsOnly("ai_usage"),
+    index("ai_usage_created_idx").on(table.createdAt),
+  ],
+).enableRLS();
+
+/** Something a user did, such as starting a practice or answering by voice. */
+export const productEvents = pgTable(
+  "product_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: userId(),
+    name: text("name").notNull(),
+    /** Small labels only, such as the input method. Never answer text. */
+    props: jsonb("props").notNull().default({}),
+    /** phone, tablet or desktop, from the browser's user agent. */
+    device: text("device"),
+    isInternal: boolean("is_internal").notNull().default(false),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    insertOwnRowsOnly("product_events"),
+    index("product_events_created_idx").on(table.createdAt),
+  ],
+).enableRLS();
+
+/** Accounts allowed to read the analytics report. No policies: API can't touch it. */
+export const analyticsAdmins = pgTable("analytics_admins", {
+  userId: userId().primaryKey(),
+  createdAt: createdAt(),
+}).enableRLS();

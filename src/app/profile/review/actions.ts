@@ -10,6 +10,7 @@ import { resumeSchema } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { track } from "@/lib/analytics/record";
 
 export type ReviewState = { error: string | null };
 
@@ -61,6 +62,7 @@ export async function rateResume(
     DAILY_REVIEW_LIMIT,
   );
   if (usage.remaining === 0 && !hasNoLimits(user.email)) {
+    track("limit_reached", { feature: "resume_review" }, { supabase, user });
     const hours = usage.hoursUntilNext ?? 1;
     return {
       error: `הגעת למגבלה של ${usage.limit} דירוגים ביום. אפשר לדרג שוב בעוד כ־${hours === 1 ? "שעה" : `${hours} שעות`}.`,
@@ -94,6 +96,7 @@ export async function rateResume(
     console.error("Saving resume review failed:", error.message);
     return { error: "לא הצלחנו לשמור את הדירוג. אפשר לנסות שוב." };
   }
+  track("resume_reviewed", { forRole: Boolean(role) }, { supabase, user });
   refresh();
   return { error: null };
 }

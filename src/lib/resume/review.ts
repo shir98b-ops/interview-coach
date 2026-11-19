@@ -18,7 +18,7 @@ export async function reviewResume(
 ): Promise<ResumeReview> {
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("resume.review").messages.parse({
       // Rewriting resume lines well needs judgment, so this uses the
       // mid-tier model (about a cent per rating).
       model: "claude-sonnet-5-5",

@@ -114,6 +114,9 @@ export function VoiceAnswerField({
   const [language, setLanguage] = useState(initialLanguage);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Whether any words came from speech, counted (as voice or text) when the
+  // answer is sent. The words themselves are never counted.
+  const [spoke, setSpoke] = useState(false);
   const recognition = useRef<Recognition | null>(null);
   // True while the user wants to keep talking. Browsers end a session after
   // a pause, so we quietly start a new one until the user presses stop.
@@ -149,6 +152,7 @@ export function VoiceAnswerField({
     r.interimResults = true;
     r.onresult = (event) => {
       heard.current = true;
+      setSpoke(true);
       setError(null);
       let pending = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -285,6 +289,11 @@ export function VoiceAnswerField({
           )}
         </div>
       )}
+      <input
+        type="hidden"
+        name="inputMethod"
+        value={spoke ? "voice" : "text"}
+      />
       <textarea
         dir="auto"
         id={id}

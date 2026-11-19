@@ -266,7 +266,7 @@ export async function generateQuestions(
 
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("interview.questions").messages.parse({
       // Good questions are the heart of the product, so this uses the
       // mid-tier model (about two cents per practice interview).
       model: "claude-sonnet-5-5",

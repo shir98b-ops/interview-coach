@@ -12,7 +12,7 @@ import {
 export async function extractJob(pasted: string): Promise<JobFromPaste> {
   let response;
   try {
-    response = await createAiClient().messages.parse({
+    response = await createAiClient("job.extract").messages.parse({
       // Copying details out of a page is simple, so the fastest and cheapest
       // model is enough (a fraction of a cent per job).
       model: "claude-haiku-5-5",
