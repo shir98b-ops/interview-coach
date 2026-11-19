@@ -7,6 +7,7 @@ import { ButtonLink, Card, Chip, PageHeading } from "@/components/ui";
 import { limitMessage } from "@/lib/interview/limits";
 import { getUsage } from "@/lib/interview/usage";
 import { createClient } from "@/lib/supabase/server";
+import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { StartPracticeForm } from "./forms";
 
@@ -52,6 +53,8 @@ async function PracticeContent() {
       getUsage(supabase),
     ]);
 
+  const noLimits = hasNoLimits(user.email);
+
   if (!profile || !roles?.length) {
     return (
       <Card className="gap-4 p-8">
@@ -77,7 +80,12 @@ async function PracticeContent() {
   return (
     <>
       <Card className="gap-5 p-6 sm:p-8">
-        {usage.remaining > 0 ? (
+        {noLimits ? (
+          <>
+            <StartPracticeForm roles={roles} />
+            <p className="text-muted text-sm">לחשבון שלך אין מגבלה יומית.</p>
+          </>
+        ) : usage.remaining > 0 ? (
           <>
             <StartPracticeForm roles={roles} />
             <p className="text-muted text-sm">

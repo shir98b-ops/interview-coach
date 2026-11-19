@@ -24,6 +24,7 @@ import {
 } from "@/lib/jobs/schema";
 import { daysUntil, fromLocalInput } from "@/lib/jobs/time";
 import { createClient } from "@/lib/supabase/server";
+import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 
 export type JobFormState = { error: string | null };
@@ -74,7 +75,7 @@ export async function addJob(
     new Date(),
     DAILY_JOB_LIMIT,
   );
-  if (usage.remaining === 0) {
+  if (usage.remaining === 0 && !hasNoLimits(user.email)) {
     return { error: `הגעת למגבלה של ${usage.limit} משרות חדשות ביום.` };
   }
 
@@ -304,7 +305,7 @@ export async function createPrepPlan(
     now,
     DAILY_PREP_LIMIT,
   );
-  if (usage.remaining === 0) {
+  if (usage.remaining === 0 && !hasNoLimits(user.email)) {
     const hours = usage.hoursUntilNext ?? 1;
     return {
       error: `הגעת למגבלה של ${usage.limit} תוכניות ביום. אפשר שוב בעוד כ־${hours === 1 ? "שעה" : `${hours} שעות`}.`,
