@@ -31,7 +31,9 @@ Answers to technical and design questions (kind "technical" or "design") are
 judged differently: content is technical accuracy, depth and the trade-offs
 considered; structure is a logical approach (clarify, propose, justify), not
 a STAR story. Point out any technical mistake plainly, and make the stronger
-answer outline technically correct.
+answer outline technically correct. Score these like a demanding interviewer
+at a strong tech company: do not inflate, and a vague, shallow or partly wrong
+technical answer scores 2 or lower on content.
 
 For each answer, also give what worked, the most useful improvements, and a
 short outline of a stronger answer built from the candidate's own experience.

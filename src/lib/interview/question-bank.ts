@@ -315,3 +315,54 @@ export const behavioralThemes = [
   "adapting to a big change",
   "an achievement and the candidate's specific part in it",
 ];
+
+/**
+ * Classic system design problems from real tech-company interviews. Without
+ * a job posting, each design interview gets one at random, so the problem
+ * matches the industry bar rather than the candidate's past jobs.
+ */
+export const systemDesignProblems = [
+  "a URL shortener with click analytics",
+  "a rate limiter for a public API",
+  "a chat and messaging service with group chats and read receipts",
+  "a news feed for a social network",
+  "a notification service that sends push, email and SMS at scale",
+  "a ride-hailing service that matches riders and drivers in real time",
+  "a video upload and streaming platform",
+  "a distributed key-value cache",
+  "a payment processing system that never charges twice",
+  "a search autocomplete service",
+  "a file storage and sync service like a cloud drive",
+  "a web crawler that indexes billions of pages",
+  "an e-commerce checkout with flash sales and limited stock",
+  "a metrics and monitoring system that ingests millions of events a second",
+  "a collaborative document editor",
+  "a job scheduler that runs millions of delayed and recurring tasks",
+  "a hotel or flight booking system that prevents double booking",
+  "a leaderboard for a mobile game with millions of players",
+];
+
+/**
+ * Areas real technical rounds cover. Each technical interview gets a random
+ * few, adapted to the role's stack, so practice goes beyond one comfort zone.
+ */
+export const technicalTopics = [
+  "data structures and time and space complexity",
+  "database indexing, query plans and transactions",
+  "SQL versus NoSQL trade-offs",
+  "caching strategies and cache invalidation",
+  "concurrency, race conditions and locking",
+  "API design, versioning and idempotency",
+  "message queues and asynchronous processing",
+  "consistency, replication and partitioning in distributed systems",
+  "authentication, authorization and common security flaws",
+  "debugging a production incident from logs and metrics",
+  "performance profiling and memory leaks",
+  "HTTP, networking and what happens when a request is made",
+  "testing strategy: unit, integration and end-to-end",
+  "observability: logging, metrics and tracing",
+  "deployment, CI/CD and rolling back safely",
+  "containers and running services in the cloud",
+  "designing a data model for a new feature",
+  "code review and keeping a large codebase maintainable",
+];

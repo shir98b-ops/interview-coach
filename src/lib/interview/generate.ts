@@ -3,7 +3,13 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import type { ResumeData } from "@/lib/resume/schema";
-import { bankFor, behavioralThemes, sampleBank } from "./question-bank";
+import {
+  bankFor,
+  behavioralThemes,
+  sampleBank,
+  systemDesignProblems,
+  technicalTopics,
+} from "./question-bank";
 import {
   QUESTION_COUNT,
   interviewLanguages,
@@ -46,30 +52,35 @@ interview. Write ${QUESTION_COUNT} questions for the candidate below.
   the commonly asked list.
 - Ask one thing per question, the way a real interviewer would say it.`;
 
-const technicalInstructions = `You are a senior engineer running the technical
-round of an interview. Write ${QUESTION_COUNT} technical questions for the
-candidate below.
+/** Shared by the technical modes: hold the bar of a real tech interview. */
+const technicalBar = `Hold the bar of a real interview at a strong tech
+company for this role and seniority. Do NOT adapt the problems, their domain
+or their difficulty to the candidate's past jobs or industry, and do not
+soften anything because of the candidate's background: the goal is to prepare
+them for the real thing. If no seniority is given, aim for mid-level.`;
 
-- Cover different ground: core concepts of the role's stack, solving a
-  concrete problem, debugging or troubleshooting a realistic failure, and the
-  trade-offs between two approaches. Use kind "technical" for these.
-- Include exactly one question about a technical decision or project on the
-  candidate's resume (kind "resume").
-- When a job posting is given, use the technologies and problems it names.
-  Otherwise use the stack the role and resume suggest.
-- Match the seniority level: fundamentals and clear reasoning for juniors,
-  architecture, scale and ownership for seniors.
+const technicalInstructions = `You are a senior engineer running the technical
+round of an interview at a strong tech company. Write ${QUESTION_COUNT}
+technical questions (kind "technical").
+
+- Cover the focus areas listed below, adapted to the role's stack. When a job
+  posting is given, use the technologies and problems it names.
+- Mix the question types: explain a concept in depth, solve a concrete
+  problem, debug a realistic production failure, and compare two approaches
+  with their trade-offs.
+- Match the seniority: solid fundamentals for juniors; architecture, scale,
+  failure modes and ownership for seniors.
 - Every question must be answerable out loud in a few minutes, without a
   computer: the candidate explains an approach, an algorithm or pseudo-code in
   words, not a full program.
-- Ask the kind of questions real technical interviewers ask; no trivia or
-  trick questions.`;
+- Ask what real technical interviewers ask; no trivia or trick questions.
+
+${technicalBar}`;
 
 const designInstructions = `You are a senior engineer running a system design
-interview. Choose ONE realistic design problem that fits the role, the job
-posting if given, and the seniority level (smaller in scope for juniors,
-larger and more ambiguous for seniors). Then write it as ${QUESTION_COUNT}
-questions, asked in this order, each of kind "design":
+interview at a strong tech company. Use the design problem given below. Then
+write it as ${QUESTION_COUNT} questions, asked in this order, each of kind
+"design":
 
 1. State the problem and ask the candidate to clarify the requirements,
    users and expected scale before designing.
@@ -79,8 +90,12 @@ questions, asked in this order, each of kind "design":
 5. Ask for the main trade-offs made and what they would do differently with
    more time or a different constraint.
 
-Each question after the first must make sense on its own while building on
-the same problem, the way an interviewer moves the discussion forward.`;
+Scale the expected depth to the seniority (a junior still gets a real
+problem, with less expected on scale). Each question after the first must make
+sense on its own while building on the same problem, the way an interviewer
+moves the discussion forward.
+
+${technicalBar}`;
 
 const instructionsFor: Record<InterviewMode, string> = {
   general: instructions,
@@ -157,7 +172,21 @@ ${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
   .join("\n")}
 </commonly_asked_questions>
 `
-    : ""
+    : mode === "technical"
+      ? `<focus_areas>
+${sampleBank(technicalTopics, 4)
+  .map((topic) => `- ${topic}`)
+  .join("\n")}
+</focus_areas>
+`
+      : `<design_problem>
+${
+  target.job
+    ? "A core system of the company in the job posting, at that company's real scale."
+    : `Design ${sampleBank(systemDesignProblems, 1)[0]}.`
+}
+</design_problem>
+`
 }${
             target.previousQuestions?.length
               ? `
@@ -174,9 +203,15 @@ ${target.previousQuestions.map((q) => `- ${q}`).join("\n")}
               : ""
           }
 
-<resume>
+${
+  // Technical rounds hold the industry bar, so the resume is left out and
+  // cannot pull the problems toward the candidate's past jobs.
+  mode === "general"
+    ? `<resume>
 ${JSON.stringify(resume, null, 2)}
-</resume>`,
+</resume>`
+    : ""
+}`,
         },
       ],
     });

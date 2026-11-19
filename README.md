@@ -56,8 +56,9 @@ with another person.
 10. Technical practice: for engineering and data roles, a technical
     interview (concepts, problem solving, debugging, trade-offs) or a system
     design interview (one problem in five steps, from requirements to
-    trade-offs), built from the job posting's stack when there is one and
-    scored on technical accuracy and depth.
+    trade-offs). Problems come from the job posting or from classic tech-company
+    interviews at the role's level, never from the candidate's past industry,
+    and answers are scored strictly on technical accuracy and depth.
 
 ## Key product decisions
 

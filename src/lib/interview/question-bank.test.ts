@@ -8,6 +8,8 @@ import {
   matchRoleFamilies,
   previousQuestionList,
   sampleBank,
+  systemDesignProblems,
+  technicalTopics,
 } from "./question-bank";
 
 const ids = (title: string) => matchRoleFamilies(title).map((f) => f.id);
@@ -104,5 +106,14 @@ describe("behavioralThemes", () => {
   it("has enough distinct themes to vary many interviews", () => {
     expect(new Set(behavioralThemes).size).toBe(behavioralThemes.length);
     expect(behavioralThemes.length).toBeGreaterThanOrEqual(12);
+  });
+});
+
+describe("technical banks", () => {
+  it("have enough distinct entries to vary practice", () => {
+    for (const list of [systemDesignProblems, technicalTopics]) {
+      expect(new Set(list).size).toBe(list.length);
+      expect(list.length).toBeGreaterThanOrEqual(15);
+    }
   });
 });
