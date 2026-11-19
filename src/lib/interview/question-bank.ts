@@ -9,6 +9,13 @@ export interface RoleFamily {
   label: string;
   /** Words in a role title that point to this family. */
   keywords: string[];
+  /**
+   * Hebrew words, as regular expression sources (Latin terms such as "UX" are
+   * already found by the keywords). Each must be a whole word,
+   * optionally after the prefix letters ו or ה, so list plural and feminine
+   * forms in the pattern itself.
+   */
+  hebrew?: string[];
   questions: string[];
 }
 
@@ -35,6 +42,7 @@ export const roleFamilies: RoleFamily[] = [
     id: "product",
     label: "Product",
     keywords: ["product", "pm", "owner"],
+    hebrew: ["מוצר(ים)?", "פרודקט"],
     questions: [
       "What is a product you love, and how would you improve it?",
       "How do you decide what goes into the next release?",
@@ -57,6 +65,20 @@ export const roleFamilies: RoleFamily[] = [
       "logistics",
       "supply",
     ],
+    hebrew: [
+      "פרויקט(ים)?",
+      "פרוייקט(ים)?",
+      "תפעול",
+      "תפעולי(ת)?",
+      "לוגיסטיקה",
+      "רכש",
+      "שרשרת אספקה",
+      "מתאמ(ת)?",
+      "רכז(ת)?",
+      "סקראם",
+      "תכנית",
+      "תוכניות",
+    ],
     questions: [
       "Tell me about a project that went off track. What did you do?",
       "How do you keep stakeholders updated on progress and risks?",
@@ -70,6 +92,15 @@ export const roleFamilies: RoleFamily[] = [
     id: "data",
     label: "Data and analytics",
     keywords: ["data", "analyst", "analytics", "bi", "insights", "research"],
+    hebrew: [
+      "נתונים",
+      "דאטה",
+      "אנליסט(ית)?",
+      "אנליטיקה",
+      "מחקר",
+      "חוקר(ת)?",
+      "מדע(ן|נית) נתונים",
+    ],
     questions: [
       "Walk me through an analysis that changed a business decision.",
       "How do you check that your data is correct before you share results?",
@@ -84,6 +115,7 @@ export const roleFamilies: RoleFamily[] = [
     label: "Marketing",
     keywords: [
       "marketing",
+      "marketer",
       "growth",
       "brand",
       "content",
@@ -91,6 +123,23 @@ export const roleFamilies: RoleFamily[] = [
       "social",
       "communications",
       "pr",
+    ],
+    hebrew: [
+      "שיווק",
+      "שיווקי(ת)?",
+      "משווק(ת)?",
+      "מיתוג",
+      "מותג",
+      "תוכן",
+      "קופירייטר(ית)?",
+      "דיגיטל",
+      "סושיאל",
+      "רשתות חברתיות",
+      "יחסי ציבור",
+      "דוברות",
+      "דובר(ת)?",
+      "צמיחה",
+      "קידום",
     ],
     questions: [
       "Tell me about a campaign you ran. What were the results?",
@@ -108,12 +157,27 @@ export const roleFamilies: RoleFamily[] = [
       "sales",
       "account",
       "business development",
+      "business developer",
       "bdr",
       "sdr",
       "customer",
       "success",
       "support",
       "service",
+    ],
+    hebrew: [
+      "מכירות",
+      "איש מכירות",
+      "אשת מכירות",
+      "לקוחות",
+      "לקוח(ות)? מפתח",
+      "שירות",
+      "תמיכה",
+      "פיתוח עסקי",
+      "מפתח(ת)? עסקי(ת)?",
+      "תיקי לקוחות",
+      "מוקד(נית|ן)?",
+      "נציג(ת)?",
     ],
     questions: [
       "Sell me this product.",
@@ -131,9 +195,19 @@ export const roleFamilies: RoleFamily[] = [
       "hr",
       "human resources",
       "recruit",
+      "recruiter",
       "talent",
       "people",
       "hiring",
+    ],
+    hebrew: [
+      "משאבי אנוש",
+      "גיוס",
+      "מגייס(ת)?",
+      "השמה",
+      "פיתוח ארגוני",
+      "פיתוח הדרכה",
+      "רכז(ת)? גיוס",
     ],
     questions: [
       "How do you assess whether a candidate is a good fit?",
@@ -147,7 +221,8 @@ export const roleFamilies: RoleFamily[] = [
   {
     id: "design",
     label: "Design",
-    keywords: ["design", "ux", "ui", "researcher"],
+    keywords: ["design", "designer", "ux", "ui", "researcher"],
+    hebrew: ["עיצוב", "מעצב(ת)?", "חווי(ה|ית) משתמש", "ממשק"],
     questions: [
       "Walk me through a project in your portfolio, from problem to result.",
       "How do you handle feedback you disagree with?",
@@ -169,6 +244,24 @@ export const roleFamilies: RoleFamily[] = [
       "bookkeeper",
       "economist",
     ],
+    hebrew: [
+      "כספים",
+      "פיננס(ים)?",
+      "פיננסי(ת)?",
+      "חשב(ת)?",
+      "רואה חשבון",
+      "רואת חשבון",
+      'רו"ח',
+      "הנהלת חשבונות",
+      "מנהל(ת)? חשבונות",
+      "חשבונאות",
+      "חשבונאי(ת)?",
+      "כלכלן",
+      "כלכלנית",
+      "בקר(ית)?",
+      "בקרה תקציבית",
+      "תקציבים",
+    ],
     questions: [
       "Walk me through how you build a budget or forecast.",
       "Tell me about a time you found an error in the numbers. What did you do?",
@@ -180,16 +273,10 @@ export const roleFamilies: RoleFamily[] = [
   },
   {
     id: "engineering",
-    label: "Engineering",
-    keywords: [
-      "engineer",
-      "developer",
-      "software",
-      "programmer",
-      "devops",
-      "qa",
-      "tester",
-    ],
+    label: "Software engineering",
+    // Matched by isSoftwareFamily below, so an electrical or civil engineer
+    // gets the questions of their own field instead.
+    keywords: [],
     questions: [
       "Tell me about a technical problem you are proud of solving.",
       "How do you approach debugging an issue you cannot reproduce?",
@@ -200,10 +287,79 @@ export const roleFamilies: RoleFamily[] = [
     ],
   },
   {
+    id: "hardware",
+    label: "Engineering (not software)",
+    keywords: [
+      "electrical",
+      "electronics",
+      "mechanical",
+      "civil",
+      "structural",
+      "chemical",
+      "industrial",
+      "hardware",
+      "manufacturing",
+      "process engineer",
+      "production engineer",
+      "biomedical",
+      "aerospace",
+      "materials",
+      "rf",
+      "asic",
+      "fpga",
+      "vlsi",
+      "chip",
+    ],
+    hebrew: [
+      "חשמל",
+      "אלקטרוניקה",
+      "מכונות",
+      "מכני(ת)?",
+      "בניין",
+      "אזרחי(ת)?",
+      "קונסטרוקציה",
+      "קונסטרוקטור(ית)?",
+      "מבנים",
+      "כימי(ה|ת)?",
+      "תעשייה וניהול",
+      'תעו"נ',
+      "חומרה",
+      "ייצור",
+      "תהליך",
+      "ביו-?רפואי(ת)?",
+      "אווירונאוטיקה",
+      "חומרים",
+      "שבבים",
+      "אנרגיה",
+    ],
+    questions: [
+      "Walk me through a design you took from requirements to a working product. What trade-offs did you make?",
+      "How do you make sure a design meets the relevant safety standards and regulations?",
+      "Tell me about a failure you found in testing or in the field. How did you find the root cause?",
+      "How do you check your calculations or a design before it is approved?",
+      "How do you work with manufacturing, suppliers or contractors when a design has to change?",
+      "Tell me about a time you had to balance cost, schedule and quality.",
+    ],
+  },
+  {
     id: "management",
     label: "Management",
     // "Manager" alone is left out: a Product Manager does not manage people.
     keywords: ["lead", "head", "director", "team leader", "supervisor"],
+    hebrew: [
+      "ראש צוות",
+      "ראש תחום",
+      "ראש מחלקה",
+      "ראש אגף",
+      "ראש מטה",
+      'ר"צ',
+      "מנהל(ת)? (צוות|מחלקה|אגף|תחום|סניף|משמרת|יחידה)",
+      "אחראי(ת)? משמרת",
+      'סמנכ"ל(ית)?',
+      'מנכ"ל(ית)?',
+      "דירקטור(ית)?",
+      "מנהל(ת)? (כללי|כללית|פעילות)",
+    ],
     questions: [
       "How would your team describe you as a manager?",
       "Tell me about a time you had to let someone go or deliver hard feedback.",
@@ -221,13 +377,46 @@ export const roleFamilies: RoleFamily[] = [
  */
 export function matchRoleFamilies(title: string): RoleFamily[] {
   const words = ` ${title.toLowerCase().replace(/[^a-z0-9]+/g, " ")} `;
-  return roleFamilies.filter((family) =>
+  const matches = (family: RoleFamily) =>
     family.keywords.some(
       (keyword) =>
         words.includes(` ${keyword} `) || words.includes(` ${keyword}s `),
-    ),
+    ) || (family.hebrew ?? []).some((word) => hebrewWord(word).test(title));
+  const hardware = matches(roleFamilies.find((f) => f.id === "hardware")!);
+  return roleFamilies.filter((family) =>
+    family.id === "engineering"
+      ? isSoftwareFamily(title, words, hardware)
+      : matches(family),
   );
 }
+
+const HEBREW_LETTER = "\\u05D0-\\u05EA";
+
+/** A Hebrew word on its own, optionally after the prefix letters ו or ה. */
+function hebrewWord(source: string): RegExp {
+  return new RegExp(
+    `(^|[^${HEBREW_LETTER}])[וה]{0,2}(${source})(?![${HEBREW_LETTER}])`,
+    "i",
+  );
+}
+
+/**
+ * Software engineering questions fit software roles, and a plain "Engineer"
+ * title, but not an electrical, mechanical or civil engineer.
+ */
+function isSoftwareFamily(
+  title: string,
+  words: string,
+  hardware: boolean,
+): boolean {
+  if (isTechnicalRole(title)) return true;
+  if (BUSINESS_DEVELOPER.test(title)) return false;
+  if (/ (tester|qa) /.test(words) || / testers /.test(words)) return true;
+  if (hardware) return false;
+  return / engineers? /.test(words) || hebrewWord("מהנדס(ת)?").test(title);
+}
+
+const BUSINESS_DEVELOPER = /business develop|פיתוח עסקי|מפתח(ת)? עסקי/i;
 
 /**
  * Software roles, whose professional round draws on core
@@ -237,13 +426,13 @@ export function isTechnicalRole(title: string): boolean {
   // Not every engineer writes software: an electrical or civil engineer gets
   // the questions of their own field.
   // A business developer is a sales role, not a software one.
-  if (/business develop|פיתוח עסקי|מפתח(ת)? עסקי/i.test(title)) return false;
+  if (BUSINESS_DEVELOPER.test(title)) return false;
   return (
     /\b(software|developer|programmer|devops|sre|backend|back-end|frontend|front-end|full[- ]?stack|qa|automation|web|mobile|ios|android|cloud|platform|data engineer|machine learning|ml engineer|ai engineer)\b/i.test(
       title,
     ) ||
     // Hebrew titles, such as "מפתח תוכנה" or "מהנדסת בקאנד".
-    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים/.test(
+    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון))/.test(
       title,
     )
   );

@@ -69,6 +69,8 @@ const taskTypes: Record<string, string> = {
     "a financial analysis with a small table of numbers in the brief: assess the situation and recommend a decision",
   engineering:
     "a written technical design: approach, architecture, trade-offs and a test plan, without writing full code",
+  hardware:
+    "an engineering design review with a small table of requirements, specs or loads in the brief: propose a design, check it against the constraints and standards, and list the risks and tests",
   management:
     "a leadership case: plan the first 90 days of a team, or handle a team conflict and a missed goal",
 };

@@ -28,6 +28,47 @@ describe("matchRoleFamilies", () => {
     expect(ids("Project Coordinator")).toEqual(["project"]);
   });
 
+  it("matches Hebrew role titles, with prefixes and feminine forms", () => {
+    expect(ids("מנהלת מוצר")).toEqual(["product"]);
+    expect(ids("מנהל פרויקטים")).toEqual(["project"]);
+    expect(ids("אנליסטית נתונים")).toEqual(["data"]);
+    expect(ids("מנהלת השיווק")).toEqual(["marketing"]);
+    expect(ids("נציג שירות לקוחות")).toEqual(["sales"]);
+    expect(ids("מגייסת")).toEqual(["people"]);
+    expect(ids("מעצבת UX")).toEqual(["design"]);
+    expect(ids("רואה חשבון")).toEqual(["finance"]);
+    expect(ids('סמנכ"ל כספים')).toEqual(["finance", "management"]);
+    expect(ids("ראש צוות פיתוח")).toEqual(["engineering", "management"]);
+  });
+
+  it("does not match Hebrew words inside longer words", () => {
+    // "חשב" (comptroller) must not match "מחשבים" (computers).
+    expect(ids("טכנאי מחשבים")).toEqual([]);
+    // "תוכן" (content) is not "תוכנה" (software).
+    expect(ids("מפתחת תוכנה")).toEqual(["engineering"]);
+  });
+
+  it("keeps engineers outside software out of the software questions", () => {
+    expect(ids("Electrical Engineer")).toEqual(["hardware"]);
+    expect(ids("Civil Engineer")).toEqual(["hardware"]);
+    expect(ids("מהנדס חשמל")).toEqual(["hardware"]);
+    expect(ids("מהנדסת בניין")).toEqual(["hardware"]);
+    expect(ids("מהנדס תעשייה וניהול")).toEqual(["hardware"]);
+    expect(ids("Software Engineer")).toEqual(["engineering"]);
+    expect(ids("מהנדס תוכנה")).toEqual(["engineering"]);
+    expect(ids("Engineer")).toEqual(["engineering"]);
+  });
+
+  it("treats business developers as sales, not software", () => {
+    expect(ids("Business Developer")).toEqual(["sales"]);
+    expect(ids("מפתח עסקי")).toEqual(["sales"]);
+  });
+
+  it("matches plural and -er forms in English", () => {
+    expect(ids("Product Designer")).toEqual(["product", "design"]);
+    expect(ids("Recruiter")).toEqual(["people"]);
+  });
+
   it("returns nothing for an unknown role", () => {
     expect(ids("Chef")).toEqual([]);
   });

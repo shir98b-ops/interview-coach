@@ -59,7 +59,9 @@ with another person.
     five steps; system design for software roles). Difficulty follows the
     seniority level, scenarios fit the chosen kind of organization (tech,
     corporate, public sector, nonprofit, small business), and problems never
-    drift toward the candidate's past industry. Answers are scored strictly,
+    drift toward the candidate's past industry. Role titles are recognized in
+    Hebrew and English, and engineers outside software (electrical, civil,
+    mechanical) get the questions of their own field. Answers are scored strictly,
     as a practitioner in that field would.
 11. Coding practice for roles that write code (software, and data roles tested
     in SQL or Python, including Hebrew job titles): a coding round with two
