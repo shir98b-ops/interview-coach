@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { scoreChange } from "@/lib/interview/progress";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AddressPicker } from "@/components/address-picker";
@@ -43,10 +44,10 @@ async function Dashboard() {
     supabase.from("target_roles").select("id", { count: "exact", head: true }),
     supabase
       .from("sessions")
-      .select("overall_score")
+      .select("overall_score, target_role_id, job_id, stage, questions(kind)")
       .not("overall_score", "is", null)
       .order("created_at", { ascending: false })
-      .limit(2),
+      .limit(20),
     supabase
       .from("sessions")
       .select("id", { count: "exact", head: true })
@@ -59,9 +60,8 @@ async function Dashboard() {
     .slice(0, 2);
 
   const firstName = profile?.full_name?.trim().split(/\s+/)[0];
-  const scores = (sessions ?? []).map((s) => s.overall_score as number);
-  const latest = scores[0];
-  const change = scores.length > 1 ? scores[0] - scores[1] : null;
+  const latest = sessions?.[0]?.overall_score ?? undefined;
+  const change = scoreChange(sessions ?? []);
   const ready = Boolean(profile) && (roleCount ?? 0) > 0;
   const lesson =
     learning.recommended && forAddress(learning.recommended, user.address);
@@ -138,10 +138,10 @@ async function Dashboard() {
                 {change !== null && (
                   <p className="text-lime font-bold">
                     {change > 0
-                      ? `עלית ${change} נקודות מהפעם הקודמת`
+                      ? `עלית ${change} נקודות מהתרגול הקודם מאותו סוג`
                       : change < 0
-                        ? `ירדת ${-change} נקודות. זה חלק מהדרך.`
-                        : "בדיוק כמו בפעם הקודמת"}
+                        ? `ירדת ${-change} נקודות מהתרגול הקודם מאותו סוג. זה חלק מהדרך.`
+                        : "בדיוק כמו בתרגול הקודם מאותו סוג"}
                   </p>
                 )}
               </>
@@ -183,7 +183,10 @@ async function Dashboard() {
               </Card>
             )}
             <div className="grid grid-cols-2 gap-5">
-              <Stat value={practiceCount ?? scores.length} label="תרגולים" />
+              <Stat
+                value={practiceCount ?? sessions?.length ?? 0}
+                label="תרגולים"
+              />
               <Stat
                 value={`${learning.completed.size}/${lessons.length}`}
                 label="שיעורים"

@@ -257,7 +257,7 @@ export function PrepPlanForm({
         className="w-full sm:w-fit"
       >
         {pending
-          ? "בונה תוכנית, זה לוקח כחצי דקה..."
+          ? "בונה תוכנית, זה לוקח עד דקה..."
           : hasPlan
             ? "לבנות תוכנית חדשה"
             : interviewId
@@ -447,7 +447,7 @@ export function JobTakeHomeForm({
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button type="submit" disabled={pending} className="w-full sm:w-fit">
         {pending
-          ? "כותב מבחן בית, זה לוקח כחצי דקה..."
+          ? "כותב מבחן בית, זה לוקח עד דקה..."
           : "לתרגל מבחן בית למשרה הזו"}
       </Button>
     </form>

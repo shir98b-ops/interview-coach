@@ -79,7 +79,11 @@ ${stageInstructions(stage)}
 - research: 3 to 5 specific things to check about the company before the
   interview. Use only what the posting says about the company; do not state
   facts about the company you are not sure of.
-- schedule: 3 to 6 prep steps with a time label and minutes each.
+- schedule: 3 to 6 prep steps with a time label and minutes each. The app
+  the candidate is using has a practice interview built from this posting,
+  with a score and feedback on each answer: make at least one step a practice
+  round there (name the kind: general, professional or case), instead of a
+  mock interview with a friend.
   ${timeframe(daysUntilInterview)}
 
 Never invent experience. Speak to the candidate directly, and write

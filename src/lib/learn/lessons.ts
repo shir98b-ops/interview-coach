@@ -367,17 +367,24 @@ type Scores = Record<RubricKey, number>;
 /**
  * Picks the lesson that helps most: the first unfinished lesson on the
  * user's weakest rubric criterion, judged by their recent answers. With no
- * scores yet, it starts with the first unfinished lesson.
+ * scores yet, it starts with the first unfinished lesson. After a
+ * professional or case round, the lesson on thinking out loud comes first,
+ * since lessons on personal stories do not help with those questions.
  */
 export function recommendLesson(
   recentScores: Scores[],
   completed: Iterable<string>,
+  { professional = false }: { professional?: boolean } = {},
 ): Lesson | undefined {
   const done = new Set(completed);
   const open = lessons.filter(
     (lesson) => lesson.track === "interview" && !done.has(lesson.slug),
   );
   if (open.length === 0) return undefined;
+  if (professional) {
+    const lesson = open.find((l) => l.slug === "thinking-out-loud");
+    if (lesson) return lesson;
+  }
   if (recentScores.length === 0) return open[0];
 
   const keys: RubricKey[] = ["content", "structure", "clarity"];

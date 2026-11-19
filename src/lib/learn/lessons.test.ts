@@ -29,6 +29,18 @@ describe("recommendLesson", () => {
     expect(recommendLesson([], [])?.slug).toBe(lessons[0].slug);
   });
 
+  it("starts with thinking out loud after a professional round", () => {
+    const lesson = recommendLesson([scores(1, 4, 4)], [], {
+      professional: true,
+    });
+    expect(lesson?.slug).toBe("thinking-out-loud");
+    expect(
+      recommendLesson([scores(1, 4, 4)], ["thinking-out-loud"], {
+        professional: true,
+      })?.focus,
+    ).toBe("content");
+  });
+
   it("picks a lesson for the weakest criterion", () => {
     const lesson = recommendLesson([scores(4, 4, 2), scores(5, 4, 1)], []);
     expect(lesson?.focus).toBe("clarity");
