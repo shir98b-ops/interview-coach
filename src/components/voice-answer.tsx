@@ -149,8 +149,19 @@ export function VoiceAnswerField({
     r.onerror = (event) => {
       const message = speechErrorMessage(event.error);
       if (message) {
+        // Some browsers (such as in-app browsers on iPhone) never send the
+        // end event after an error, so stop showing "listening" right away.
         wanted.current = false;
+        clearSilenceTimer();
         setError(message);
+        setInterim("");
+        setListening(false);
+        recognition.current = null;
+        try {
+          r.abort();
+        } catch {
+          // Already stopped.
+        }
       }
     };
     r.onend = () => {

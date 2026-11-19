@@ -36,7 +36,7 @@ export function speechErrorMessage(error: string): string | null {
   switch (error) {
     case "not-allowed":
     case "service-not-allowed":
-      return "אין גישה למיקרופון. צריך לאשר את המיקרופון בהגדרות הדפדפן ולנסות שוב.";
+      return "אין גישה למיקרופון. אם פתחת את הקישור מתוך אפליקציה אחרת, כדאי לפתוח אותו ישירות בספארי או בכרום. אחרת צריך לאשר את המיקרופון בהגדרות הדפדפן ולנסות שוב.";
     case "audio-capture":
       return "לא נמצא מיקרופון. אפשר לחבר מיקרופון או להקליד.";
     case "network":
