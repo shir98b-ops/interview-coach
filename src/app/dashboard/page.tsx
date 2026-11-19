@@ -59,7 +59,7 @@ async function Dashboard() {
     .filter((i) => i.startsAt.getTime() + i.minutes * 60000 >= now.getTime())
     .slice(0, 2);
 
-  const firstName = profile?.full_name?.trim().split(/\s+/)[0];
+  const firstName = displayName(profile?.full_name?.trim().split(/\s+/)[0]);
   const latest = sessions?.[0]?.overall_score ?? undefined;
   const change = scoreChange(sessions ?? []);
   const ready = Boolean(profile) && (roleCount ?? 0) > 0;
@@ -229,4 +229,10 @@ function Stat({ value, label }: { value: number | string; label: string }) {
       <p className="text-muted">{label}</p>
     </Card>
   );
+}
+
+/** Resumes often spell names in capitals; "SHIR" reads better as "Shir". */
+function displayName(name: string | undefined): string | undefined {
+  if (!name || !/^[A-Z][A-Z'-]+$/.test(name)) return name;
+  return name[0] + name.slice(1).toLowerCase();
 }
