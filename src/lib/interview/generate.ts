@@ -3,7 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import type { ResumeData } from "@/lib/resume/schema";
-import { bankFor } from "./question-bank";
+import { bankFor, sampleBank } from "./question-bank";
 import {
   QUESTION_COUNT,
   interviewLanguages,
@@ -20,7 +20,12 @@ export interface PracticeTarget {
   job?: { company: string; description: string } | null;
   /** The stage practiced for, with what it checks and earlier stages. */
   stage?: { name: string; focus: string; history: string } | null;
+  /** Questions already asked in earlier practice for this role or job. */
+  previousQuestions?: string[];
 }
+
+/** How many examples from the question bank each interview starts from. */
+const BANK_SAMPLE_SIZE = 12;
 
 const instructions = `You are an experienced hiring manager preparing a first-round
 interview. Write ${QUESTION_COUNT} questions for the candidate below.
@@ -92,10 +97,24 @@ ${target.stage.history}
               : ""
           }
 <commonly_asked_questions>
-${bankFor(target.title, target.seniority)
+${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
   .map((q) => `- ${q}`)
   .join("\n")}
 </commonly_asked_questions>
+${
+  target.previousQuestions?.length
+    ? `
+The candidate has already practiced for this role and was asked the questions
+below. Do not ask any of them again, not even reworded. Choose different
+situations, skills and parts of the resume, and vary how the questions are
+phrased, so every practice interview feels new.
+
+<already_asked>
+${target.previousQuestions.map((q) => `- ${q}`).join("\n")}
+</already_asked>
+`
+    : ""
+}
 
 <resume>
 ${JSON.stringify(resume, null, 2)}

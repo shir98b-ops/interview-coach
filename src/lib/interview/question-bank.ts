@@ -244,3 +244,41 @@ export function bankFor(
     ...families.flatMap((family) => family.questions),
   ];
 }
+
+/**
+ * A random handful of the bank, in random order, so each interview starts
+ * from different examples instead of the same first questions every time.
+ */
+export function sampleBank(
+  bank: string[],
+  count: number,
+  random: () => number = Math.random,
+): string[] {
+  const shuffled = [...bank];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
+}
+
+/** How many earlier questions the AI is shown so it does not repeat them. */
+export const PREVIOUS_QUESTION_LIMIT = 60;
+
+/**
+ * Earlier questions for the same role or job, newest first, without exact
+ * duplicates and capped, ready to list in the prompt.
+ */
+export function previousQuestionList(texts: string[]): string[] {
+  const seen = new Set<string>();
+  const list: string[] = [];
+  for (const text of texts) {
+    const clean = text.trim().replace(/\s+/g, " ");
+    const key = clean.toLowerCase();
+    if (!clean || seen.has(key)) continue;
+    seen.add(key);
+    list.push(clean);
+    if (list.length === PREVIOUS_QUESTION_LIMIT) break;
+  }
+  return list;
+}
