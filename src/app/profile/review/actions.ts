@@ -8,6 +8,7 @@ import { reviewResume } from "@/lib/resume/review";
 import { DAILY_REVIEW_LIMIT, reviewScore } from "@/lib/resume/review-schema";
 import { resumeSchema } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
+import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 
 export type ReviewState = { error: string | null };
@@ -59,7 +60,7 @@ export async function rateResume(
     new Date(),
     DAILY_REVIEW_LIMIT,
   );
-  if (usage.remaining === 0) {
+  if (usage.remaining === 0 && !hasNoLimits(user.email)) {
     const hours = usage.hoursUntilNext ?? 1;
     return {
       error: `הגעת למגבלה של ${usage.limit} דירוגים ביום. אפשר לדרג שוב בעוד כ־${hours === 1 ? "שעה" : `${hours} שעות`}.`,
