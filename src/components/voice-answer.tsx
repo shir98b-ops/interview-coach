@@ -44,19 +44,31 @@ function recognitionClass(): RecognitionConstructor | null {
 }
 
 /**
- * Phones handle continuous listening badly: Android repeats earlier words
- * in every new result, and iPhones stop early. There we listen one phrase
- * at a time and start again after each one.
+ * Android repeats earlier words in every new result when listening
+ * continuously, so there we listen one phrase at a time and quietly start
+ * again after each one.
  */
-function isPhone(): boolean {
+function isAndroid(): boolean {
+  return /Android/i.test(navigator.userAgent);
+}
+
+/**
+ * iPhones and iPads only start listening right after a tap, so they cannot
+ * restart on their own. There we listen continuously and, when the phone
+ * stops after a pause, ask the user to tap again.
+ */
+function isIOS(): boolean {
   return (
-    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
   );
 }
 
 const silenceHelp =
   "עוד לא שמענו כלום. כדאי לבדוק שהמיקרופון מאושר לאתר. באייפון צריך גם להפעיל הכתבה: הגדרות, כללי, מקלדת, הפעלת הכתבה. אפשר גם להקליד.";
+
+const pausedNotice =
+  "ההקלטה נעצרה אחרי הפסקה. אפשר ללחוץ שוב על המיקרופון ולהמשיך מאותה נקודה.";
 
 const noSubscription = () => () => {};
 
@@ -99,6 +111,7 @@ export function VoiceAnswerField({
   const [listening, setListening] = useState(false);
   const [language, setLanguage] = useState(initialLanguage);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const recognition = useRef<Recognition | null>(null);
   // True while the user wants to keep talking. Browsers end a session after
   // a pause, so we quietly start a new one until the user presses stop.
@@ -128,7 +141,9 @@ export function VoiceAnswerField({
 
     const r = new Recognition();
     r.lang = speechLanguages[language].code;
-    r.continuous = !isPhone();
+    r.continuous = !isAndroid();
+    const canRestart = !isIOS();
+    setNotice(null);
     r.interimResults = true;
     r.onresult = (event) => {
       heard.current = true;
@@ -171,7 +186,7 @@ export function VoiceAnswerField({
         setValue((current) => appendTranscript(current, leftover, maxLength));
       }
       setInterim("");
-      if (wanted.current) {
+      if (wanted.current && canRestart) {
         try {
           r.start();
           return;
@@ -179,6 +194,8 @@ export function VoiceAnswerField({
           wanted.current = false;
         }
       }
+      if (wanted.current) setNotice(pausedNotice);
+      wanted.current = false;
       clearSilenceTimer();
       recognition.current = null;
       setListening(false);
@@ -288,7 +305,12 @@ export function VoiceAnswerField({
           {error}
         </p>
       )}
-      {support === "yes" && !listening && !error && (
+      {notice && !listening && !error && (
+        <p aria-live="polite" className="text-violet font-medium">
+          {notice}
+        </p>
+      )}
+      {support === "yes" && !listening && !error && !notice && (
         <p className="text-muted text-sm">
           אפשר לדבר, להקליד, או גם וגם. כדאי לעבור על הטקסט ולתקן לפני השליחה.
         </p>
