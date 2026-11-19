@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { bankFor, commonQuestions, matchRoleFamilies } from "./question-bank";
+import {
+  PREVIOUS_QUESTION_LIMIT,
+  bankFor,
+  commonQuestions,
+  matchRoleFamilies,
+  previousQuestionList,
+  sampleBank,
+} from "./question-bank";
 
 const ids = (title: string) => matchRoleFamilies(title).map((f) => f.id);
 
@@ -33,5 +40,48 @@ describe("bankFor", () => {
     expect(bankFor("Chef", "Manager")).toContain(
       "How do you set goals for your team?",
     );
+  });
+});
+
+describe("sampleBank", () => {
+  const bank = ["a", "b", "c", "d", "e"];
+
+  it("returns the requested number of distinct questions from the bank", () => {
+    const sample = sampleBank(bank, 3);
+    expect(sample).toHaveLength(3);
+    expect(new Set(sample).size).toBe(3);
+    for (const q of sample) expect(bank).toContain(q);
+  });
+
+  it("changes order with the random source", () => {
+    const first = sampleBank(bank, 5, () => 0);
+    const second = sampleBank(bank, 5, () => 0.99);
+    expect(first).not.toEqual(second);
+  });
+
+  it("does not change the bank itself", () => {
+    sampleBank(bank, 2);
+    expect(bank).toEqual(["a", "b", "c", "d", "e"]);
+  });
+});
+
+describe("previousQuestionList", () => {
+  it("drops blanks and repeats, ignoring case and spacing", () => {
+    expect(
+      previousQuestionList([
+        "Tell me about yourself.",
+        "  tell me   about yourself. ",
+        "",
+        "Why this role?",
+      ]),
+    ).toEqual(["Tell me about yourself.", "Why this role?"]);
+  });
+
+  it("keeps at most the limit", () => {
+    const many = Array.from(
+      { length: PREVIOUS_QUESTION_LIMIT + 10 },
+      (_, i) => `Question ${i}`,
+    );
+    expect(previousQuestionList(many)).toHaveLength(PREVIOUS_QUESTION_LIMIT);
   });
 });

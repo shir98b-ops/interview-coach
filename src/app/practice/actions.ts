@@ -16,6 +16,10 @@ import {
 } from "@/lib/jobs/schema";
 import { limitMessage } from "@/lib/interview/limits";
 import { getUsage } from "@/lib/interview/usage";
+import {
+  PREVIOUS_QUESTION_LIMIT,
+  previousQuestionList,
+} from "@/lib/interview/question-bank";
 import { parseLanguage, validateAnswer } from "@/lib/interview/schema";
 import { resumeSchema } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
@@ -115,10 +119,35 @@ export async function startPractice(
     };
   }
 
+  // Earlier questions for the same job or role, so new ones do not repeat
+  // them. Row level security limits this to the user's own interviews.
+  const earlier = supabase
+    .from("sessions")
+    .select("id")
+    .order("created_at", { ascending: false })
+    .limit(20);
+  const { data: earlierSessions } = job
+    ? await earlier.eq("job_id", job.id)
+    : role.id
+      ? await earlier.eq("target_role_id", role.id)
+      : { data: [] };
+  const sessionIds = (earlierSessions ?? []).map((s) => s.id as string);
+  const { data: earlierQuestions } = sessionIds.length
+    ? await supabase
+        .from("questions")
+        .select("text, created_at")
+        .in("session_id", sessionIds)
+        .order("created_at", { ascending: false })
+        .limit(PREVIOUS_QUESTION_LIMIT * 2)
+    : { data: [] };
+  const previousQuestions = previousQuestionList(
+    (earlierQuestions ?? []).map((q) => q.text as string),
+  );
+
   let questions;
   try {
     questions = await generateQuestions(
-      role,
+      { ...role, previousQuestions },
       resume.data,
       language,
       user.address,
