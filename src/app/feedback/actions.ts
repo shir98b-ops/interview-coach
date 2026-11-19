@@ -2,7 +2,11 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { feedbackPage, validateFeedback } from "@/lib/feedback/schema";
+import {
+  feedbackPage,
+  parseRating,
+  validateFeedback,
+} from "@/lib/feedback/schema";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { track } from "@/lib/analytics/record";
@@ -25,9 +29,12 @@ export async function sendFeedback(
   if (!user) redirect("/login");
 
   const page = feedbackPage((await headers()).get("referer"));
-  const { error } = await supabase
-    .from("feedback")
-    .insert({ user_id: user.id, message: checked.text, page });
+  const { error } = await supabase.from("feedback").insert({
+    user_id: user.id,
+    message: checked.text,
+    page,
+    rating: parseRating(formData.get("rating")),
+  });
   if (error) {
     console.error("Saving feedback failed:", error.message);
     return { status: "error", error: "לא הצלחנו לשלוח. אפשר לנסות שוב." };

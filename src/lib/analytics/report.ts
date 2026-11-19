@@ -68,6 +68,7 @@ export const actionLabels: Record<string, string> = {
   "take_home.score": "ציון למבחן בית",
   "job.extract": "קריאת מודעת משרה",
   "job.prep": "תוכנית הכנה למשרה",
+  "feedback.digest": "סיכום משוב (שלך)",
 };
 
 export function usd(value: number): string {

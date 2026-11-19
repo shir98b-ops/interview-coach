@@ -186,6 +186,8 @@ export const feedback = pgTable(
     userId: userId(),
     message: text("message").notNull(),
     page: text("page"),
+    /** The user's optional rating of the app, 1 to 5. */
+    rating: smallint("rating"),
     createdAt: createdAt(),
   },
   () => [ownRowsOnly("feedback")],
@@ -316,5 +318,20 @@ export const productEvents = pgTable(
 /** Accounts allowed to read the analytics report. No policies: API can't touch it. */
 export const analyticsAdmins = pgTable("analytics_admins", {
   userId: userId().primaryKey(),
+  createdAt: createdAt(),
+}).enableRLS();
+
+/**
+ * AI summaries of user feedback, saved so the owner can reread them without
+ * paying for a new summary. No policies: only admin functions reach it.
+ */
+export const feedbackDigests = pgTable("feedback_digests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdBy: uuid("created_by").references(() => authUsers.id, {
+    onDelete: "set null",
+  }),
+  periodDays: integer("period_days").notNull(),
+  feedbackCount: integer("feedback_count").notNull(),
+  digest: jsonb("digest").notNull(),
   createdAt: createdAt(),
 }).enableRLS();
