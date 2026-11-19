@@ -292,3 +292,26 @@ export function previousQuestionList(texts: string[]): string[] {
   }
   return list;
 }
+
+/**
+ * Themes for behavioral questions. Each interview gets a random pair, so
+ * the stories asked for change from one practice to the next.
+ */
+export const behavioralThemes = [
+  "conflict with a colleague or manager",
+  "a failure or mistake and what was learned",
+  "working under a tight deadline",
+  "prioritizing between competing tasks",
+  "influencing without authority",
+  "handling ambiguity or unclear requirements",
+  "receiving and acting on difficult feedback",
+  "taking ownership beyond the job description",
+  "a difficult customer or stakeholder",
+  "learning something new quickly",
+  "improving a process or a way of working",
+  "disagreeing with a decision and committing anyway",
+  "helping a teammate succeed",
+  "making a decision with incomplete data",
+  "adapting to a big change",
+  "an achievement and the candidate's specific part in it",
+];

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   PREVIOUS_QUESTION_LIMIT,
   bankFor,
+  behavioralThemes,
   commonQuestions,
   isTechnicalRole,
   matchRoleFamilies,
@@ -96,5 +97,12 @@ describe("isTechnicalRole", () => {
   it("is false for other roles", () => {
     expect(isTechnicalRole("Account Executive")).toBe(false);
     expect(isTechnicalRole("HR Business Partner")).toBe(false);
+  });
+});
+
+describe("behavioralThemes", () => {
+  it("has enough distinct themes to vary many interviews", () => {
+    expect(new Set(behavioralThemes).size).toBe(behavioralThemes.length);
+    expect(behavioralThemes.length).toBeGreaterThanOrEqual(12);
   });
 });

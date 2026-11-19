@@ -3,7 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import type { ResumeData } from "@/lib/resume/schema";
-import { bankFor, sampleBank } from "./question-bank";
+import { bankFor, behavioralThemes, sampleBank } from "./question-bank";
 import {
   QUESTION_COUNT,
   interviewLanguages,
@@ -38,9 +38,12 @@ interview. Write ${QUESTION_COUNT} questions for the candidate below.
   specific item on the candidate's resume.
 - Match the seniority level. If none is given, aim for the level the resume
   suggests.
-- Stay close to what real interviewers ask. Base at least three questions on
-  the commonly asked questions listed below, adapting them to the role and the
+- Stay close to what real interviewers ask. Base about two questions on the
+  commonly asked questions listed below, adapting them to the role and the
   candidate's background; do not invent unusual or trick questions.
+- Questions the candidate was already asked (listed at the end, when there
+  are any) always win: never repeat or reword one of them, even if it is in
+  the commonly asked list.
 - Ask one thing per question, the way a real interviewer would say it.`;
 
 const technicalInstructions = `You are a senior engineer running the technical
@@ -143,7 +146,12 @@ ${target.stage.history}
           }
 ${
   mode === "general"
-    ? `<commonly_asked_questions>
+    ? `This time, build the behavioral questions around these themes:
+${sampleBank(behavioralThemes, 2)
+  .map((theme) => `- ${theme}`)
+  .join("\n")}
+
+<commonly_asked_questions>
 ${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
   .map((q) => `- ${q}`)
   .join("\n")}
@@ -154,9 +162,10 @@ ${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
             target.previousQuestions?.length
               ? `
 The candidate has already practiced for this role and was asked the questions
-below. Do not ask any of them again, not even reworded. Choose different
-situations, skills and parts of the resume, and vary how the questions are
-phrased, so every practice interview feels new.
+below. Do not ask any of them again, not even reworded or with the same
+intent. Dig into resume items, projects and skills that were not asked about
+yet, and vary how the questions open and are phrased, so every practice
+interview feels new.
 
 <already_asked>
 ${target.previousQuestions.map((q) => `- ${q}`).join("\n")}
