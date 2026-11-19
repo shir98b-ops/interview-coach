@@ -32,11 +32,16 @@ export async function rateResume(
   if (!user) redirect("/login?next=/profile/review");
 
   const roleId = String(formData.get("roleId") ?? "");
-  const [{ data: profile }, { data: role }, { data: recent }] =
+  const lastForRole = supabase
+    .from("resume_reviews")
+    .select("created_at")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const [{ data: profile }, { data: role }, { data: recent }, { data: last }] =
     await Promise.all([
       supabase
         .from("profiles")
-        .select("resume_data")
+        .select("resume_data, updated_at")
         .eq("user_id", user.id)
         .maybeSingle(),
       roleId
@@ -50,11 +55,26 @@ export async function rateResume(
         .from("resume_reviews")
         .select("created_at")
         .gt("created_at", limitWindowStart().toISOString()),
+      roleId
+        ? lastForRole.eq("target_role_id", roleId)
+        : lastForRole.is("target_role_id", null),
     ]);
 
   const resume = resumeSchema.safeParse(profile?.resume_data);
   if (!resume.success) {
     return { error: "קודם צריך להעלות קורות חיים בעמוד הפרופיל." };
+  }
+  // The same resume rated again for the same role would only show the AI's
+  // noise as progress, so a new rating waits for a new resume.
+  if (
+    last?.[0] &&
+    profile?.updated_at &&
+    new Date(last[0].created_at) > new Date(profile.updated_at)
+  ) {
+    return {
+      error:
+        "קורות החיים לא השתנו מאז הדירוג הקודם לתפקיד הזה, אז דירוג חדש לא יראה שיפור אמיתי. אחרי שמעדכנים ומעלים אותם מחדש, אפשר לדרג שוב.",
+    };
   }
   const usage = usageStatus(
     (recent ?? []).map((row) => new Date(row.created_at)),

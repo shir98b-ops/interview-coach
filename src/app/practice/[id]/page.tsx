@@ -178,6 +178,11 @@ async function SessionContent({
           (f, i) => f !== null && !isCodingKind(questions[i].kind),
         ) as AnswerFeedback[],
         (attempts ?? []).map((a) => a.lesson_slug as string),
+        {
+          professional: questions.some(
+            (q) => q.kind === "technical" || q.kind === "design",
+          ),
+        },
       )
     : undefined;
   const lesson = recommended && forAddress(recommended, user.address);

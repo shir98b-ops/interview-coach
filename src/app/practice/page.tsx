@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { JobName } from "@/app/jobs/interview-card";
+import { scoreChange } from "@/lib/interview/progress";
 import { StartPracticeForm } from "./forms";
 
 export const metadata: Metadata = { title: "תרגול · Interview Coach" };
@@ -48,10 +49,10 @@ async function PracticeContent() {
       supabase
         .from("sessions")
         .select(
-          "id, created_at, completed_at, overall_score, target_roles(title), jobs(title, company)",
+          "id, created_at, completed_at, overall_score, target_role_id, job_id, stage, questions(kind), target_roles(title), jobs(title, company)",
         )
         .order("created_at", { ascending: false })
-        .limit(20),
+        .limit(40),
       getUsage(supabase),
     ]);
 
@@ -78,6 +79,11 @@ async function PracticeContent() {
     .filter((s) => s.overall_score !== null)
     .map((s) => s.overall_score as number)
     .reverse();
+  const change = scoreChange(sessions ?? []);
+  // Practices left in the middle are kept out of the way, so the list shows
+  // the ones that were scored.
+  const finished = (sessions ?? []).filter((s) => s.completed_at).slice(0, 20);
+  const unfinished = (sessions ?? []).filter((s) => !s.completed_at);
 
   return (
     <>
@@ -108,66 +114,98 @@ async function PracticeContent() {
       {sessions && sessions.length > 0 && (
         <section className="flex flex-col gap-4">
           <h2 className="text-2xl font-extrabold">התרגולים שלך</h2>
-          <ProgressChart scores={scores} />
+          <ProgressChart scores={scores} change={change} />
           <ul className="flex flex-col gap-3">
-            {sessions.map((session) => {
-              const role = session.target_roles as unknown as {
-                title: string;
-              } | null;
-              const job = session.jobs as unknown as {
-                title: string;
-                company: string;
-              } | null;
-              return (
-                <li key={session.id}>
-                  <Link
-                    href={`/practice/${session.id}`}
-                    className="hover:bg-violet-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
-                  >
-                    <span className="flex flex-col">
-                      <span className="font-bold">
-                        {job ? (
-                          <JobName company={job.company} title={job.title} />
-                        ) : (
-                          <bdi>{role?.title ?? "תפקיד שנמחק"}</bdi>
-                        )}
-                      </span>
-                      <span className="text-muted text-sm">
-                        {formatDate(session.created_at)}
-                      </span>
-                    </span>
-                    {session.overall_score !== null ? (
-                      <span className="text-violet text-2xl font-extrabold">
-                        {session.overall_score}
-                      </span>
-                    ) : (
-                      <Chip tone={session.completed_at ? "violet" : "orange"}>
-                        {session.completed_at ? "הסתיים" : "בתהליך"}
-                      </Chip>
-                    )}
-                  </Link>
-                </li>
-              );
-            })}
+            {finished.map((session) => (
+              <PracticeItem key={session.id} session={session} />
+            ))}
           </ul>
+          {unfinished.length > 0 && (
+            <details className="flex flex-col gap-3">
+              <summary className="text-muted cursor-pointer font-bold">
+                תרגולים שלא הסתיימו ({unfinished.length})
+              </summary>
+              <ul className="mt-3 flex flex-col gap-3">
+                {unfinished.map((session) => (
+                  <PracticeItem key={session.id} session={session} />
+                ))}
+              </ul>
+            </details>
+          )}
         </section>
       )}
     </>
   );
 }
 
+interface PracticeRow {
+  id: string;
+  created_at: string;
+  completed_at: string | null;
+  overall_score: number | null;
+  target_roles: unknown;
+  jobs: unknown;
+}
+
+function PracticeItem({ session }: { session: PracticeRow }) {
+  const role = session.target_roles as unknown as {
+    title: string;
+  } | null;
+  const job = session.jobs as unknown as {
+    title: string;
+    company: string;
+  } | null;
+  return (
+    <li>
+      <Link
+        href={`/practice/${session.id}`}
+        className="hover:bg-violet-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
+      >
+        <span className="flex flex-col">
+          <span className="font-bold">
+            {job ? (
+              <JobName company={job.company} title={job.title} />
+            ) : (
+              <bdi>{role?.title ?? "תפקיד שנמחק"}</bdi>
+            )}
+          </span>
+          <span className="text-muted text-sm">
+            {formatDate(session.created_at)}
+          </span>
+        </span>
+        {session.overall_score !== null ? (
+          <span className="text-violet text-2xl font-extrabold">
+            {session.overall_score}
+          </span>
+        ) : (
+          <Chip tone={session.completed_at ? "violet" : "orange"}>
+            {session.completed_at ? "הסתיים" : "בתהליך"}
+          </Chip>
+        )}
+      </Link>
+    </li>
+  );
+}
+
 /** Scores of scored interviews, oldest first, as a simple bar chart. */
-function ProgressChart({ scores }: { scores: number[] }) {
+function ProgressChart({
+  scores,
+  change,
+}: {
+  scores: number[];
+  change: number | null;
+}) {
   if (scores.length < 2) return null;
-  const change = scores[scores.length - 1] - scores[0];
   return (
     <Card tone="lilac" className="gap-4">
       <p className="font-bold">
-        {change > 0
-          ? `עלית ${change} נקודות מאז התרגול הראשון. כל הכבוד!`
-          : change < 0
-            ? `ירדת ${-change} נקודות מאז התרגול הראשון. שיעור קצר יכול לעזור.`
-            : "אותו ציון כמו בתרגול הראשון."}
+        {change === null
+          ? "כל עמודה היא תרגול אחד. ההשוואה היא רק בין תרגולים מאותו סוג ולאותו תפקיד."
+          : change > 0
+            ? `עלית ${change} נקודות מהתרגול הקודם מאותו סוג. כל הכבוד!`
+            : change < 0
+              ? `ירדת ${-change} נקודות מהתרגול הקודם מאותו סוג. שיעור קצר יכול לעזור.`
+              : "אותו ציון כמו בתרגול הקודם מאותו סוג."}
       </p>
       <div
         dir="ltr"

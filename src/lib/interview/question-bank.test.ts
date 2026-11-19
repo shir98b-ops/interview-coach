@@ -55,6 +55,9 @@ describe("matchRoleFamilies", () => {
     expect(ids("מהנדס חשמל")).toEqual(["hardware"]);
     expect(ids("מהנדסת בניין")).toEqual(["hardware"]);
     expect(ids("מהנדס תעשייה וניהול")).toEqual(["hardware"]);
+    expect(ids("מהנדס מוצר")).toEqual(["hardware"]);
+    expect(ids("מהנדסת מוצר בכירה")).toEqual(["hardware"]);
+    expect(ids("מנהל מוצר")).toEqual(["product"]);
     expect(ids("Software Engineer")).toEqual(["engineering"]);
     expect(ids("מהנדס תוכנה")).toEqual(["engineering"]);
     expect(ids("Engineer")).toEqual(["engineering"]);

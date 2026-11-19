@@ -333,6 +333,9 @@ export const roleFamilies: RoleFamily[] = [
       "chip",
     ],
     hebrew: [
+      // In Israeli job ads, "מהנדס/ת מוצר" is a hardware or mechanical role.
+      "מהנדס(ת)? מוצר",
+      "הנדסת מוצר",
       "חשמל",
       "אלקטרוניקה",
       "מכונות",
@@ -795,10 +798,15 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
         words.includes(` ${keyword} `) || words.includes(` ${keyword}s `),
     ) || (family.hebrew ?? []).some((word) => hebrewWord(word).test(title));
   const hardware = matches(roleFamilies.find((f) => f.id === "hardware")!);
+  // A Hebrew "product engineer" designs physical products, not a product
+  // manager's work.
+  const productEngineer = hebrewWord("(מהנדס(ת)?|הנדסת) מוצר").test(title);
   return roleFamilies.filter((family) =>
     family.id === "engineering"
       ? isSoftwareFamily(title, words, hardware)
-      : matches(family),
+      : family.id === "product" && productEngineer
+        ? false
+        : matches(family),
   );
 }
 
