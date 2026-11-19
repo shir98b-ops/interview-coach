@@ -12,6 +12,7 @@ import {
 } from "@/lib/learn/exercise-feedback";
 import { getLesson } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
+import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 
 export type ExerciseState =
@@ -52,7 +53,7 @@ export async function submitExercise(
     new Date(),
     DAILY_EXERCISE_LIMIT,
   );
-  if (usage.remaining === 0) {
+  if (usage.remaining === 0 && !hasNoLimits(user.email)) {
     const hours = usage.hoursUntilNext ?? 1;
     return {
       status: "error",

@@ -127,6 +127,9 @@ Environment Variables, as type Config for all environments, then redeploy.
 Resume reading, interview questions and feedback also need `ANTHROPIC_API_KEY` (from console.anthropic.com).
 Add it to `.env.local`, and in Vercel as type Secret for all environments.
 
+To skip the daily usage limits on your own account while testing, set
+`UNLIMITED_EMAILS` to your sign-in email (comma separated for several).
+
 Then open http://localhost:3000.
 
 | Command             | What it does                      |

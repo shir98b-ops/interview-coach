@@ -19,6 +19,7 @@ import { getUsage } from "@/lib/interview/usage";
 import { parseLanguage, validateAnswer } from "@/lib/interview/schema";
 import { resumeSchema } from "@/lib/resume/schema";
 import { createClient } from "@/lib/supabase/server";
+import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 
 export type FormState = { error: string | null };
@@ -101,7 +102,8 @@ export async function startPractice(
       }
     : savedRole;
   const usage = await getUsage(supabase);
-  if (usage.remaining === 0) return { error: limitMessage(usage) };
+  if (usage.remaining === 0 && !hasNoLimits(user.email))
+    return { error: limitMessage(usage) };
 
   const resume = resumeSchema.safeParse(profile?.resume_data);
   if (!resume.success) {
