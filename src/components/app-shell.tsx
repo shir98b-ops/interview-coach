@@ -1,8 +1,9 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { signOut } from "@/app/login/actions";
 import { FeedbackButton } from "./feedback-button";
 import { NavLinks } from "./nav-links";
+import { OwnerLink } from "./owner-link";
 import { SiteFooter } from "./site-footer";
 
 export function Logo() {
@@ -45,6 +46,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <NavLinks />
           </div>
           <div className="flex items-center">
+            <Suspense fallback={null}>
+              <OwnerLink />
+            </Suspense>
             <FeedbackButton />
             <form action={signOut}>
               <button
