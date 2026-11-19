@@ -4,6 +4,7 @@ import {
   bankFor,
   behavioralThemes,
   commonQuestions,
+  focusAreasFor,
   isCodingRole,
   isTechnicalRole,
   matchRoleFamilies,
@@ -59,6 +60,26 @@ describe("matchRoleFamilies", () => {
     expect(ids("Engineer")).toEqual(["engineering"]);
   });
 
+  it("matches the professions added for social work, education, health and more", () => {
+    expect(ids("עובדת סוציאלית")).toEqual(["social"]);
+    expect(ids("עו״ס")).toEqual(["social"]);
+    expect(ids("Social Worker")).toEqual(["social"]);
+    expect(ids("מחנכת כיתה ו")).toEqual(["education"]);
+    expect(ids("High School Teacher")).toEqual(["education"]);
+    expect(ids("אחות מוסמכת")).toEqual(["health"]);
+    expect(ids("Registered Nurse")).toEqual(["health"]);
+    expect(ids("עורכת דין")).toEqual(["legal"]);
+    expect(ids('עו"ד מסחרי')).toEqual(["legal"]);
+    expect(ids("מלצרית")).toEqual(["service"]);
+    expect(ids("עובד עירייה")).toEqual(["public"]);
+    expect(ids("Security Engineer")).toEqual(["engineering", "security"]);
+    expect(ids("מנהלת משרד")).toEqual(["admin"]);
+  });
+
+  it("does not take public relations for the public sector", () => {
+    expect(ids("יחסי ציבור")).toEqual(["marketing"]);
+  });
+
   it("treats business developers as sales, not software", () => {
     expect(ids("Business Developer")).toEqual(["sales"]);
     expect(ids("מפתח עסקי")).toEqual(["sales"]);
@@ -70,20 +91,31 @@ describe("matchRoleFamilies", () => {
   });
 
   it("returns nothing for an unknown role", () => {
-    expect(ids("Chef")).toEqual([]);
+    expect(ids("Juggler")).toEqual([]);
+  });
+});
+
+describe("focusAreasFor", () => {
+  it("gives the professional topics of the field, with Israeli anchors", () => {
+    expect(focusAreasFor("עובדת סוציאלית").join(" ")).toMatch(/Youth Law/);
+    expect(focusAreasFor("עורך דין").join(" ")).toMatch(/Privacy Protection/);
+  });
+
+  it("is empty for a role with no field topics", () => {
+    expect(focusAreasFor("Juggler")).toEqual([]);
   });
 });
 
 describe("bankFor", () => {
   it("always includes the common questions", () => {
-    expect(bankFor("Chef")).toEqual(commonQuestions);
+    expect(bankFor("Juggler")).toEqual(commonQuestions);
     expect(bankFor("Data Analyst").length).toBeGreaterThan(
       commonQuestions.length,
     );
   });
 
   it("adds management questions for the Manager level", () => {
-    expect(bankFor("Chef", "Manager")).toContain(
+    expect(bankFor("Juggler", "Manager")).toContain(
       "How do you set goals for your team?",
     );
   });

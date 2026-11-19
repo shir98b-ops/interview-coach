@@ -14,7 +14,8 @@ describe("taskTypeFor", () => {
   });
 
   it("falls back to a general case for unknown roles", () => {
-    expect(taskTypeFor("Chef")).toMatch(/business case/);
+    expect(taskTypeFor("Juggler")).toMatch(/business case/);
+    expect(taskTypeFor("Chef")).toMatch(/service improvement/);
   });
 });
 

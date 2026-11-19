@@ -8,6 +8,7 @@ import {
   bankFor,
   behavioralThemes,
   codingTopics,
+  focusAreasFor,
   isTechnicalRole,
   sampleBank,
   sqlTopics,
@@ -222,10 +223,12 @@ ${
     : ""
 }`;
   }
+  const focus = focusAreasFor(target.title);
   if (mode === "professional") {
-    return technical
+    const topics = technical ? technicalTopics : focus;
+    return topics.length
       ? `<focus_areas>
-${sampleBank(technicalTopics, 4)
+${sampleBank(topics, 4)
   .map((topic) => `- ${topic}`)
   .join("\n")}
 </focus_areas>
@@ -246,7 +249,12 @@ Design ${sampleBank(systemDesignProblems, 1)[0]}.
 `
     : `<case>
 Choose a realistic, demanding situation that people in this role face, typical
-of the organization type below if one is given. Pick a different case each time.
+of the organization type below if one is given. Pick a different case each time.${
+        focus.length
+          ? `
+Set it in this area of the profession: ${sampleBank(focus, 1)[0]}.`
+          : ""
+      }
 </case>
 `;
 }
