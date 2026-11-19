@@ -229,6 +229,18 @@ export function matchRoleFamilies(title: string): RoleFamily[] {
   );
 }
 
+/**
+ * Software roles, whose professional round draws on core
+ * engineering topics and whose case round is a system design interview.
+ */
+export function isTechnicalRole(title: string): boolean {
+  // Not every engineer writes software: an electrical or civil engineer gets
+  // the questions of their own field.
+  return /\b(software|developer|programmer|devops|sre|backend|back-end|frontend|front-end|full[- ]?stack|qa|automation|web|mobile|ios|android|cloud|platform|data engineer|machine learning|ml engineer|ai engineer)\b/i.test(
+    title,
+  );
+}
+
 /** The commonly asked questions to show the AI for a role. */
 export function bankFor(
   title: string,
@@ -282,3 +294,77 @@ export function previousQuestionList(texts: string[]): string[] {
   }
   return list;
 }
+
+/**
+ * Themes for behavioral questions. Each interview gets a random pair, so
+ * the stories asked for change from one practice to the next.
+ */
+export const behavioralThemes = [
+  "conflict with a colleague or manager",
+  "a failure or mistake and what was learned",
+  "working under a tight deadline",
+  "prioritizing between competing tasks",
+  "influencing without authority",
+  "handling ambiguity or unclear requirements",
+  "receiving and acting on difficult feedback",
+  "taking ownership beyond the job description",
+  "a difficult customer or stakeholder",
+  "learning something new quickly",
+  "improving a process or a way of working",
+  "disagreeing with a decision and committing anyway",
+  "helping a teammate succeed",
+  "making a decision with incomplete data",
+  "adapting to a big change",
+  "an achievement and the candidate's specific part in it",
+];
+
+/**
+ * Classic system design problems from real tech-company interviews. Without
+ * a job posting, each design interview gets one at random, so the problem
+ * matches the industry bar rather than the candidate's past jobs.
+ */
+export const systemDesignProblems = [
+  "a URL shortener with click analytics",
+  "a rate limiter for a public API",
+  "a chat and messaging service with group chats and read receipts",
+  "a news feed for a social network",
+  "a notification service that sends push, email and SMS at scale",
+  "a ride-hailing service that matches riders and drivers in real time",
+  "a video upload and streaming platform",
+  "a distributed key-value cache",
+  "a payment processing system that never charges twice",
+  "a search autocomplete service",
+  "a file storage and sync service like a cloud drive",
+  "a web crawler that indexes billions of pages",
+  "an e-commerce checkout with flash sales and limited stock",
+  "a metrics and monitoring system that ingests millions of events a second",
+  "a collaborative document editor",
+  "a job scheduler that runs millions of delayed and recurring tasks",
+  "a hotel or flight booking system that prevents double booking",
+  "a leaderboard for a mobile game with millions of players",
+];
+
+/**
+ * Areas real technical rounds cover. Each technical interview gets a random
+ * few, adapted to the role's stack, so practice goes beyond one comfort zone.
+ */
+export const technicalTopics = [
+  "data structures and time and space complexity",
+  "database indexing, query plans and transactions",
+  "SQL versus NoSQL trade-offs",
+  "caching strategies and cache invalidation",
+  "concurrency, race conditions and locking",
+  "API design, versioning and idempotency",
+  "message queues and asynchronous processing",
+  "consistency, replication and partitioning in distributed systems",
+  "authentication, authorization and common security flaws",
+  "debugging a production incident from logs and metrics",
+  "performance profiling and memory leaks",
+  "HTTP, networking and what happens when a request is made",
+  "testing strategy: unit, integration and end-to-end",
+  "observability: logging, metrics and tracing",
+  "deployment, CI/CD and rolling back safely",
+  "containers and running services in the cloud",
+  "designing a data model for a new feature",
+  "code review and keeping a large codebase maintainable",
+];

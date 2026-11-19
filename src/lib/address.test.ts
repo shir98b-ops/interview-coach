@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { addressInstruction, g, parseAddress } from "./address";
+import {
+  addressInstruction,
+  g,
+  hebrewScriptRule,
+  parseAddress,
+} from "./address";
 
 describe("g", () => {
   it("picks the form for the user's choice", () => {
@@ -28,5 +33,13 @@ describe("addressInstruction", () => {
   it("never assumes a gender without a choice", () => {
     expect(addressInstruction(null)).toMatch(/gender-neutral/);
     expect(addressInstruction("f")).toMatch(/feminine/);
+  });
+});
+
+describe("hebrewScriptRule", () => {
+  it("is part of every address instruction", () => {
+    for (const address of ["m", "f", null] as const) {
+      expect(addressInstruction(address)).toContain(hebrewScriptRule);
+    }
   });
 });

@@ -53,6 +53,14 @@ with another person.
    button turns speech into text in the answer box (Hebrew or English), so
    users can talk the way they would in a real interview and fix the text
    before sending.
+10. Professional practice for every profession: besides the general
+    interview, a professional round (knowledge, methods, regulations and real
+    work scenarios of the field) or a case interview (one realistic case in
+    five steps; system design for software roles). Difficulty follows the
+    seniority level, scenarios fit the chosen kind of organization (tech,
+    corporate, public sector, nonprofit, small business), and problems never
+    drift toward the candidate's past industry. Answers are scored strictly,
+    as a practitioner in that field would.
 
 ## Key product decisions
 
@@ -63,6 +71,7 @@ with another person.
 | Start with **written** answers; add voice later                  | Written answers deliver the core value (tailored questions and feedback) with fewer moving parts. Voice adds transcription and audio handling, so it comes in stage 8.                                                                                                                                                                                              |
 | Voice through the **browser's own speech recognition**           | It is free, needs no new service, keys or audio storage, and supports Hebrew. The app never receives or stores audio, only the text the user chooses to send (the browser's speech service, Google's in Chrome, hears the audio). Browsers without it (such as Firefox) keep the typing box, and the coach is told to ignore missing punctuation in spoken answers. |
 | **No repeated questions** across practice for the same role      | Job searches can take months. Each new interview sees the questions already asked for that role or job and must cover new ground, and it starts from a random sample of the question bank, so practice stays fresh.                                                                                                                                                 |
+| **Professional rounds for every profession**                     | A social worker, a business manager and an electrical engineer each need the real questions of their field, at their level. Reasoning out loud works by voice or text on any phone; coding exercises with an editor come next for developers.                                                                                                                       |
 | Score against a **fixed rubric** instead of a free-form grade    | A rubric (content, structure, clarity) makes scores consistent between sessions and explainable to the user, so "3 out of 5" always means the same thing.                                                                                                                                                                                                           |
 | The user **confirms** what the AI extracts from the resume       | AI extraction is fast but sometimes wrong. A quick review step keeps the profile accurate, and everything after it depends on that profile.                                                                                                                                                                                                                         |
 | The original resume file is **not stored**                       | Only the details the user approves are saved. Data we never keep cannot leak, and the product only needs the details, not the file.                                                                                                                                                                                                                                 |

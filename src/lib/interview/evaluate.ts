@@ -27,6 +27,16 @@ Scale: 1 = missing or off topic, 2 = weak, 3 = acceptable but generic,
 consistent: a short or vague answer cannot score above 2 on content.
 ${dictationNote}
 
+Answers to professional knowledge and case questions (kind "technical" or
+"design") are judged as an experienced practitioner in that field would judge
+them: content is professional accuracy, depth and judgment (the right
+methods, rules, tools and trade-offs for this profession); structure is a
+logical approach (understand, analyze, act, check), not a STAR story. Point
+out any professional mistake plainly, and make the stronger answer outline
+professionally correct. Score these like a demanding interviewer: do not
+inflate, and a vague, shallow or partly wrong answer scores 2 or lower on
+content.
+
 For each answer, also give what worked, the most useful improvements, and a
 short outline of a stronger answer built from the candidate's own experience.
 Speak to the candidate directly ("you"). Write the feedback in the language

@@ -2,10 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   PREVIOUS_QUESTION_LIMIT,
   bankFor,
+  behavioralThemes,
   commonQuestions,
+  isTechnicalRole,
   matchRoleFamilies,
   previousQuestionList,
   sampleBank,
+  systemDesignProblems,
+  technicalTopics,
 } from "./question-bank";
 
 const ids = (title: string) => matchRoleFamilies(title).map((f) => f.id);
@@ -83,5 +87,36 @@ describe("previousQuestionList", () => {
       (_, i) => `Question ${i}`,
     );
     expect(previousQuestionList(many)).toHaveLength(PREVIOUS_QUESTION_LIMIT);
+  });
+});
+
+describe("isTechnicalRole", () => {
+  it("is true for software roles", () => {
+    expect(isTechnicalRole("Backend Developer")).toBe(true);
+    expect(isTechnicalRole("Senior Software Engineer")).toBe(true);
+    expect(isTechnicalRole("Data Engineer")).toBe(true);
+  });
+  it("is false for other roles", () => {
+    expect(isTechnicalRole("Account Executive")).toBe(false);
+    expect(isTechnicalRole("HR Business Partner")).toBe(false);
+    expect(isTechnicalRole("Data Analyst")).toBe(false);
+    expect(isTechnicalRole("Electrical Engineer")).toBe(false);
+    expect(isTechnicalRole("Social Worker")).toBe(false);
+  });
+});
+
+describe("behavioralThemes", () => {
+  it("has enough distinct themes to vary many interviews", () => {
+    expect(new Set(behavioralThemes).size).toBe(behavioralThemes.length);
+    expect(behavioralThemes.length).toBeGreaterThanOrEqual(12);
+  });
+});
+
+describe("technical banks", () => {
+  it("have enough distinct entries to vary practice", () => {
+    for (const list of [systemDesignProblems, technicalTopics]) {
+      expect(new Set(list).size).toBe(list.length);
+      expect(list.length).toBeGreaterThanOrEqual(15);
+    }
   });
 });
