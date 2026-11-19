@@ -24,13 +24,19 @@ export function g(text: string, address: Address | null): string {
   );
 }
 
+/**
+ * Keeps English names readable inside Hebrew text. Without it the AI
+ * sometimes half-transliterates a word, such as "בג'ira" for "in Jira".
+ */
+export const hebrewScriptRule = `When writing in Hebrew, keep names of tools, products, technologies and companies (such as Jira, Excel, React or Salesforce) in their original English spelling, as whole words. Never mix Hebrew and English letters inside one word, and never half-transliterate a name. Join a Hebrew prefix to an English word with a hyphen (ב-Jira, ל-Excel), or rephrase (בכלי Jira).`;
+
 /** The instruction that tells the AI how to address the user in Hebrew. */
 export function addressInstruction(address: Address | null): string {
   if (address === "m") {
-    return "When writing in Hebrew, address the candidate in the masculine second person (אתה).";
+    return `When writing in Hebrew, address the candidate in the masculine second person (אתה). ${hebrewScriptRule}`;
   }
   if (address === "f") {
-    return "When writing in Hebrew, address the candidate in the feminine second person (את).";
+    return `When writing in Hebrew, address the candidate in the feminine second person (את). ${hebrewScriptRule}`;
   }
-  return "When writing in Hebrew, the candidate's gender is unknown: use gender-neutral phrasing (infinitives, or plural forms), and never assume a gender.";
+  return `When writing in Hebrew, the candidate's gender is unknown: use gender-neutral phrasing (infinitives, or plural forms), and never assume a gender. ${hebrewScriptRule}`;
 }
