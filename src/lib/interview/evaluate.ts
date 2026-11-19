@@ -2,6 +2,7 @@ import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
+import { dictationNote } from "@/lib/voice/prompt";
 import {
   evaluationSchema,
   feedbackByPosition,
@@ -16,7 +17,7 @@ export interface AnsweredQuestion {
   answer: string;
 }
 
-const instructions = `You are an experienced interview coach. Score each written
+const instructions = `You are an experienced interview coach. Score each
 answer below against this rubric, from 1 to 5 per criterion:
 
 ${rubric.map((r) => `- ${r.prompt}`).join("\n")}
@@ -24,6 +25,7 @@ ${rubric.map((r) => `- ${r.prompt}`).join("\n")}
 Scale: 1 = missing or off topic, 2 = weak, 3 = acceptable but generic,
 4 = strong, 5 = excellent, ready for a real interview. Be honest and
 consistent: a short or vague answer cannot score above 2 on content.
+${dictationNote}
 
 For each answer, also give what worked, the most useful improvements, and a
 short outline of a stronger answer built from the candidate's own experience.

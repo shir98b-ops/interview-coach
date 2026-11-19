@@ -7,6 +7,7 @@ import {
   readExerciseFeedback,
   type ExerciseFeedback,
 } from "./exercise-feedback";
+import { dictationNote } from "@/lib/voice/prompt";
 import type { Lesson } from "./lessons";
 
 /** Scores one lesson exercise answer against what the lesson taught. */
@@ -35,7 +36,8 @@ question. Judge the answer only against the lesson's goal:
 
 Score from 1 to 5: 1 = ignores the goal, 3 = partly meets it, 5 = fully meets
 it and would work in a real interview. A very short or off-topic answer
-scores 1 or 2. Then say what worked, the one or two changes that would help
+scores 1 or 2. ${dictationNote}
+Then say what worked, the one or two changes that would help
 most, and a short stronger version built from the candidate's own story.
 Speak to the candidate directly. Write everything in the language of the
 candidate's answer. ${addressInstruction(address)}
