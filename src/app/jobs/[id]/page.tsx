@@ -1,4 +1,5 @@
-import { isTechnicalRole } from "@/lib/interview/question-bank";
+import { defaultCodeLanguage } from "@/lib/code/languages";
+import { isCodingRole, isTechnicalRole } from "@/lib/interview/question-bank";
 import type { Metadata } from "next";
 import { formatDate } from "@/lib/format";
 import Link from "next/link";
@@ -79,6 +80,8 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
     ]);
   if (!job) notFound();
   const technical = isTechnicalRole(job.title);
+  const coding = isCodingRole(job.title);
+  const codeLanguage = defaultCodeLanguage(job.title);
   const status = parseStatus(job.status);
   const now = new Date();
   // The newest plan for the job as a whole, and for each stage.
@@ -223,7 +226,11 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                                 <p className="font-bold">
                                   מבחן תרגול בסגנון של המשרה הזו, עם ציון ומשוב.
                                 </p>
-                                <JobTakeHomeForm jobId={job.id} />
+                                <JobTakeHomeForm
+                                  jobId={job.id}
+                                  coding={coding}
+                                  codeLanguage={codeLanguage}
+                                />
                               </>
                             ) : (
                               <>
@@ -235,6 +242,8 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                                   stage={interview.kind}
                                   modes={interview.kind === "professional"}
                                   technical={technical}
+                                  coding={coding}
+                                  codeLanguage={codeLanguage}
                                 />
                               </>
                             )}
@@ -309,7 +318,13 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
             <h2 className="text-2xl font-extrabold">תרגול ראיון למשרה</h2>
             <p>חמש שאלות שנבנות מתוך המודעה, ואחריהן ציון ומשוב על כל תשובה.</p>
           </div>
-          <JobPracticeForm jobId={job.id} modes technical={technical} />
+          <JobPracticeForm
+            jobId={job.id}
+            modes
+            technical={technical}
+            coding={coding}
+            codeLanguage={codeLanguage}
+          />
           {practices && practices.length > 0 && (
             <ul className="flex flex-col gap-2">
               {practices.map((p) => (

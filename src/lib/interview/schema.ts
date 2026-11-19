@@ -2,7 +2,11 @@ import { z } from "zod";
 
 /** How many questions one practice interview has. */
 export const QUESTION_COUNT = 5;
+/** A coding round has fewer, longer problems. */
+export const CODING_QUESTION_COUNT = 2;
 export const MAX_ANSWER_LENGTH = 5000;
+/** Code answers hold the code and an optional explanation. */
+export const MAX_CODE_ANSWER_LENGTH = 12000;
 
 export const questionKinds = [
   "behavioral",
@@ -10,6 +14,7 @@ export const questionKinds = [
   "resume",
   "technical",
   "design",
+  "coding",
 ] as const;
 export type QuestionKind = (typeof questionKinds)[number];
 
@@ -19,7 +24,27 @@ export const kindLabels: Record<QuestionKind, string> = {
   resume: "על הניסיון שלך",
   technical: "ידע מקצועי",
   design: "ניתוח מקרה",
+  coding: "תרגיל קוד",
 };
+
+/**
+ * A coding question's kind is saved with its programming language, such as
+ * "coding:python", so the answer box opens in that language.
+ */
+export function splitKind(kind: string): {
+  kind: string;
+  codeLanguage: string | null;
+} {
+  const [base, language] = kind.split(":");
+  return {
+    kind: base,
+    codeLanguage: base === "coding" ? (language ?? null) : null,
+  };
+}
+
+export function isCodingKind(kind: string): boolean {
+  return splitKind(kind).kind === "coding";
+}
 
 /**
  * The kind of interview to practice, for every profession: a general
@@ -39,6 +64,11 @@ export const interviewModes = {
     label: "ניתוח מקרה",
     description: "מקרה אחד מהעבודה, שלב אחרי שלב, כמו בראיון אמיתי.",
   },
+  coding: {
+    label: "תרגילי קוד",
+    description:
+      "שתי בעיות קוד ברמה של התפקיד. כותבים קוד ומקבלים משוב על נכונות, יעילות ואיכות.",
+  },
 } as const;
 
 export type InterviewMode = keyof typeof interviewModes;
@@ -53,6 +83,7 @@ export function modeLabel(mode: InterviewMode, technical: boolean): string {
 export function parseMode(value: unknown): InterviewMode {
   if (value === "professional" || value === "technical") return "professional";
   if (value === "case" || value === "system-design") return "case";
+  if (value === "coding") return "coding";
   return "general";
 }
 
@@ -97,14 +128,14 @@ export const questionSetSchema = z.object({
         kind: z
           .enum(questionKinds)
           .describe(
-            "behavioral: past behavior (a time when...); role: skills and judgment the role needs; resume: digs into a specific item on the candidate's resume; technical: professional or technical knowledge, scenarios and problem solving; design: one step of a case or system design discussion.",
+            "behavioral: past behavior (a time when...); role: skills and judgment the role needs; resume: digs into a specific item on the candidate's resume; technical: professional or technical knowledge, scenarios and problem solving; design: one step of a case or system design discussion; coding: a programming problem the candidate solves by writing code.",
           ),
         text: z
           .string()
           .describe("The question, as the interviewer would ask it."),
       }),
     )
-    .describe(`Exactly ${QUESTION_COUNT} questions, in the order to ask them.`),
+    .describe("The questions, in the order to ask them."),
 });
 
 export type QuestionSet = z.infer<typeof questionSetSchema>;
@@ -115,23 +146,25 @@ export type QuestionSet = z.infer<typeof questionSetSchema>;
  */
 export function normalizeQuestions(
   set: QuestionSet,
+  count = QUESTION_COUNT,
 ): { kind: QuestionKind; text: string }[] {
   return set.questions
     .map((q) => ({ kind: q.kind, text: q.text.trim() }))
     .filter((q) => q.text.length > 0)
-    .slice(0, QUESTION_COUNT);
+    .slice(0, count);
 }
 
 /** Validates an answer typed by the user. */
 export function validateAnswer(
   value: unknown,
+  max = MAX_ANSWER_LENGTH,
 ): { ok: true; text: string } | { ok: false; error: string } {
   const text = typeof value === "string" ? value.trim() : "";
   if (!text) return { ok: false, error: "צריך לכתוב תשובה לפני שממשיכים." };
-  if (text.length > MAX_ANSWER_LENGTH) {
+  if (text.length > max) {
     return {
       ok: false,
-      error: `תשובה יכולה להיות עד ${MAX_ANSWER_LENGTH} תווים.`,
+      error: `תשובה יכולה להיות עד ${max} תווים.`,
     };
   }
   return { ok: true, text };

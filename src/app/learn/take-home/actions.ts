@@ -4,11 +4,14 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { AiError } from "@/lib/ai/client";
 import { limitWindowStart, usageStatus } from "@/lib/interview/limits";
+import { parseCodeLanguage } from "@/lib/code/languages";
+import { isCodingRole } from "@/lib/interview/question-bank";
 import { parseLanguage } from "@/lib/interview/schema";
 import { evaluateTakeHome, generateTakeHome } from "@/lib/take-home/ai";
 import {
   DAILY_TAKE_HOME_LIMIT,
   parseDifficulty,
+  parseFormat,
   readBrief,
   takeHomeScore,
   validateSubmission,
@@ -47,6 +50,8 @@ export async function startTakeHome(
   const { supabase, user } = await requireUser("/learn/take-home");
   const difficulty = parseDifficulty(formData.get("difficulty"));
   const language = parseLanguage(formData.get("language"));
+  const requestedFormat = parseFormat(formData.get("format"));
+  const codeLanguage = parseCodeLanguage(formData.get("codeLanguage"));
 
   const jobId = String(formData.get("jobId") ?? "");
   const [{ data: savedRole }, { data: job }, { data: recent }] =
@@ -97,9 +102,22 @@ export async function startTakeHome(
     };
   }
 
+  // Code take-homes are only for roles that write code.
+  const format =
+    requestedFormat === "code" && isCodingRole(role.title)
+      ? "code"
+      : "document";
+
   let brief;
   try {
-    brief = await generateTakeHome(role, difficulty, language, user.address);
+    brief = await generateTakeHome(
+      role,
+      difficulty,
+      language,
+      user.address,
+      format,
+      codeLanguage,
+    );
   } catch (error) {
     if (error instanceof AiError) return aiError(error, "Take-home generation");
     throw error;
@@ -147,7 +165,10 @@ export async function submitTakeHome(
 
   let submission = takeHome.submission as string | null;
   if (!submission) {
-    const checked = validateSubmission(formData.get("submission"));
+    const checked = validateSubmission(
+      formData.get("submission"),
+      brief.format,
+    );
     if (!checked.ok) return { error: checked.error };
     submission = checked.text;
     const { error } = await supabase

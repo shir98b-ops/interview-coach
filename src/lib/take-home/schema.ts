@@ -10,6 +10,15 @@ import { matchRoleFamilies } from "@/lib/interview/question-bank";
 /** Each take-home costs a few cents to write and score, so cap them daily. */
 export const DAILY_TAKE_HOME_LIMIT = 3;
 export const MAX_SUBMISSION_LENGTH = 15000;
+/** Code take-homes hold several files, so they may be longer. */
+export const MAX_CODE_SUBMISSION_LENGTH = 40000;
+
+/** A written take-home, or one solved by writing code. */
+export type TakeHomeFormat = "document" | "code";
+
+export function parseFormat(value: unknown): TakeHomeFormat {
+  return value === "code" ? "code" : "document";
+}
 
 export const difficulties = {
   easy: {
@@ -60,6 +69,8 @@ const taskTypes: Record<string, string> = {
     "a financial analysis with a small table of numbers in the brief: assess the situation and recommend a decision",
   engineering:
     "a written technical design: approach, architecture, trade-offs and a test plan, without writing full code",
+  hardware:
+    "an engineering design review with a small table of requirements, specs or loads in the brief: propose a design, check it against the constraints and standards, and list the risks and tests",
   management:
     "a leadership case: plan the first 90 days of a team, or handle a team conflict and a missed goal",
 };
@@ -92,10 +103,26 @@ export const briefSchema = z.object({
     .describe("What to hand in and in what form, e.g. a 1-2 page document"),
 });
 
-export type TakeHomeBrief = z.infer<typeof briefSchema>;
+/** A code take-home also gives starter code or sample data. */
+export const codeBriefSchema = briefSchema.extend({
+  starterCode: z
+    .string()
+    .describe(
+      "Starter code, function signatures, sample input or table rows the candidate works from, as plain code without fences. Empty if none is needed.",
+    ),
+});
+
+/** What is saved: the brief, plus its format and programming language. */
+const savedBriefSchema = briefSchema.extend({
+  format: z.enum(["document", "code"]).optional(),
+  codeLanguage: z.string().optional(),
+  starterCode: z.string().optional(),
+});
+
+export type TakeHomeBrief = z.infer<typeof savedBriefSchema>;
 
 export function readBrief(value: unknown): TakeHomeBrief | null {
-  const parsed = briefSchema.safeParse(value);
+  const parsed = savedBriefSchema.safeParse(value);
   return parsed.success ? parsed.data : null;
 }
 
@@ -132,6 +159,47 @@ export const takeHomeRubric = [
 ] as const;
 
 export type TakeHomeKey = (typeof takeHomeRubric)[number]["key"];
+
+/** The same four scores, judged the way a code review judges them. */
+export const codeTakeHomeRubric: {
+  key: TakeHomeKey;
+  label: string;
+  description: string;
+  prompt: string;
+}[] = [
+  {
+    key: "understanding",
+    label: "הבנת הדרישות",
+    description: "עונה על כל הדרישות, ומציין הנחות במקומות שלא היו ברורים.",
+    prompt:
+      "Understanding: covers every requirement in the brief, and states assumptions where the brief was open.",
+  },
+  {
+    key: "solution",
+    label: "נכונות ופתרון",
+    description: "הקוד עובד, מטפל במקרי קצה ובשגיאות, ויעיל במידה הנדרשת.",
+    prompt:
+      "Solution: the code is correct, handles edge cases and errors, and is efficient enough for the stated scale.",
+  },
+  {
+    key: "structure",
+    label: "איכות קוד ומבנה",
+    description: "חלוקה הגיונית לקבצים ופונקציות, שמות ברורים וקוד קריא.",
+    prompt:
+      "Structure: sensible split into files, modules and functions, clear names, readable and idiomatic code.",
+  },
+  {
+    key: "actionability",
+    label: "בדיקות ותיעוד",
+    description: "יש בדיקות אוטומטיות, והסבר קצר איך מריצים ולמה נבחר הפתרון.",
+    prompt:
+      "Tests and docs: automated tests for the main paths and edge cases, and a short README on how to run it and the choices made.",
+  },
+];
+
+export function rubricFor(format: TakeHomeFormat | undefined) {
+  return format === "code" ? codeTakeHomeRubric : takeHomeRubric;
+}
 
 export const takeHomeEvaluationSchema = z.object({
   understanding: z.number().describe("Score from 1 to 5"),
@@ -176,15 +244,24 @@ export function takeHomeScore(feedback: Record<TakeHomeKey, number>): number {
 
 export function validateSubmission(
   value: unknown,
+  format: TakeHomeFormat = "document",
 ): { ok: true; text: string } | { ok: false; error: string } {
   const text = typeof value === "string" ? value.trim() : "";
+  const max =
+    format === "code" ? MAX_CODE_SUBMISSION_LENGTH : MAX_SUBMISSION_LENGTH;
   if (text.length < 50) {
-    return { ok: false, error: "ההגשה קצרה מדי. צריך לפחות כמה פסקאות." };
-  }
-  if (text.length > MAX_SUBMISSION_LENGTH) {
     return {
       ok: false,
-      error: `ההגשה יכולה להיות עד ${MAX_SUBMISSION_LENGTH} תווים.`,
+      error:
+        format === "code"
+          ? "ההגשה קצרה מדי. צריך להדביק את הקוד."
+          : "ההגשה קצרה מדי. צריך לפחות כמה פסקאות.",
+    };
+  }
+  if (text.length > max) {
+    return {
+      ok: false,
+      error: `ההגשה יכולה להיות עד ${max.toLocaleString("he-IL")} תווים.`,
     };
   }
   return { ok: true, text };

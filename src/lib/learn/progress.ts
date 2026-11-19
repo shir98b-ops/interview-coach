@@ -1,5 +1,6 @@
 import "server-only";
 import { readFeedback } from "@/lib/interview/feedback";
+import { isCodingKind } from "@/lib/interview/schema";
 import type { createClient } from "@/lib/supabase/server";
 import { recommendLesson } from "./lessons";
 
@@ -15,7 +16,7 @@ export async function getLearningState(supabase: Supabase) {
     supabase.from("lesson_attempts").select("lesson_slug"),
     supabase
       .from("answers")
-      .select("scores")
+      .select("scores, questions(kind)")
       .not("scores", "is", null)
       .order("created_at", { ascending: false })
       .limit(15),
@@ -23,7 +24,13 @@ export async function getLearningState(supabase: Supabase) {
   const completed = new Set(
     (attempts ?? []).map((a) => a.lesson_slug as string),
   );
+  // Lessons teach how to answer out loud, so code answers do not count.
+  const kindOf = (a: { questions: unknown }) => {
+    const q = a.questions as { kind: string } | { kind: string }[] | null;
+    return (Array.isArray(q) ? q[0]?.kind : q?.kind) ?? "";
+  };
   const scores = (answers ?? [])
+    .filter((a) => !isCodingKind(kindOf(a)))
     .map((a) => readFeedback(a.scores))
     .filter((f) => f !== null);
   return {
