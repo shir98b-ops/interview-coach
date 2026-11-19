@@ -14,6 +14,7 @@ import { kindLabels, type QuestionKind } from "@/lib/interview/schema";
 import { forAddress, recommendLesson } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { languageFor } from "@/lib/voice/transcript";
 import { AnswerForm, RetryFeedbackForm } from "../forms";
 
 export const metadata: Metadata = { title: "תרגול · Interview Coach" };
@@ -122,6 +123,7 @@ async function SessionContent({
           sessionId={session.id}
           questionId={current.id}
           isLast={number === questions.length}
+          language={languageFor(current.text)}
         />
       </section>
     );

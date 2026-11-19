@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { Button, ErrorText, inputStyles } from "@/components/ui";
+import { Button, ErrorText } from "@/components/ui";
+import { VoiceAnswerField } from "@/components/voice-answer";
 import { MAX_ANSWER_LENGTH } from "@/lib/interview/schema";
 import { submitExercise, type ExerciseState } from "./actions";
 import { ExerciseFeedbackView } from "./feedback-view";
@@ -26,15 +27,15 @@ export function ExerciseForm({
         <label htmlFor="exercise-answer" className="text-muted font-medium">
           התשובה שלך
         </label>
-        <textarea
-          dir="auto"
+        <VoiceAnswerField
           id="exercise-answer"
           name="answer"
-          required
           rows={8}
           maxLength={MAX_ANSWER_LENGTH}
           placeholder="אפשר לענות בעברית או באנגלית."
-          className={`${inputStyles} min-h-48`}
+          className="min-h-48"
+          language="he"
+          disabled={pending}
         />
         <p className="text-muted text-sm">טיפ: {hint}</p>
         {state.status === "error" && <ErrorText>{state.error}</ErrorText>}
