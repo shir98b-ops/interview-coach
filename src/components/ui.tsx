@@ -43,15 +43,19 @@ export function ButtonLink({
  * is reserved for upcoming interviews, and the rest give each area its own
  * pastel.
  */
+const onColor = "[&_.text-muted]:text-ink-soft";
 const cardTones = {
   white: "bg-white shadow-[0_10px_30px_rgba(20,38,58,0.06)]",
-  blue: "bg-sky",
-  sky: "bg-sky-light",
-  pink: "bg-pink-soft",
-  lavender: "bg-lavender-soft",
-  mint: "bg-success-soft",
-  sun: "bg-sun",
+  blue: `bg-sky ${onColor}`,
+  sky: `bg-sky-light ${onColor}`,
+  pink: `bg-pink ${onColor}`,
+  lavender: `bg-lavender ${onColor}`,
+  mint: `bg-mint ${onColor}`,
+  sun: `bg-sun ${onColor}`,
 } as const;
+
+/** Colors for a row of tiles, so neighbors never share a color. */
+export const tileTones = ["sky", "lavender", "mint", "pink"] as const;
 
 export function Card({
   tone = "white",

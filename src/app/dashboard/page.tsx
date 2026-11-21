@@ -107,7 +107,7 @@ async function Dashboard() {
       )}
 
       {!ready ? (
-        <Card className="gap-5 p-8">
+        <Card tone="blue" className="gap-5 p-8">
           <h2 className="text-2xl font-extrabold">מתכוננים לתרגול הראשון</h2>
           <ol className="flex flex-col gap-3 text-lg">
             <Step done={Boolean(profile)} number={1}>
@@ -155,7 +155,7 @@ async function Dashboard() {
           <div className="flex flex-col gap-5">
             {lesson ? (
               <Card tone="pink">
-                <Chip>השיעור הבא בשבילך</Chip>
+                <Chip tone="glass">השיעור הבא בשבילך</Chip>
                 <h2 className="text-xl font-bold">{lesson.title}</h2>
                 <p className="text-muted">
                   {lesson.minutes} דקות · {lesson.summary}
@@ -176,10 +176,12 @@ async function Dashboard() {
             )}
             <div className="grid grid-cols-2 gap-5">
               <Stat
+                tone="sky"
                 value={practiceCount ?? sessions?.length ?? 0}
                 label="תרגולים"
               />
               <Stat
+                tone="lavender"
                 value={`${learning.completed.size}/${lessons.length}`}
                 label="שיעורים"
               />
@@ -214,9 +216,17 @@ function Step({
   );
 }
 
-function Stat({ value, label }: { value: number | string; label: string }) {
+function Stat({
+  tone,
+  value,
+  label,
+}: {
+  tone: "sky" | "lavender";
+  value: number | string;
+  label: string;
+}) {
   return (
-    <Card className="gap-1">
+    <Card tone={tone} className="gap-1">
       <p className="text-3xl font-extrabold">{value}</p>
       <p className="text-muted">{label}</p>
     </Card>

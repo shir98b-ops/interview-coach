@@ -5,6 +5,7 @@ import {
   Chip,
   Icon,
   ScoreTrend,
+  tileTones,
   type IconName,
 } from "@/components/ui";
 import { SiteFooter } from "@/components/site-footer";
@@ -86,7 +87,7 @@ export default function Home() {
           <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, index) => (
               <li key={step.title}>
-                <Card className="h-full">
+                <Card tone={tileTones[index % 4]} className="h-full">
                   <div className="flex items-center gap-3">
                     <Icon name={step.icon} size={48} />
                     <h3 className="text-xl font-bold">
@@ -101,7 +102,7 @@ export default function Home() {
           </ol>
         </section>
 
-        <Card tone="pink" className="items-start gap-4 p-8">
+        <Card tone="blue" className="items-start gap-4 p-8">
           <h2 className="text-2xl font-extrabold">יוצאים לסיבוב הראשון?</h2>
           <p className="text-muted text-lg">
             נכנסים עם חשבון גוגל, ותוך שתי דקות כבר עונים על השאלה הראשונה.

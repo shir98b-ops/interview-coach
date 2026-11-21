@@ -4,7 +4,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Loading } from "@/components/app-shell";
-import { ButtonLink, Card, Chip, PageHeading } from "@/components/ui";
+import {
+  ButtonLink,
+  Card,
+  Chip,
+  PageHeading,
+  tileTones,
+} from "@/components/ui";
 import {
   readReview,
   reviewRubric,
@@ -160,8 +166,8 @@ function ReviewDetails({
       </Card>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {reviewRubric.map((r) => (
-          <Card key={r.key} className="gap-1 p-5">
+        {reviewRubric.map((r, i) => (
+          <Card key={r.key} tone={tileTones[i % 4]} className="gap-1 p-5">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold">{r.label}</p>
               <p className="text-blue text-2xl font-extrabold">
