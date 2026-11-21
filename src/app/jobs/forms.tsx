@@ -37,22 +37,33 @@ export function PasteJobForm() {
   const [state, action, pending] = useActionState(addJob, initial);
   return (
     <form action={action} className="flex flex-col gap-3">
+      <label htmlFor="posting" className="font-extrabold">
+        קישור למשרה או הטקסט של המודעה
+      </label>
       <textarea
+        id="posting"
         name="posting"
         rows={6}
         required
         maxLength={MAX_PASTE_LENGTH}
         dir="auto"
-        aria-label="עמוד המשרה"
-        placeholder="מלינקדאין: פותחים את המשרה, מסמנים הכל, מעתיקים ומדביקים כאן. מאתר של חברה: מספיק להדביק את הקישור."
-        className={inputStyles}
+        placeholder="מדביקים כאן. מלינקדאין עדיף להעתיק את הטקסט, כי הקישור דורש התחברות."
+        className={`${inputStyles.replace("bg-white", "bg-canvas").replace("border-2", "border-[1.5px]")} placeholder-shown:[direction:rtl]`}
       />
+      <p className="sr-only">
+        מהמודעה נכין מה מחפשים, איפה הפערים ושאלות צפויות.
+      </p>
+      <ul aria-hidden className="flex flex-wrap gap-2 text-sm font-extrabold">
+        <li className="bg-sky-light rounded-full px-3 py-1.5">מה מחפשים</li>
+        <li className="bg-lavender rounded-full px-3 py-1.5">איפה הפערים</li>
+        <li className="bg-mint rounded-full px-3 py-1.5">שאלות צפויות</li>
+      </ul>
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button
         type="submit"
         variant="primary"
         disabled={pending}
-        className="w-full sm:w-fit"
+        className="min-h-[54px] w-full"
       >
         {pending ? "קורא את המשרה..." : "להוסיף משרה"}
       </Button>

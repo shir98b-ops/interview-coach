@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
+  Avatar,
   ButtonLink,
   Chip,
   Icon,
@@ -69,18 +70,10 @@ export function Greeting({
   subtitle: string;
   streakDays: number;
 }) {
-  const avatar = (className: string) => (
-    <span
-      aria-hidden
-      className={`h-14 w-14 shrink-0 items-center justify-center rounded-full border-4 border-white bg-[#ffd27a] text-xl font-black shadow-[0_6px_14px_rgba(20,38,58,0.12)] ${className}`}
-    >
-      {(name?.[0] ?? "?").toUpperCase()}
-    </span>
-  );
   return (
     <header className="flex items-center justify-between gap-3">
       <div className="flex items-center gap-3">
-        {avatar("flex lg:hidden")}
+        <Avatar name={name} className="flex lg:hidden" />
         <div className="flex flex-col">
           <h1 className="text-2xl leading-tight font-black lg:text-4xl">
             {name ? `היי ${name}` : "היי"}
@@ -94,7 +87,7 @@ export function Greeting({
           {streakDays === 1 ? "יום אחד" : `${streakDays} ימים`}
         </span>
       )}
-      {avatar("hidden lg:flex")}
+      <Avatar name={name} className="hidden lg:flex" />
     </header>
   );
 }

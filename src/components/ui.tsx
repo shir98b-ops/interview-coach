@@ -230,3 +230,21 @@ export function ScoreTrend({
     </div>
   );
 }
+
+/** The round yellow badge with the user's first initial. */
+export function Avatar({
+  name,
+  className = "",
+}: {
+  name: string | undefined;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={`h-14 w-14 shrink-0 items-center justify-center rounded-full border-4 border-white bg-[#ffd27a] text-xl font-black shadow-[0_6px_14px_rgba(20,38,58,0.12)] ${className}`}
+    >
+      {(name?.[0] ?? "?").toUpperCase()}
+    </span>
+  );
+}
