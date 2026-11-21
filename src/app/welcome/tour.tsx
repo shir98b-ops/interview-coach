@@ -93,7 +93,7 @@ export function WelcomeTour() {
             type="button"
             onClick={close}
             aria-label="לסגור את ההדרכה"
-            className="text-muted hover:bg-violet-soft flex size-11 items-center justify-center rounded-full text-2xl"
+            className="text-muted hover:bg-sky-soft flex size-11 items-center justify-center rounded-full text-2xl"
           >
             ×
           </button>
@@ -105,7 +105,7 @@ export function WelcomeTour() {
           </h2>
           <p className="text-lg">{current.body}</p>
           {current.where && (
-            <p className="text-violet font-bold">{current.where}</p>
+            <p className="text-blue font-bold">{current.where}</p>
           )}
         </div>
 
@@ -113,7 +113,7 @@ export function WelcomeTour() {
           {steps.map((_, index) => (
             <span
               key={index}
-              className={`h-2 rounded-full transition-all ${index === step ? "bg-violet w-6" : "bg-line w-2"}`}
+              className={`h-2 rounded-full transition-all ${index === step ? "bg-blue w-6" : "bg-line w-2"}`}
             />
           ))}
         </div>
@@ -124,7 +124,7 @@ export function WelcomeTour() {
               type="checkbox"
               checked={hideForGood}
               onChange={(event) => setHideForGood(event.target.checked)}
-              className="accent-violet size-5"
+              className="accent-blue size-5"
             />
             לא להציג את זה שוב
           </label>
@@ -140,7 +140,7 @@ export function WelcomeTour() {
             )}
             <Button
               type="button"
-              variant={last ? "lime" : "primary"}
+              variant="primary"
               onClick={() => (last ? close() : setStep(step + 1))}
             >
               {last ? "מתחילים" : "הבא"}

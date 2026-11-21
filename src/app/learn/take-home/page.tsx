@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "מבחני בית · Interview Coach
 export default function TakeHomesPage() {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-      <Link href="/learn" className="text-violet w-fit font-medium">
+      <Link href="/learn" className="text-blue w-fit font-medium">
         → ללמידה
       </Link>
       <PageHeading
@@ -57,12 +57,12 @@ async function TakeHomes() {
           <StartTakeHomeForm roles={roles} />
         </Card>
       ) : (
-        <Card className="gap-4 p-8">
+        <Card tone="blue" className="gap-4 p-8">
           <h2 className="text-2xl font-extrabold">קודם בוחרים תפקיד</h2>
           <p className="text-muted text-lg">
             מבחן הבית נכתב לפי התפקיד שאליו מתכוננים.
           </p>
-          <ButtonLink href="/profile" variant="lime" className="w-fit">
+          <ButtonLink href="/profile" variant="primary" className="w-fit">
             להוסיף תפקיד
           </ButtonLink>
         </Card>
@@ -76,7 +76,7 @@ async function TakeHomes() {
               <li key={t.id}>
                 <Link
                   href={`/learn/take-home/${t.id}`}
-                  className="hover:bg-violet-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
+                  className="hover:bg-sky-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
                 >
                   <span className="flex flex-col">
                     <span dir="auto" className="font-bold">
@@ -88,11 +88,11 @@ async function TakeHomes() {
                     </span>
                   </span>
                   {t.score !== null ? (
-                    <span className="text-violet text-2xl font-extrabold">
+                    <span className="text-blue text-2xl font-extrabold">
                       {t.score}
                     </span>
                   ) : (
-                    <Chip tone={t.submission ? "violet" : "orange"}>
+                    <Chip tone={t.submission ? "blue" : "pink"}>
                       {t.submission ? "הוגש" : "בעבודה"}
                     </Chip>
                   )}

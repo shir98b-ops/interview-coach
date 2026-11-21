@@ -40,7 +40,7 @@ export const metadata: Metadata = { title: "משרה · Interview Coach" };
 export default function JobPage({ params }: PageProps<"/jobs/[id]">) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-      <Link href="/jobs" className="text-violet w-fit font-medium">
+      <Link href="/jobs" className="text-blue w-fit font-medium">
         → לכל המשרות
       </Link>
       <Suspense fallback={<Loading />}>
@@ -119,7 +119,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
             href={job.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-violet w-fit font-bold"
+            className="text-blue w-fit font-bold"
           >
             למודעת המשרה ←
           </a>
@@ -152,7 +152,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                   <span
                     className={`rounded-full px-3 py-1 text-sm font-bold ${
                       current
-                        ? "bg-violet text-white"
+                        ? "bg-blue text-white"
                         : done
                           ? "bg-success-soft text-success-ink"
                           : "bg-canvas text-muted"
@@ -285,7 +285,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
       </Card>
 
       {!job.description ? (
-        <Card tone="orange" className="gap-4 p-6 sm:p-8">
+        <Card tone="pink" className="gap-4 p-6 sm:p-8">
           <h2 className="text-2xl font-extrabold">מתחילים בתיאור המשרה</h2>
           <p className="text-lg">
             מדביקים כאן את הטקסט של המודעה, ומקבלים תוכנית הכנה ותרגול ראיון
@@ -294,7 +294,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
           <DescriptionForm jobId={job.id} current={null} />
         </Card>
       ) : (
-        <Card className="gap-6 p-6 sm:p-8">
+        <Card tone="lavender" className="gap-6 p-6 sm:p-8">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-extrabold">
               {interviews.length
@@ -313,7 +313,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
       )}
 
       {job.description && (
-        <Card tone="lilac" className="gap-4 p-6 sm:p-8">
+        <Card tone="lavender" className="gap-4 p-6 sm:p-8">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-extrabold">תרגול ראיון למשרה</h2>
             <p>חמש שאלות שנבנות מתוך המודעה, ואחריהן ציון ומשוב על כל תשובה.</p>
@@ -331,7 +331,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                 <li key={p.id}>
                   <Link
                     href={`/practice/${p.id}`}
-                    className="hover:bg-violet-soft flex items-center justify-between rounded-2xl bg-white px-4 py-3"
+                    className="hover:bg-sky-soft flex items-center justify-between rounded-2xl bg-white px-4 py-3"
                   >
                     <span>
                       {p.stage
@@ -339,7 +339,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                         : "תרגול כללי"}{" "}
                       · {formatDate(p.created_at)}
                     </span>
-                    <span className="text-violet font-extrabold">
+                    <span className="text-blue font-extrabold">
                       {p.overall_score ?? "בתהליך"}
                     </span>
                   </Link>

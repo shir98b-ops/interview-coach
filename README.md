@@ -147,6 +147,10 @@ for fields outside tech.
 
 All AI calls run on the server, so API keys never reach the browser.
 
+The 3D icons in `public/icons/` are from
+[Fluent Emoji](https://github.com/microsoft/fluentui-emoji) by Microsoft,
+used under the MIT license.
+
 ## Running locally
 
 Requires Node.js 22.

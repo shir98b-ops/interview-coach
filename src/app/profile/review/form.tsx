@@ -38,7 +38,7 @@ export function RateResumeForm({
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button
         type="submit"
-        variant="lime"
+        variant="primary"
         disabled={pending}
         className="w-full sm:w-fit"
       >

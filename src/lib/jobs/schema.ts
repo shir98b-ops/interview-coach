@@ -1,11 +1,11 @@
 /** Where a job application stands. Stored in English, shown in Hebrew. */
 export const jobStatuses = {
-  saved: { label: "שמרתי לעצמי", tone: "violet" },
-  applied: { label: "הגשתי", tone: "violet" },
-  interviewing: { label: "בתהליך ראיונות", tone: "orange" },
-  offer: { label: "קיבלתי הצעה", tone: "lime" },
-  rejected: { label: "לא התקדם", tone: "violet" },
-  withdrawn: { label: "ויתרתי", tone: "violet" },
+  saved: { label: "שמרתי לעצמי", tone: "blue" },
+  applied: { label: "הגשתי", tone: "blue" },
+  interviewing: { label: "בתהליך ראיונות", tone: "pink" },
+  offer: { label: "קיבלתי הצעה", tone: "mint" },
+  rejected: { label: "לא התקדם", tone: "blue" },
+  withdrawn: { label: "ויתרתי", tone: "blue" },
 } as const;
 
 export type JobStatus = keyof typeof jobStatuses;

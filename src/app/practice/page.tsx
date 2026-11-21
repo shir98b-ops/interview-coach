@@ -60,7 +60,7 @@ async function PracticeContent() {
 
   if (!profile || !roles?.length) {
     return (
-      <Card className="gap-4 p-8">
+      <Card tone="blue" className="gap-4 p-8">
         <h2 className="text-2xl font-extrabold">קודם כל, כמה פרטים עליך</h2>
         <p className="text-muted text-lg">
           השאלות מותאמות לקורות החיים ולתפקיד המבוקש, אז צריך קודם
@@ -68,7 +68,7 @@ async function PracticeContent() {
             ? " להוסיף לפחות תפקיד אחד."
             : " להעלות קורות חיים ולבחור תפקיד."}
         </p>
-        <ButtonLink href="/profile" variant="lime" className="w-fit">
+        <ButtonLink href="/profile" variant="primary" className="w-fit">
           לפרופיל שלי
         </ButtonLink>
       </Card>
@@ -104,7 +104,7 @@ async function PracticeContent() {
         ) : (
           <p
             role="status"
-            className="bg-orange-soft text-orange-ink rounded-2xl p-4"
+            className="bg-pink-soft text-pink-ink rounded-2xl p-4"
           >
             {limitMessage(usage)}
           </p>
@@ -159,7 +159,7 @@ function PracticeItem({ session }: { session: PracticeRow }) {
     <li>
       <Link
         href={`/practice/${session.id}`}
-        className="hover:bg-violet-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
+        className="hover:bg-sky-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
       >
         <span className="flex flex-col">
           <span className="font-bold">
@@ -174,11 +174,11 @@ function PracticeItem({ session }: { session: PracticeRow }) {
           </span>
         </span>
         {session.overall_score !== null ? (
-          <span className="text-violet text-2xl font-extrabold">
+          <span className="text-blue text-2xl font-extrabold">
             {session.overall_score}
           </span>
         ) : (
-          <Chip tone={session.completed_at ? "violet" : "orange"}>
+          <Chip tone={session.completed_at ? "blue" : "pink"}>
             {session.completed_at ? "הסתיים" : "בתהליך"}
           </Chip>
         )}
@@ -197,7 +197,7 @@ function ProgressChart({
 }) {
   if (scores.length < 2) return null;
   return (
-    <Card tone="lilac" className="gap-4">
+    <Card tone="lavender" className="gap-4">
       <p className="font-bold">
         {change === null
           ? "כל עמודה היא תרגול אחד. ההשוואה היא רק בין תרגולים מאותו סוג ולאותו תפקיד."
@@ -217,7 +217,7 @@ function ProgressChart({
           <div
             key={index}
             title={`${score} / 100`}
-            className="bg-violet flex-1 rounded-t-lg"
+            className="bg-blue flex-1 rounded-t-lg"
             style={{ height: `${Math.max(score, 4)}%` }}
           />
         ))}

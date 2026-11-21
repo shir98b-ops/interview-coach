@@ -21,7 +21,7 @@ export function AdminTabs() {
             href={tab.href}
             aria-current={current ? "page" : undefined}
             className={`flex min-h-11 items-center rounded-full px-5 font-bold ${
-              current ? "bg-ink text-white" : "bg-violet-soft"
+              current ? "bg-ink text-white" : "bg-sky-soft"
             }`}
           >
             {tab.label}

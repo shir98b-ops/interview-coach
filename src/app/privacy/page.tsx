@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/app-shell";
-import { Card } from "@/components/ui";
+import { Card, tileTones } from "@/components/ui";
 
 export const metadata: Metadata = { title: "פרטיות · Interview Coach" };
 
@@ -70,8 +70,8 @@ export default function PrivacyPage() {
             מה נשמר, למה, ואיך מוחקים. בקצרה ובלי אותיות קטנות.
           </p>
         </div>
-        {sections.map((section) => (
-          <Card key={section.heading} className="gap-3">
+        {sections.map((section, i) => (
+          <Card key={section.heading} tone={tileTones[i % 4]} className="gap-3">
             <h2 className="text-xl font-extrabold">{section.heading}</h2>
             <ul className="flex list-disc flex-col gap-2 ps-5 text-lg">
               {section.items.map((item) => (
@@ -81,7 +81,7 @@ export default function PrivacyPage() {
           </Card>
         ))}
         <p className="text-muted text-sm">עודכן לאחרונה: נובמבר 2026.</p>
-        <Link href="/" className="text-violet w-fit font-bold">
+        <Link href="/" className="text-blue w-fit font-bold">
           → חזרה לדף הבית
         </Link>
       </main>

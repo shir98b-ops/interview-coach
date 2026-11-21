@@ -12,7 +12,7 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 px-4 py-16">
       <Logo />
-      <Card className="gap-5 p-8">
+      <Card tone="blue" className="gap-5 p-8">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-extrabold">כניסה</h1>
           <p className="text-muted text-lg">
@@ -25,7 +25,7 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
       </Card>
       <p className="text-muted text-center text-sm">
         כניסה לאתר היא הסכמה ל
-        <Link href="/privacy" className="text-violet font-bold">
+        <Link href="/privacy" className="text-blue font-bold">
           מדיניות הפרטיות
         </Link>
         .

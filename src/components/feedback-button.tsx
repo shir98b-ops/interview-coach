@@ -7,16 +7,25 @@ import { Button, ErrorText, inputStyles } from "./ui";
 
 const initial: FeedbackState = { status: "idle" };
 
-/** A small "feedback" menu in the header that opens a short form. */
-export function FeedbackButton() {
+/**
+ * A small "feedback" menu that opens a short form, below the link or, in the
+ * desktop sidebar, above it and toward the page.
+ */
+export function FeedbackButton({
+  placement = "below",
+}: {
+  placement?: "below" | "above";
+}) {
   const [state, action, pending] = useActionState(sendFeedback, initial);
 
   return (
     <details className="relative">
-      <summary className="text-muted hover:bg-violet-soft flex min-h-11 cursor-pointer list-none items-center rounded-full px-4 font-medium">
+      <summary className="text-muted hover:bg-sky-soft flex min-h-11 cursor-pointer list-none items-center rounded-full px-4 font-medium">
         משוב
       </summary>
-      <div className="border-line fixed inset-x-4 top-16 z-20 flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-lg sm:absolute sm:inset-x-auto sm:end-0 sm:top-auto sm:mt-2 sm:w-80">
+      <div
+        className={`border-line fixed inset-x-4 top-16 z-20 flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-lg sm:absolute sm:inset-x-auto sm:w-80 ${placement === "above" ? "sm:start-0 sm:top-auto sm:bottom-full sm:mb-2" : "sm:end-0 sm:top-auto sm:mt-2"}`}
+      >
         {state.status === "sent" ? (
           <p role="status" className="text-success-ink font-bold">
             תודה! המשוב התקבל.
@@ -48,7 +57,7 @@ export function FeedbackButton() {
                       value={star}
                       className="peer sr-only"
                     />
-                    <span className="border-line peer-checked:bg-violet peer-focus-visible:outline-violet peer-checked:border-violet flex size-11 items-center justify-center rounded-full border-2 font-bold peer-checked:text-white peer-focus-visible:outline-2">
+                    <span className="border-line peer-checked:bg-blue peer-focus-visible:outline-blue peer-checked:border-blue flex size-11 items-center justify-center rounded-full border-2 font-bold peer-checked:text-white peer-focus-visible:outline-2">
                       {star}
                     </span>
                     <span className="sr-only">

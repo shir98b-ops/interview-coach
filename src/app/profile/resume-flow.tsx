@@ -7,7 +7,7 @@ import { splitList, type ResumeData } from "@/lib/resume/schema";
 import { extractResumeAction, saveProfile, type ExtractState } from "./actions";
 
 const input = inputStyles;
-const linkButton = "text-sm font-bold text-violet hover:text-violet-dark";
+const linkButton = "text-sm font-bold text-blue hover:text-blue-dark";
 
 /** Upload a resume, then review and save the extracted details. */
 export function ResumeFlow({ hasProfile }: { hasProfile: boolean }) {
@@ -235,7 +235,7 @@ function ReviewForm({
 
       {error && <ErrorText>{error}</ErrorText>}
       <div className="flex flex-wrap items-center gap-4">
-        <Button type="submit" variant="lime" disabled={saving}>
+        <Button type="submit" variant="primary" disabled={saving}>
           {saving ? "שומר..." : "לשמור פרופיל"}
         </Button>
         <Button type="button" variant="quiet" onClick={onCancel}>

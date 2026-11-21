@@ -4,7 +4,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Loading } from "@/components/app-shell";
-import { ButtonLink, Card, Chip, PageHeading } from "@/components/ui";
+import {
+  ButtonLink,
+  Card,
+  Chip,
+  PageHeading,
+  tileTones,
+} from "@/components/ui";
 import {
   readReview,
   reviewRubric,
@@ -21,7 +27,7 @@ export const metadata: Metadata = {
 export default function ResumeReviewPage() {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-      <Link href="/profile" className="text-violet w-fit font-medium">
+      <Link href="/profile" className="text-blue w-fit font-medium">
         → לפרופיל
       </Link>
       <PageHeading
@@ -57,12 +63,12 @@ async function Reviews() {
 
   if (!profile?.resume_data) {
     return (
-      <Card className="gap-4 p-8">
+      <Card tone="blue" className="gap-4 p-8">
         <h2 className="text-2xl font-extrabold">קודם מעלים קורות חיים</h2>
         <p className="text-muted text-lg">
           הדירוג נעשה על הפרטים שאישרת בפרופיל.
         </p>
-        <ButtonLink href="/profile" variant="lime" className="w-fit">
+        <ButtonLink href="/profile" variant="primary" className="w-fit">
           להעלות קורות חיים
         </ButtonLink>
       </Card>
@@ -111,7 +117,7 @@ async function Reviews() {
                     {formatDate(r.created_at)}
                   </span>
                 </span>
-                <span className="text-violet text-2xl font-extrabold">
+                <span className="text-blue text-2xl font-extrabold">
                   {r.score}
                 </span>
               </li>
@@ -136,7 +142,7 @@ function ReviewDetails({
 }) {
   return (
     <section className="flex flex-col gap-5">
-      <Card tone="violet" className="gap-3 p-7">
+      <Card tone="blue" className="gap-3 p-7">
         <p dir="auto" className="opacity-90">
           {role ? localizeSeniority(role) : "דירוג כללי"}
         </p>
@@ -148,7 +154,7 @@ function ReviewDetails({
           <span className="text-2xl opacity-80"> / 100</span>
         </p>
         {change !== null && change !== 0 && (
-          <p className="text-lime font-bold">
+          <p className="text-blue-dark font-bold">
             {change > 0
               ? `עלית ${change} נקודות מהדירוג הקודם`
               : `ירדת ${-change} נקודות מהדירוג הקודם`}
@@ -160,11 +166,11 @@ function ReviewDetails({
       </Card>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {reviewRubric.map((r) => (
-          <Card key={r.key} className="gap-1 p-5">
+        {reviewRubric.map((r, i) => (
+          <Card key={r.key} tone={tileTones[i % 4]} className="gap-1 p-5">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold">{r.label}</p>
-              <p className="text-violet text-2xl font-extrabold">
+              <p className="text-blue text-2xl font-extrabold">
                 {review[r.key]}/5
               </p>
             </div>
@@ -192,16 +198,16 @@ function ReviewDetails({
           <ol className="flex flex-col gap-3">
             {review.fixes.map((fix, i) => (
               <li key={i}>
-                <Card className="gap-3 p-5">
+                <Card tone={tileTones[(i + 1) % 4]} className="gap-3 p-5">
                   <p className="flex gap-3 font-bold">
-                    <span className="bg-violet-soft text-violet-dark flex size-8 shrink-0 items-center justify-center rounded-xl">
+                    <span className="bg-sky-soft text-blue-dark flex size-8 shrink-0 items-center justify-center rounded-xl">
                       {i + 1}
                     </span>
                     <span dir="auto">{fix.issue}</span>
                   </p>
                   {fix.before && (
-                    <div className="bg-orange-soft rounded-2xl p-4">
-                      <p className="text-orange-ink text-sm font-bold">היום</p>
+                    <div className="bg-pink-soft rounded-2xl p-4">
+                      <p className="text-pink-ink text-sm font-bold">היום</p>
                       <p dir="auto">{fix.before}</p>
                     </div>
                   )}
@@ -222,13 +228,13 @@ function ReviewDetails({
       )}
 
       {review.keywords.length > 0 && (
-        <Card tone="lilac" className="gap-3">
-          <p className="text-violet-dark font-bold">
+        <Card tone="lavender" className="gap-3">
+          <p className="text-blue-dark font-bold">
             מילים שמגייסים מחפשים ואין אצלך
           </p>
           <div className="flex flex-wrap gap-2">
             {review.keywords.map((k) => (
-              <Chip key={k} tone="violet">
+              <Chip key={k} tone="blue">
                 <span dir="auto">{k}</span>
               </Chip>
             ))}

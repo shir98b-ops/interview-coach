@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 /*
- * The "energetic" look: deep violet, lime and orange on a soft lilac
- * background, big rounded cards and chunky buttons. Light only, so the
- * colors stay as designed.
+ * The "playful" look: an off-white page, deep navy for text and the main
+ * button, and a different saturated pastel for each area of the app. Yellow
+ * is kept for upcoming interviews only, so it always reads as "this is
+ * urgent". Light only, so the colors stay as designed.
  */
 :root {
   color-scheme: light;
@@ -12,20 +13,34 @@
 @theme inline {
   --font-sans: var(--font-rubik), system-ui, sans-serif;
 
-  --color-ink: #17112e;
-  --color-muted: #4a4366;
-  --color-canvas: #f6f4ff;
-  --color-line: #e7e2ff;
-  --color-violet: #6d28ff;
-  --color-violet-dark: #4a13c9;
-  --color-violet-soft: #efe9ff;
-  --color-lime: #c6f432;
-  --color-lime-dark: #9bc31f;
-  --color-orange: #ff8a3d;
-  --color-orange-soft: #fff1e7;
-  --color-orange-ink: #a8430f;
-  --color-success-soft: #ecfbd0;
-  --color-success-ink: #3d5a00;
+  /* Text and surfaces */
+  --color-ink: #14263a;
+  --color-ink-soft: #3d4a57;
+  --color-muted: #6b7686;
+  --color-canvas: #f6f7fb;
+  --color-line: #dde1ea;
+
+  /* Active state, links and progress */
+  --color-blue: #1252b0;
+  --color-blue-dark: #0d3d85;
+
+  /* Area colors */
+  --color-sky: #9fcbff;
+  --color-sky-light: #b9dcff;
+  --color-sky-soft: #e8f2ff;
+  --color-lavender: #e6c8ff;
+  --color-lavender-deep: #d7b3ff;
+  --color-mint: #bdeccb;
+  --color-pink: #ffc9e3;
+  --color-pink-soft: #ffeaf4;
+  --color-pink-ink: #9b2c5e;
+
+  /* Upcoming interview only */
+  --color-sun: #ffc85c;
+  --color-sun-soft: #fff4dc;
+
+  --color-success-soft: #ddf6e5;
+  --color-success-ink: #1e6b3a;
   --color-danger: #c81e3a;
 }
 
@@ -36,6 +51,6 @@ body {
 
 /* Keeps keyboard focus visible on every control. */
 :focus-visible {
-  outline: 3px solid var(--color-violet);
+  outline: 3px solid var(--color-blue);
   outline-offset: 2px;
 }

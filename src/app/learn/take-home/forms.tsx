@@ -16,7 +16,7 @@ import {
 import { startTakeHome, submitTakeHome, type TakeHomeState } from "./actions";
 
 const optionStyles =
-  "flex cursor-pointer items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 font-medium transition hover:border-violet has-[:checked]:border-violet has-[:checked]:bg-violet-soft";
+  "flex cursor-pointer items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 font-medium transition hover:border-blue has-[:checked]:border-blue has-[:checked]:bg-sky-soft";
 
 const languageNames: Record<string, string> = { en: "English", he: "עברית" };
 
@@ -47,7 +47,7 @@ export function StartTakeHomeForm({
               defaultChecked={index === 0}
               onChange={() => setRoleId(role.id)}
               required
-              className="accent-violet size-5 shrink-0"
+              className="accent-blue size-5 shrink-0"
             />
             <span dir="auto">{role.title}</span>
           </label>
@@ -70,7 +70,7 @@ export function StartTakeHomeForm({
                 name="difficulty"
                 value={key}
                 defaultChecked={key === "medium"}
-                className="accent-violet size-5 shrink-0"
+                className="accent-blue size-5 shrink-0"
               />
               <span className="flex flex-col">
                 <span className="font-bold">{d.label}</span>
@@ -92,7 +92,7 @@ export function StartTakeHomeForm({
                 name="language"
                 value={code}
                 defaultChecked={index === 0}
-                className="accent-violet size-5 shrink-0"
+                className="accent-blue size-5 shrink-0"
               />
               <span lang={code}>{languageNames[code] ?? code}</span>
             </label>
@@ -102,7 +102,7 @@ export function StartTakeHomeForm({
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button
         type="submit"
-        variant="lime"
+        variant="primary"
         disabled={pending}
         className="w-full sm:w-fit"
       >
@@ -148,7 +148,7 @@ export function TakeHomeFormatChoice({
               value={option.value}
               checked={format === option.value}
               onChange={() => setFormat(option.value)}
-              className="accent-violet mt-1 size-5 shrink-0"
+              className="accent-blue mt-1 size-5 shrink-0"
             />
             <span className="flex flex-col">
               <span className="font-bold">{option.label}</span>
@@ -232,7 +232,7 @@ export function SubmitTakeHomeForm({
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button
         type="submit"
-        variant="lime"
+        variant="primary"
         disabled={pending}
         className="w-full sm:w-fit"
       >

@@ -8,7 +8,7 @@ import { interviewKinds } from "@/lib/jobs/schema";
 import { daysUntil, formatInterviewTime, whenLabel } from "@/lib/jobs/time";
 
 const smallButton =
-  "inline-flex min-h-11 items-center rounded-full bg-white px-4 text-sm font-bold ring-2 ring-line hover:bg-violet-soft";
+  "inline-flex min-h-11 items-center rounded-full bg-white px-4 text-sm font-bold ring-2 ring-line hover:bg-sky-soft";
 
 /** One interview: when, what kind, and buttons to add it to a calendar. */
 export function InterviewCard({
@@ -33,7 +33,7 @@ export function InterviewCard({
   return (
     <li className="bg-canvas flex flex-col gap-3 rounded-2xl p-4">
       <div className="flex flex-wrap items-center gap-2">
-        <Chip tone={past ? "violet" : days <= 1 ? "orange" : "lime"}>
+        <Chip tone={past ? "blue" : days <= 1 ? "pink" : "mint"}>
           {past ? "עבר" : whenLabel(days)}
         </Chip>
         <span className="font-bold">{interviewKinds[interview.kind]}</span>
