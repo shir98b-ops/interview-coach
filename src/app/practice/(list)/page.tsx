@@ -13,7 +13,7 @@ import { getSignedInUser } from "@/lib/supabase/user";
 import { JobName } from "@/app/jobs/interview-card";
 import { scoreChange } from "@/lib/interview/progress";
 import { parseMode } from "@/lib/interview/schema";
-import { StartPracticeForm } from "./forms";
+import { StartPracticeForm } from "../forms";
 
 export const metadata: Metadata = { title: "תרגול · Interview Coach" };
 

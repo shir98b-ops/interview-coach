@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
-import { Loading } from "@/components/app-shell";
-import { ButtonLink, Card, Chip, StepBar, tileTones } from "@/components/ui";
+import { AppShell, Loading } from "@/components/app-shell";
+import { ButtonLink, Card, Chip, tileTones } from "@/components/ui";
 import {
   answerAverage,
   readFeedback,
@@ -23,21 +23,26 @@ import { seniorityLabel } from "@/lib/format";
 import { forAddress, recommendLesson } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
-import { languageFor } from "@/lib/voice/transcript";
-import { AnswerForm, RetryFeedbackForm } from "../forms";
+import { RetryFeedbackForm } from "../forms";
+import { QuestionScreen } from "./question-screen";
 
 export const metadata: Metadata = { title: "תרגול · Interview Coach" };
 
+/**
+ * While answering, the practice fills the screen with no app frame, so the
+ * question has all the attention. The results open in the usual frame.
+ */
 export default function SessionPage({ params }: PageProps<"/practice/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-      <Link href="/practice" className="text-blue w-fit font-medium">
-        → לכל התרגולים
-      </Link>
-      <Suspense fallback={<Loading />}>
-        <SessionContent params={params} />
-      </Suspense>
-    </div>
+    <Suspense
+      fallback={
+        <main className="mx-auto w-full max-w-3xl px-[18px] py-6">
+          <Loading />
+        </main>
+      }
+    >
+      <SessionContent params={params} />
+    </Suspense>
   );
 }
 
@@ -131,40 +136,13 @@ async function SessionContent({
   if (current) {
     const number = questions.indexOf(current) + 1;
     return (
-      <section className="flex flex-col gap-5">
-        <StepBar total={questions.length} done={number - 1} />
-        <div className="flex flex-wrap items-center gap-2">
-          <Chip>
-            שאלה {number} מתוך {questions.length} · {kindLabel(current.kind)}
-          </Chip>
-          <span dir="auto" className="text-muted text-sm">
-            {roleName}
-          </span>
-        </div>
-        {isCodingKind(current.kind) ? (
-          <>
-            <h1 className="sr-only">תרגיל קוד</h1>
-            <Card tone="question" className="text-lg leading-relaxed">
-              <RichText text={current.text} />
-            </Card>
-          </>
-        ) : (
-          <h1
-            dir="auto"
-            className="text-2xl leading-snug font-bold sm:text-3xl"
-          >
-            {current.text}
-          </h1>
-        )}
-        <AnswerForm
-          key={current.id}
-          sessionId={session.id}
-          questionId={current.id}
-          isLast={number === questions.length}
-          language={languageFor(current.text)}
-          kind={current.kind}
-        />
-      </section>
+      <QuestionScreen
+        sessionId={session.id}
+        questions={questions}
+        current={current}
+        number={number}
+        roleTitle={job?.title ?? role?.title ?? ""}
+      />
     );
   }
 
@@ -188,126 +166,133 @@ async function SessionContent({
   const lesson = recommended && forAddress(recommended, user.address);
 
   return (
-    <section className="flex flex-col gap-8">
-      {scored && session.overall_score !== null ? (
-        <Card tone="blue" className="gap-3 p-7">
-          <p dir="auto" className="opacity-90">
-            {roleName}
-          </p>
-          <h1 className="text-xl font-bold">הציון שלך בתרגול</h1>
-          <p
-            dir="ltr"
-            className="text-right text-6xl leading-none font-extrabold"
-          >
-            {session.overall_score}
-            <span className="text-2xl opacity-80"> / 100</span>
-          </p>
-          <p className="opacity-90">
-            כל תשובה מקבלת ציון מ־1 עד 5 על שלושה מדדים. הטיפים למטה, ותרגול
-            נוסף יראה את ההתקדמות.
-          </p>
-        </Card>
-      ) : (
-        <Card tone="blue">
-          <h1 className="text-2xl font-extrabold">התרגול הסתיים</h1>
-          <RetryFeedbackForm sessionId={session.id} />
-        </Card>
-      )}
-
-      {lesson && (
-        <Card tone="pink">
-          <Chip>כדאי ללמוד עכשיו</Chip>
-          <h2 className="text-xl font-bold">{lesson.title}</h2>
-          <p className="text-muted">
-            {lesson.minutes} דקות · {lesson.summary}
-          </p>
-          <ButtonLink
-            href={`/learn/${lesson.slug}`}
-            variant="quiet"
-            className="w-fit"
-          >
-            לשיעור
-          </ButtonLink>
-        </Card>
-      )}
-
-      <details className="rounded-[28px] bg-white p-6 shadow-[0_12px_40px_rgba(77,40,200,0.08)]">
-        <summary className="cursor-pointer font-bold">
-          איך נותנים ציון לתשובות?
-        </summary>
-        <ul className="text-muted mt-3 flex flex-col gap-2">
-          {hasSpoken &&
-            rubric.map((r) => (
-              <li key={r.key}>
-                <span className="text-ink font-bold">{r.label}:</span>{" "}
-                {r.description}
-              </li>
-            ))}
-          {hasCoding &&
-            rubric.map((r) => (
-              <li key={`code-${r.key}`}>
-                <span className="text-ink font-bold">
-                  {codingLabels[r.key]}
-                  {hasSpoken ? " (בתרגילי קוד)" : ""}:
-                </span>{" "}
-                {codingDescriptions[r.key]}
-              </li>
-            ))}
-          <li>1 = חסר, 3 = סביר אבל כללי, 5 = מוכן לראיון אמיתי.</li>
-        </ul>
-      </details>
-
-      <ol className="flex flex-col gap-6">
-        {questions.map((q, index) => (
-          <li key={q.id}>
-            <Card tone={tileTones[index % 4]} className="gap-4">
-              <Chip tone="glass">
-                שאלה {index + 1} · {kindLabel(q.kind)}
-              </Chip>
-              {isCodingKind(q.kind) ? (
-                <>
-                  <details>
-                    <summary className="cursor-pointer text-lg font-bold">
-                      הבעיה
-                    </summary>
-                    <RichText text={q.text} className="mt-3" />
-                  </details>
-                  <RichText
-                    text={answerText(q) ?? ""}
-                    className="bg-canvas rounded-2xl p-4"
-                  />
-                </>
-              ) : (
-                <>
-                  <h2 dir="auto" className="text-lg font-bold">
-                    {q.text}
-                  </h2>
-                  <p
-                    dir="auto"
-                    className="bg-canvas rounded-2xl p-4 whitespace-pre-wrap"
-                  >
-                    {answerText(q)}
-                  </p>
-                </>
-              )}
-              {feedback[index] && (
-                <FeedbackDetails
-                  feedback={feedback[index]}
-                  coding={isCodingKind(q.kind)}
-                />
-              )}
+    <AppShell>
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
+        <Link href="/practice" className="text-blue w-fit font-medium">
+          → לכל התרגולים
+        </Link>
+        <section className="flex flex-col gap-8">
+          {scored && session.overall_score !== null ? (
+            <Card tone="blue" className="gap-3 p-7">
+              <p dir="auto" className="opacity-90">
+                {roleName}
+              </p>
+              <h1 className="text-xl font-bold">הציון שלך בתרגול</h1>
+              <p
+                dir="ltr"
+                className="text-right text-6xl leading-none font-extrabold"
+              >
+                {session.overall_score}
+                <span className="text-2xl opacity-80"> / 100</span>
+              </p>
+              <p className="opacity-90">
+                כל תשובה מקבלת ציון מ־1 עד 5 על שלושה מדדים. הטיפים למטה, ותרגול
+                נוסף יראה את ההתקדמות.
+              </p>
             </Card>
-          </li>
-        ))}
-      </ol>
-      <ButtonLink
-        href="/practice"
-        variant="primary"
-        className="w-full sm:w-fit"
-      >
-        לתרגול נוסף
-      </ButtonLink>
-    </section>
+          ) : (
+            <Card tone="blue">
+              <h1 className="text-2xl font-extrabold">התרגול הסתיים</h1>
+              <RetryFeedbackForm sessionId={session.id} />
+            </Card>
+          )}
+
+          {lesson && (
+            <Card tone="pink">
+              <Chip>כדאי ללמוד עכשיו</Chip>
+              <h2 className="text-xl font-bold">{lesson.title}</h2>
+              <p className="text-muted">
+                {lesson.minutes} דקות · {lesson.summary}
+              </p>
+              <ButtonLink
+                href={`/learn/${lesson.slug}`}
+                variant="quiet"
+                className="w-fit"
+              >
+                לשיעור
+              </ButtonLink>
+            </Card>
+          )}
+
+          <details className="rounded-[28px] bg-white p-6 shadow-[0_12px_40px_rgba(77,40,200,0.08)]">
+            <summary className="cursor-pointer font-bold">
+              איך נותנים ציון לתשובות?
+            </summary>
+            <ul className="text-muted mt-3 flex flex-col gap-2">
+              {hasSpoken &&
+                rubric.map((r) => (
+                  <li key={r.key}>
+                    <span className="text-ink font-bold">{r.label}:</span>{" "}
+                    {r.description}
+                  </li>
+                ))}
+              {hasCoding &&
+                rubric.map((r) => (
+                  <li key={`code-${r.key}`}>
+                    <span className="text-ink font-bold">
+                      {codingLabels[r.key]}
+                      {hasSpoken ? " (בתרגילי קוד)" : ""}:
+                    </span>{" "}
+                    {codingDescriptions[r.key]}
+                  </li>
+                ))}
+              <li>1 = חסר, 3 = סביר אבל כללי, 5 = מוכן לראיון אמיתי.</li>
+            </ul>
+          </details>
+
+          <ol className="flex flex-col gap-6">
+            {questions.map((q, index) => (
+              <li key={q.id}>
+                <Card tone={tileTones[index % 4]} className="gap-4">
+                  <Chip tone="glass">
+                    שאלה {index + 1} · {kindLabel(q.kind)}
+                  </Chip>
+                  {isCodingKind(q.kind) ? (
+                    <>
+                      <details>
+                        <summary className="cursor-pointer text-lg font-bold">
+                          הבעיה
+                        </summary>
+                        <RichText text={q.text} className="mt-3" />
+                      </details>
+                      <RichText
+                        text={answerText(q) ?? ""}
+                        className="bg-canvas rounded-2xl p-4"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <h2 dir="auto" className="text-lg font-bold">
+                        {q.text}
+                      </h2>
+                      <p
+                        dir="auto"
+                        className="bg-canvas rounded-2xl p-4 whitespace-pre-wrap"
+                      >
+                        {answerText(q)}
+                      </p>
+                    </>
+                  )}
+                  {feedback[index] && (
+                    <FeedbackDetails
+                      feedback={feedback[index]}
+                      coding={isCodingKind(q.kind)}
+                    />
+                  )}
+                </Card>
+              </li>
+            ))}
+          </ol>
+          <ButtonLink
+            href="/practice"
+            variant="primary"
+            className="w-full sm:w-fit"
+          >
+            לתרגול נוסף
+          </ButtonLink>
+        </section>
+      </div>
+    </AppShell>
   );
 }
 
