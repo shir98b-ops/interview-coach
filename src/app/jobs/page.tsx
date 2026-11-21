@@ -60,7 +60,7 @@ async function JobsContent() {
       {all.length === 0 && <AddJobCard first />}
 
       {upcoming.length > 0 && (
-        <Card tone="lilac" className="gap-4 p-6 sm:p-8">
+        <Card tone="lavender" className="gap-4 p-6 sm:p-8">
           <h2 className="text-2xl font-extrabold">ראיונות קרובים</h2>
           <ul className="flex flex-col gap-3">
             {upcoming.map((interview) => (
@@ -120,7 +120,7 @@ function JobList({
         <li key={job.id}>
           <Link
             href={`/jobs/${job.id}`}
-            className="bg-canvas hover:bg-violet-soft flex flex-wrap items-center justify-between gap-2 rounded-2xl p-4"
+            className="bg-canvas hover:bg-sky-soft flex flex-wrap items-center justify-between gap-2 rounded-2xl p-4"
           >
             <span className="font-bold">
               <JobName company={job.company} title={job.title} />
@@ -137,7 +137,7 @@ function JobList({
 
 function AddJobCard({ first = false }: { first?: boolean }) {
   return (
-    <Card tone={first ? "orange" : "white"} className="gap-4 p-6 sm:p-8">
+    <Card tone={first ? "pink" : "white"} className="gap-4 p-6 sm:p-8">
       <div className="flex flex-col gap-1">
         <h2 className="text-2xl font-extrabold">
           {first ? "מוסיפים את המשרה הראשונה" : "להוסיף משרה"}
@@ -162,7 +162,7 @@ function AddJobCard({ first = false }: { first?: boolean }) {
 
 function ImportCard() {
   return (
-    <Card tone="lilac" className="gap-4 p-6 sm:p-8">
+    <Card tone="lavender" className="gap-4 p-6 sm:p-8">
       <div className="flex flex-col gap-1">
         <h2 className="text-2xl font-extrabold">
           כל המשרות שהגשת בלינקדאין, בבת אחת

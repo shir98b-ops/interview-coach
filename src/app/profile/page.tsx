@@ -84,7 +84,7 @@ async function ProfileContent({
       </Card>
 
       {resume && (
-        <Card tone="orange" className="gap-3 p-6 sm:p-8">
+        <Card tone="pink" className="gap-3 p-6 sm:p-8">
           <h2 className="text-2xl font-extrabold">
             כמה חזקים קורות החיים שלך?
           </h2>
@@ -109,7 +109,7 @@ async function ProfileContent({
             {roles.map((role) => (
               <li
                 key={role.id}
-                className="bg-violet-soft flex items-center justify-between gap-3 rounded-2xl px-4 py-3"
+                className="bg-sky-soft flex items-center justify-between gap-3 rounded-2xl px-4 py-3"
               >
                 <span className="font-bold">
                   <span dir="auto">{role.title}</span>
@@ -124,7 +124,7 @@ async function ProfileContent({
                   <input type="hidden" name="id" value={role.id} />
                   <button
                     type="submit"
-                    className="text-violet hover:text-violet-dark text-sm font-bold"
+                    className="text-blue hover:text-blue-dark text-sm font-bold"
                   >
                     הסרה
                   </button>

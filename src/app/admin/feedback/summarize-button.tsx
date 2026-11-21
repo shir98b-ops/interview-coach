@@ -17,7 +17,7 @@ export function SummarizeButton({
   return (
     <form action={action} className="flex flex-col gap-2">
       <input type="hidden" name="days" value={days} />
-      <Button type="submit" variant="lime" disabled={pending}>
+      <Button type="submit" variant="primary" disabled={pending}>
         {pending
           ? "מסכם... (כחצי דקה)"
           : hasDigest

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AddressPicker } from "@/components/address-picker";
 import { Loading } from "@/components/app-shell";
-import { ButtonLink, Card, Chip } from "@/components/ui";
+import { ButtonLink, Card, Chip, ScoreTrend } from "@/components/ui";
 import { InterviewCard } from "@/app/jobs/interview-card";
 import { upcomingInterviews } from "@/lib/jobs/queries";
 import { getLearningState } from "@/lib/learn/progress";
@@ -75,7 +75,7 @@ async function Dashboard() {
       </h1>
 
       {!user.address && (
-        <Card tone="lilac" className="gap-4">
+        <Card tone="lavender" className="gap-4">
           <h2 className="text-xl font-extrabold">איך לפנות אליך?</h2>
           <p>כדי שהשאלות, המשובים והשיעורים ידברו אליך נכון.</p>
           <AddressPicker current={null} next="/dashboard" />
@@ -83,7 +83,7 @@ async function Dashboard() {
       )}
 
       {nextInterviews.length > 0 && (
-        <Card tone="lilac" className="gap-4">
+        <Card tone="lavender" className="gap-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-xl font-extrabold">ראיונות קרובים</h2>
             <ButtonLink
@@ -120,30 +120,20 @@ async function Dashboard() {
               מתחילים תרגול ראיון ראשון
             </Step>
           </ol>
-          <ButtonLink href="/profile" variant="lime" className="w-fit">
+          <ButtonLink href="/profile" variant="primary" className="w-fit">
             {profile ? "להוסיף תפקיד" : "להעלות קורות חיים"}
           </ButtonLink>
         </Card>
       ) : (
         <div className="grid gap-5 md:grid-cols-2">
-          <Card tone="violet" className="gap-3 p-7">
+          <Card tone="blue" className="gap-3 p-7">
             {latest !== undefined ? (
               <>
-                <p className="opacity-90">הציון האחרון שלך</p>
-                <p
-                  dir="ltr"
-                  className="text-right text-6xl leading-none font-extrabold"
-                >
-                  {latest}
-                  <span className="text-2xl opacity-80"> / 100</span>
-                </p>
-                {change !== null && (
-                  <p className="text-lime font-bold">
-                    {change > 0
-                      ? `עלית ${change} נקודות מהתרגול הקודם מאותו סוג`
-                      : change < 0
-                        ? `ירדת ${-change} נקודות מהתרגול הקודם מאותו סוג. זה חלק מהדרך.`
-                        : "בדיוק כמו בתרגול הקודם מאותו סוג"}
+                <p className="text-lg font-bold">הציון האחרון שלך</p>
+                <ScoreTrend score={latest} change={change} />
+                {change !== null && change < 0 && (
+                  <p className="font-medium">
+                    ירידה קטנה היא חלק מהדרך. התרגול הבא יראה את ההתקדמות.
                   </p>
                 )}
               </>
@@ -157,14 +147,14 @@ async function Dashboard() {
                 </p>
               </>
             )}
-            <ButtonLink href="/practice" variant="lime" className="mt-2">
+            <ButtonLink href="/practice" variant="primary" className="mt-2">
               להתחיל תרגול
             </ButtonLink>
           </Card>
 
           <div className="flex flex-col gap-5">
             {lesson ? (
-              <Card tone="orange">
+              <Card tone="pink">
                 <Chip>השיעור הבא בשבילך</Chip>
                 <h2 className="text-xl font-bold">{lesson.title}</h2>
                 <p className="text-muted">
@@ -179,7 +169,7 @@ async function Dashboard() {
                 </ButtonLink>
               </Card>
             ) : (
-              <Card tone="lime">
+              <Card tone="mint">
                 <h2 className="text-xl font-bold">סיימת את כל השיעורים!</h2>
                 <p className="text-muted">אפשר לחזור לכל שיעור ולתרגל שוב.</p>
               </Card>
@@ -214,7 +204,7 @@ function Step({
     <li className="flex items-center gap-3">
       <span
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl font-extrabold ${
-          done ? "bg-lime" : "bg-violet-soft text-violet-dark"
+          done ? "bg-mint" : "bg-sky-soft text-blue-dark"
         }`}
       >
         {done ? "✓" : number}

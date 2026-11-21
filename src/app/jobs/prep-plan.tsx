@@ -100,7 +100,7 @@ export function PrepPlanView({ plan }: { plan: PrepPlan }) {
               key={`${s.when}-${i}`}
               className="border-line flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-2xl border-2 p-4"
             >
-              <span className="text-violet font-extrabold">{s.when}</span>
+              <span className="text-blue font-extrabold">{s.when}</span>
               <span className="flex-1">{s.task}</span>
               <span className="text-muted text-sm">{s.minutes} דקות</span>
             </li>

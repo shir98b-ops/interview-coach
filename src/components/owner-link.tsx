@@ -15,7 +15,7 @@ export async function OwnerLink() {
   return (
     <Link
       href="/admin/insights"
-      className="bg-lime text-ink inline-flex min-h-11 items-center rounded-full px-4 font-bold hover:brightness-105"
+      className="bg-mint text-ink inline-flex min-h-11 items-center rounded-full px-4 font-bold hover:brightness-95"
     >
       ניהול
     </Link>

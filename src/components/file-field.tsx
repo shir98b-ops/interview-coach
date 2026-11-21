@@ -33,7 +33,7 @@ export function FileField({
   return (
     <div className="flex flex-col gap-2">
       <span className="font-bold">{label}</span>
-      <div className="border-line has-[:focus-visible]:border-violet flex flex-wrap items-center gap-3 rounded-2xl border-2 bg-white px-3 py-2">
+      <div className="border-line has-[:focus-visible]:border-blue flex flex-wrap items-center gap-3 rounded-2xl border-2 bg-white px-3 py-2">
         <input
           id={id}
           type="file"
@@ -46,7 +46,7 @@ export function FileField({
         />
         <label
           htmlFor={id}
-          className="bg-violet-soft text-violet-dark inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 font-bold peer-disabled:opacity-60"
+          className="bg-sky-soft text-blue-dark inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 font-bold peer-disabled:opacity-60"
         >
           בחירת קובץ
         </label>

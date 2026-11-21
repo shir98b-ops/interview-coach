@@ -29,9 +29,9 @@ export function validateDescription(value: unknown): DescriptionCheck {
 }
 
 export const matchLevels = {
-  strong: { label: "מתאים", tone: "lime" },
-  partial: { label: "חלקי", tone: "orange" },
-  gap: { label: "פער", tone: "violet" },
+  strong: { label: "מתאים", tone: "mint" },
+  partial: { label: "חלקי", tone: "pink" },
+  gap: { label: "פער", tone: "blue" },
 } as const;
 
 /** The plan the AI writes for one job. */

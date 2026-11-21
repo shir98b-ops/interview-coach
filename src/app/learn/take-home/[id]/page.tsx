@@ -26,7 +26,7 @@ export default function TakeHomePage({
 }: PageProps<"/learn/take-home/[id]">) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-      <Link href="/learn/take-home" className="text-violet w-fit font-medium">
+      <Link href="/learn/take-home" className="text-blue w-fit font-medium">
         → לכל מבחני הבית
       </Link>
       <Suspense fallback={<Loading />}>
@@ -61,7 +61,7 @@ async function TakeHome({
     <>
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
-          <Chip tone="violet">
+          <Chip tone="blue">
             {code ? "פרויקט קוד" : "מבחן בית"} · {difficulty.label}
             {code && brief.codeLanguage
               ? ` · ${codeLanguages[parseCodeLanguage(brief.codeLanguage)]}`
@@ -90,7 +90,7 @@ async function TakeHome({
           <ol className="flex flex-col gap-3">
             {brief.tasks.map((task, i) => (
               <li key={i} className="flex gap-3">
-                <span className="bg-violet-soft text-violet-dark flex size-8 shrink-0 items-center justify-center rounded-xl font-extrabold">
+                <span className="bg-sky-soft text-blue-dark flex size-8 shrink-0 items-center justify-center rounded-xl font-extrabold">
                   {i + 1}
                 </span>
                 <span dir="auto" className="text-lg whitespace-pre-line">
@@ -106,8 +106,8 @@ async function TakeHome({
             <CodeBlock code={brief.starterCode} />
           </div>
         )}
-        <div className="bg-orange-soft rounded-2xl p-4">
-          <p className="text-orange-ink font-bold">מה מגישים</p>
+        <div className="bg-pink-soft rounded-2xl p-4">
+          <p className="text-pink-ink font-bold">מה מגישים</p>
           <p dir="auto">{brief.deliverable}</p>
         </div>
       </Card>
@@ -133,14 +133,14 @@ async function TakeHome({
           </details>
           <ButtonLink
             href="/learn/take-home"
-            variant="lime"
+            variant="primary"
             className="w-full sm:w-fit"
           >
             למבחן בית נוסף
           </ButtonLink>
         </>
       ) : (
-        <Card tone="lilac" className="gap-4 p-6 sm:p-8">
+        <Card tone="lavender" className="gap-4 p-6 sm:p-8">
           <h2 className="text-2xl font-extrabold">
             {takeHome.submission ? "ההגשה התקבלה" : "ההגשה שלך"}
           </h2>
@@ -166,7 +166,7 @@ function Feedback({
 }) {
   return (
     <section className="flex flex-col gap-5">
-      <Card tone="violet" className="gap-3 p-7">
+      <Card tone="blue" className="gap-3 p-7">
         <h2 className="text-xl font-bold">הציון שלך</h2>
         <p
           dir="ltr"
@@ -181,7 +181,7 @@ function Feedback({
           <Card key={r.key} className="gap-1 p-5">
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold">{r.label}</p>
-              <p className="text-violet text-2xl font-extrabold">
+              <p className="text-blue text-2xl font-extrabold">
                 {feedback[r.key]}/5
               </p>
             </div>
@@ -196,8 +196,8 @@ function Feedback({
         </div>
       )}
       {feedback.improvements.length > 0 && (
-        <div className="bg-orange-soft rounded-2xl p-5">
-          <p className="text-orange-ink font-bold">מה לשפר</p>
+        <div className="bg-pink-soft rounded-2xl p-5">
+          <p className="text-pink-ink font-bold">מה לשפר</p>
           <ul className="mt-1 flex list-disc flex-col gap-1 ps-5">
             {feedback.improvements.map((item, i) => (
               <li key={i} dir="auto">
@@ -208,8 +208,8 @@ function Feedback({
         </div>
       )}
       {feedback.interviewQuestions.length > 0 && (
-        <div className="bg-violet-soft rounded-2xl p-5">
-          <p className="text-violet-dark font-bold">
+        <div className="bg-sky-soft rounded-2xl p-5">
+          <p className="text-blue-dark font-bold">
             שאלות שכדאי להתכונן אליהן בראיון
           </p>
           <ul className="mt-1 flex list-disc flex-col gap-1 ps-5">

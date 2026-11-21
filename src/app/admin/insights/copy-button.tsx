@@ -9,7 +9,7 @@ export function CopyReport({ text }: { text: string }) {
   return (
     <Button
       type="button"
-      variant="lime"
+      variant="primary"
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text);

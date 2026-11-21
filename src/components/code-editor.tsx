@@ -68,7 +68,7 @@ export function CodeEditor({
       autoComplete="off"
       autoCorrect="off"
       onKeyDown={onKeyDown}
-      className="border-line bg-ink focus:border-violet w-full rounded-2xl border-2 px-4 py-3 text-left font-mono text-sm leading-relaxed text-white placeholder:text-white/50 focus:outline-none"
+      className="border-line bg-ink focus:border-blue w-full rounded-2xl border-2 px-4 py-3 text-left font-mono text-sm leading-relaxed text-white placeholder:text-white/50 focus:outline-none"
     />
   );
 }
@@ -92,7 +92,7 @@ export function CodeLanguageSelect({
         name={name}
         defaultValue={defaultValue}
         disabled={disabled}
-        className="border-line focus:border-violet w-full rounded-2xl border-2 bg-white px-4 py-3 text-base focus:outline-none"
+        className="border-line focus:border-blue w-full rounded-2xl border-2 bg-white px-4 py-3 text-base focus:outline-none"
       >
         {(Object.keys(codeLanguages) as CodeLanguage[]).map((key) => (
           <option key={key} value={key}>

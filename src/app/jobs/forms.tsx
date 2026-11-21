@@ -50,7 +50,7 @@ export function PasteJobForm() {
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button
         type="submit"
-        variant="lime"
+        variant="primary"
         disabled={pending}
         className="w-full sm:w-fit"
       >
@@ -252,7 +252,7 @@ export function PrepPlanForm({
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button
         type="submit"
-        variant={hasPlan ? "quiet" : "lime"}
+        variant={hasPlan ? "quiet" : "primary"}
         disabled={pending}
         className="w-full sm:w-fit"
       >

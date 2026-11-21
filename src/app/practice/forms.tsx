@@ -32,7 +32,7 @@ import {
 } from "./actions";
 
 const optionStyles =
-  "flex cursor-pointer items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 font-medium transition hover:border-violet has-[:checked]:border-violet has-[:checked]:bg-violet-soft";
+  "flex cursor-pointer items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 font-medium transition hover:border-blue has-[:checked]:border-blue has-[:checked]:bg-sky-soft";
 
 const languageNames: Record<string, string> = { en: "English", he: "עברית" };
 
@@ -66,7 +66,7 @@ export function StartPracticeForm({
               defaultChecked={index === 0}
               onChange={() => setRoleId(role.id)}
               required
-              className="accent-violet size-5 shrink-0"
+              className="accent-blue size-5 shrink-0"
             />
             <span dir="auto">
               {role.title}
@@ -117,7 +117,7 @@ export function StartPracticeForm({
                 name="language"
                 value={code}
                 defaultChecked={index === 0}
-                className="accent-violet size-5 shrink-0"
+                className="accent-blue size-5 shrink-0"
               />
               <span lang={code}>{languageNames[code] ?? code}</span>
             </label>
@@ -128,7 +128,7 @@ export function StartPracticeForm({
       {state.error && <ErrorText>{state.error}</ErrorText>}
       <Button
         type="submit"
-        variant="lime"
+        variant="primary"
         disabled={pending}
         className="w-full sm:w-fit"
       >
@@ -169,7 +169,7 @@ export function ModeChoice({
             value={option}
             checked={mode === option}
             onChange={() => setChosen(option)}
-            className="accent-violet mt-1 size-5 shrink-0"
+            className="accent-blue mt-1 size-5 shrink-0"
           />
           <span className="flex flex-col">
             <span>{modeLabel(option, technical)}</span>
@@ -328,7 +328,12 @@ export function RetryFeedbackForm({ sessionId }: { sessionId: string }) {
       <input type="hidden" name="sessionId" value={sessionId} />
       <p>התשובות שלך נשמרו, אבל עוד לא הצלחנו לתת להן ציון.</p>
       {state.error && <ErrorText>{state.error}</ErrorText>}
-      <Button type="submit" variant="lime" disabled={pending} className="w-fit">
+      <Button
+        type="submit"
+        variant="primary"
+        disabled={pending}
+        className="w-fit"
+      >
         {pending ? "בודק את התשובות שלך, זה יכול לקחת עד דקה..." : "לקבל משוב"}
       </Button>
     </form>

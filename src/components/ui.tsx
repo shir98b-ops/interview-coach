@@ -1,18 +1,19 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
 /**
- * The building blocks of the "energetic" design, so every page shares the
- * same buttons, cards and spacing.
+ * The building blocks of the "playful" design, so every page shares the
+ * same buttons, cards and spacing. Each screen has one primary (navy)
+ * button for its main action; every other button is the quiet white one.
  */
 
 const buttonBase =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-6 py-3 text-lg font-extrabold transition active:translate-y-1 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-extrabold transition duration-150 motion-safe:hover:-translate-y-0.5 active:translate-y-1 disabled:pointer-events-none disabled:opacity-60";
 
 export const buttonStyles = {
-  primary: `${buttonBase} bg-violet text-white shadow-[0_6px_0_var(--color-violet-dark)] hover:brightness-110 active:shadow-[0_2px_0_var(--color-violet-dark)]`,
-  lime: `${buttonBase} bg-lime text-ink shadow-[0_6px_0_var(--color-lime-dark)] hover:brightness-105 active:shadow-[0_2px_0_var(--color-lime-dark)]`,
-  quiet: `${buttonBase} bg-white text-ink ring-2 ring-line hover:bg-violet-soft`,
+  primary: `${buttonBase} bg-ink text-white shadow-[0_5px_0_#07121f] hover:shadow-[0_7px_0_#07121f] active:shadow-[0_1px_0_#07121f]`,
+  quiet: `${buttonBase} bg-white text-ink ring-2 ring-line shadow-[0_4px_0_var(--color-line)] hover:bg-sky-soft active:shadow-none`,
 } as const;
 
 type Variant = keyof typeof buttonStyles;
@@ -37,12 +38,19 @@ export function ButtonLink({
   );
 }
 
+/**
+ * Card colors. "blue" is the main card of a screen (the next step), "sun"
+ * is reserved for upcoming interviews, and the rest give each area its own
+ * pastel.
+ */
 const cardTones = {
-  white: "bg-white shadow-[0_12px_40px_rgba(77,40,200,0.08)]",
-  violet: "bg-violet text-white",
-  orange: "bg-orange-soft",
-  lilac: "bg-violet-soft",
-  lime: "bg-success-soft",
+  white: "bg-white shadow-[0_10px_30px_rgba(20,38,58,0.06)]",
+  blue: "bg-sky",
+  sky: "bg-sky-light",
+  pink: "bg-pink-soft",
+  lavender: "bg-lavender-soft",
+  mint: "bg-success-soft",
+  sun: "bg-sun",
 } as const;
 
 export function Card({
@@ -62,16 +70,17 @@ export function Card({
 }
 
 export function Chip({
-  tone = "orange",
+  tone = "pink",
   children,
 }: {
-  tone?: "orange" | "violet" | "lime";
+  tone?: "pink" | "blue" | "mint" | "glass";
   children: ReactNode;
 }) {
   const tones = {
-    orange: "bg-orange-soft text-orange-ink",
-    violet: "bg-violet-soft text-violet-dark",
-    lime: "bg-success-soft text-success-ink",
+    pink: "bg-pink-soft text-pink-ink",
+    blue: "bg-sky-soft text-blue-dark",
+    mint: "bg-success-soft text-success-ink",
+    glass: "bg-white/60 text-ink",
   };
   return (
     <span
@@ -89,7 +98,7 @@ export function StepBar({ total, done }: { total: number; done: number }) {
       {Array.from({ length: total }, (_, i) => (
         <div
           key={i}
-          className={`h-2.5 flex-1 rounded-full ${i < done ? "bg-violet" : "bg-line"}`}
+          className={`h-2.5 flex-1 rounded-full ${i < done ? "bg-blue" : "bg-line"}`}
         />
       ))}
     </div>
@@ -120,4 +129,74 @@ export function ErrorText({ children }: { children: ReactNode }) {
 }
 
 export const inputStyles =
-  "w-full rounded-2xl border-2 border-line bg-white px-4 py-3 text-base text-ink placeholder:text-muted/70 focus:border-violet focus:outline-none";
+  "w-full rounded-2xl border-2 border-line bg-white px-4 py-3 text-base text-ink placeholder:text-muted/70 focus:border-blue focus:outline-none";
+
+/**
+ * One of the app's 3D icons (Fluent Emoji 3D by Microsoft, MIT licensed).
+ * Icons are decoration: they sit beside their text, never above it, and the
+ * text carries the meaning.
+ */
+export type IconName =
+  | "book"
+  | "briefcase"
+  | "bulb"
+  | "calendar"
+  | "chart"
+  | "clipboard"
+  | "fire"
+  | "laptop"
+  | "memo"
+  | "microphone"
+  | "page"
+  | "puzzle"
+  | "speech"
+  | "target"
+  | "trophy";
+
+export function Icon({
+  name,
+  size = 48,
+  className = "",
+}: {
+  name: IconName;
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <Image
+      src={`/icons/${name}.png`}
+      alt=""
+      width={size}
+      height={size}
+      className={`shrink-0 drop-shadow-[0_8px_10px_rgba(11,42,92,0.2)] ${className}`}
+    />
+  );
+}
+
+/**
+ * A score is never shown alone: it comes with the change since the last
+ * comparable practice, when there is one.
+ */
+export function ScoreTrend({
+  score,
+  change,
+}: {
+  score: number;
+  change: number | null;
+}) {
+  return (
+    <div className="flex flex-wrap items-end gap-3">
+      <p dir="ltr" className="text-6xl leading-none font-black">
+        {score}
+        <span className="text-2xl font-bold opacity-70">/100</span>
+      </p>
+      {change !== null && (
+        <Chip tone={change < 0 ? "pink" : "glass"}>
+          {change === 0
+            ? "כמו בפעם הקודמת"
+            : `\u200e${change > 0 ? "+" : ""}${change} מהקודם`}
+        </Chip>
+      )}
+    </div>
+  );
+}

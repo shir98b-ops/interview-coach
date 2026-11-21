@@ -49,15 +49,15 @@ async function LessonList() {
         </p>
         <div className="bg-line h-3 rounded-full" aria-hidden>
           <div
-            className="bg-lime h-3 rounded-full"
+            className="bg-mint h-3 rounded-full"
             style={{ width: `${(completed.size / lessons.length) * 100}%` }}
           />
         </div>
       </div>
 
       {recommended && (
-        <Card tone="violet" className="gap-3 p-7">
-          <span className="bg-lime text-ink inline-flex w-fit rounded-full px-3 py-1 text-sm font-bold">
+        <Card tone="blue" className="gap-3 p-7">
+          <span className="bg-mint text-ink inline-flex w-fit rounded-full px-3 py-1 text-sm font-bold">
             מומלץ בשבילך
           </span>
           <h2 className="text-2xl font-extrabold">{recommended.title}</h2>
@@ -66,7 +66,7 @@ async function LessonList() {
           </p>
           <ButtonLink
             href={`/learn/${recommended.slug}`}
-            variant="lime"
+            variant="primary"
             className="mt-1 w-full sm:w-fit"
           >
             להתחיל שיעור
@@ -74,7 +74,7 @@ async function LessonList() {
         </Card>
       )}
 
-      <Card tone="orange" className="gap-3 p-7">
+      <Card tone="pink" className="gap-3 p-7">
         <h2 className="text-2xl font-extrabold">מבחן בית לתרגול</h2>
         <p className="text-lg">
           מקבלים משימה בסגנון של מבחני בית אמיתיים לפי התפקיד שלך, מגישים בכתב
@@ -127,14 +127,12 @@ function LessonGrid({
                 <div className="flex items-center justify-between gap-3">
                   <span
                     className={`flex size-10 items-center justify-center rounded-2xl font-extrabold ${
-                      done
-                        ? "bg-lime text-ink"
-                        : "bg-violet-soft text-violet-dark"
+                      done ? "bg-mint text-ink" : "bg-sky-soft text-blue-dark"
                     }`}
                   >
                     {done ? "✓" : index + 1}
                   </span>
-                  <Chip tone={done ? "lime" : "orange"}>
+                  <Chip tone={done ? "mint" : "pink"}>
                     {done
                       ? "סיימת"
                       : lesson.track === "take-home"
@@ -144,7 +142,7 @@ function LessonGrid({
                 </div>
                 <h2 className="text-xl font-bold">{lesson.title}</h2>
                 <p className="text-muted">{lesson.summary}</p>
-                <p className="text-violet mt-auto text-sm font-bold">
+                <p className="text-blue mt-auto text-sm font-bold">
                   {lesson.minutes} דקות ←
                 </p>
               </Link>

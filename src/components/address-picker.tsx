@@ -21,8 +21,8 @@ export function AddressPicker({
           aria-pressed={current === key}
           className={`min-h-12 rounded-2xl px-5 font-bold transition ${
             current === key
-              ? "bg-violet text-white"
-              : "text-ink ring-line hover:bg-violet-soft bg-white ring-2"
+              ? "bg-blue text-white"
+              : "text-ink ring-line hover:bg-sky-soft bg-white ring-2"
           }`}
         >
           {addressLabels[key]}

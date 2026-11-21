@@ -22,10 +22,10 @@ import { SummarizeButton } from "./summarize-button";
 
 export const metadata: Metadata = { title: "משוב משתמשים · Interview Coach" };
 
-const priorityTone: Record<Priority, "orange" | "violet" | "lime"> = {
-  high: "orange",
-  medium: "violet",
-  low: "lime",
+const priorityTone: Record<Priority, "pink" | "blue" | "mint"> = {
+  high: "pink",
+  medium: "blue",
+  low: "mint",
 };
 
 /**
@@ -93,7 +93,7 @@ async function Inbox({
             href={`/admin/feedback?days=${period}`}
             aria-current={period === days ? "page" : undefined}
             className={`rounded-full px-4 py-1 font-bold ${
-              period === days ? "bg-violet text-white" : "bg-violet-soft"
+              period === days ? "bg-blue text-white" : "bg-sky-soft"
             }`}
           >
             {period} ימים
@@ -121,7 +121,7 @@ async function Inbox({
                   <span className="w-8 font-bold">{star}★</span>
                   <span className="bg-line h-3 flex-1 overflow-hidden rounded-full">
                     <span
-                      className="bg-violet block h-full rounded-full"
+                      className="bg-blue block h-full rounded-full"
                       style={{ width: `${(n / stats.rated) * 100}%` }}
                     />
                   </span>
@@ -133,7 +133,7 @@ async function Inbox({
         )}
       </Card>
 
-      <Card tone="lilac" className="gap-4">
+      <Card tone="lavender" className="gap-4">
         <h2 className="text-xl font-extrabold">סיכום</h2>
         {digest && saved ? (
           <>
@@ -192,7 +192,7 @@ async function Inbox({
                     {priorities[tag.priority]} · {feedbackKinds[tag.kind]}
                   </Chip>
                 )}
-                {item.is_internal && <Chip tone="violet">הבדיקה שלך</Chip>}
+                {item.is_internal && <Chip tone="blue">הבדיקה שלך</Chip>}
                 {item.rating && <Stars rating={item.rating} />}
                 <span className="text-muted">
                   {formatDate(item.created_at)} · משתמש {item.user_label}
@@ -212,7 +212,7 @@ async function Inbox({
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-violet-soft flex flex-col gap-1 rounded-2xl p-4">
+    <div className="bg-sky-soft flex flex-col gap-1 rounded-2xl p-4">
       <span className="text-muted text-sm">{label}</span>
       <span className="text-2xl font-extrabold">{value}</span>
     </div>

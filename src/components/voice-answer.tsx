@@ -247,8 +247,8 @@ export function VoiceAnswerField({
             aria-pressed={listening}
             className={`inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 py-2 text-lg font-extrabold transition active:translate-y-0.5 disabled:opacity-60 ${
               listening
-                ? "bg-orange text-ink shadow-[0_4px_0_var(--color-orange-ink)]"
-                : "text-ink ring-line hover:bg-violet-soft bg-white ring-2"
+                ? "bg-pink text-ink shadow-[0_4px_0_var(--color-pink-ink)]"
+                : "text-ink ring-line hover:bg-sky-soft bg-white ring-2"
             }`}
           >
             {listening ? (
@@ -277,7 +277,7 @@ export function VoiceAnswerField({
                     aria-pressed={language === code}
                     className={`rounded-full px-3 py-1 font-medium ${
                       language === code
-                        ? "bg-violet-soft text-violet"
+                        ? "bg-sky-soft text-blue"
                         : "text-muted hover:text-ink"
                     }`}
                   >
@@ -317,7 +317,7 @@ export function VoiceAnswerField({
         </p>
       )}
       {notice && !listening && !error && (
-        <p aria-live="polite" className="text-violet font-medium">
+        <p aria-live="polite" className="text-blue font-medium">
           {notice}
         </p>
       )}

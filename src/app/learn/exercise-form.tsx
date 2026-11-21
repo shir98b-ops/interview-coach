@@ -41,7 +41,7 @@ export function ExerciseForm({
         {state.status === "error" && <ErrorText>{state.error}</ErrorText>}
         <Button
           type="submit"
-          variant="lime"
+          variant="primary"
           disabled={pending}
           className="w-full sm:w-fit"
         >

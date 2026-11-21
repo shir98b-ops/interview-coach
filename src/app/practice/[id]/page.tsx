@@ -31,7 +31,7 @@ export const metadata: Metadata = { title: "תרגול · Interview Coach" };
 export default function SessionPage({ params }: PageProps<"/practice/[id]">) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-      <Link href="/practice" className="text-violet w-fit font-medium">
+      <Link href="/practice" className="text-blue w-fit font-medium">
         → לכל התרגולים
       </Link>
       <Suspense fallback={<Loading />}>
@@ -190,7 +190,7 @@ async function SessionContent({
   return (
     <section className="flex flex-col gap-8">
       {scored && session.overall_score !== null ? (
-        <Card tone="violet" className="gap-3 p-7">
+        <Card tone="blue" className="gap-3 p-7">
           <p dir="auto" className="opacity-90">
             {roleName}
           </p>
@@ -215,7 +215,7 @@ async function SessionContent({
       )}
 
       {lesson && (
-        <Card tone="orange">
+        <Card tone="pink">
           <Chip>כדאי ללמוד עכשיו</Chip>
           <h2 className="text-xl font-bold">{lesson.title}</h2>
           <p className="text-muted">
@@ -261,7 +261,7 @@ async function SessionContent({
         {questions.map((q, index) => (
           <li key={q.id}>
             <Card className="gap-4">
-              <Chip tone="violet">
+              <Chip tone="blue">
                 שאלה {index + 1} · {kindLabel(q.kind)}
               </Chip>
               {isCodingKind(q.kind) ? (
@@ -300,7 +300,11 @@ async function SessionContent({
           </li>
         ))}
       </ol>
-      <ButtonLink href="/practice" variant="lime" className="w-full sm:w-fit">
+      <ButtonLink
+        href="/practice"
+        variant="primary"
+        className="w-full sm:w-fit"
+      >
         לתרגול נוסף
       </ButtonLink>
     </section>
@@ -318,11 +322,11 @@ function FeedbackDetails({
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-2">
         {rubric.map((r) => (
-          <Chip key={r.key} tone="violet">
+          <Chip key={r.key} tone="blue">
             {coding ? codingLabels[r.key] : r.label} {feedback[r.key]}/5
           </Chip>
         ))}
-        <Chip tone="lime">ממוצע {answerAverage(feedback).toFixed(1)}</Chip>
+        <Chip tone="mint">ממוצע {answerAverage(feedback).toFixed(1)}</Chip>
       </div>
       {feedback.strengths && (
         <div className="bg-success-soft rounded-2xl p-4">
@@ -331,8 +335,8 @@ function FeedbackDetails({
         </div>
       )}
       {feedback.improvements && (
-        <div className="bg-orange-soft rounded-2xl p-4">
-          <p className="text-orange-ink font-bold">מה לשפר</p>
+        <div className="bg-pink-soft rounded-2xl p-4">
+          <p className="text-pink-ink font-bold">מה לשפר</p>
           {coding ? (
             <RichText text={feedback.improvements} />
           ) : (
@@ -341,8 +345,8 @@ function FeedbackDetails({
         </div>
       )}
       {feedback.betterAnswer && (
-        <details className="bg-violet-soft rounded-2xl p-4">
-          <summary className="text-violet-dark cursor-pointer font-bold">
+        <details className="bg-sky-soft rounded-2xl p-4">
+          <summary className="text-blue-dark cursor-pointer font-bold">
             {coding ? "פתרון לדוגמה" : "ככה יכולה להישמע תשובה חזקה יותר"}
           </summary>
           {coding ? (

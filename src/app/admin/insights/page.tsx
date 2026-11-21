@@ -42,7 +42,7 @@ export default function InsightsPage({
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-violet-soft flex flex-col gap-1 rounded-2xl p-4">
+    <div className="bg-sky-soft flex flex-col gap-1 rounded-2xl p-4">
       <span className="text-muted text-sm">{label}</span>
       <span className="text-2xl font-extrabold">{value}</span>
     </div>
@@ -103,7 +103,7 @@ async function Report({
             href={`/admin/insights?days=${period}`}
             aria-current={period === days ? "page" : undefined}
             className={`rounded-full px-4 py-1 font-bold ${
-              period === days ? "bg-violet text-white" : "bg-violet-soft"
+              period === days ? "bg-blue text-white" : "bg-sky-soft"
             }`}
           >
             {period} ימים
@@ -192,7 +192,7 @@ async function Report({
         </div>
       </div>
 
-      <Card tone="lilac" className="gap-4">
+      <Card tone="lavender" className="gap-4">
         <p className="text-lg">
           הבדיקות שלך בתקופה: {report.owner_tests.events} פעולות,{" "}
           {report.owner_tests.ai_calls} קריאות, בעלות של{" "}

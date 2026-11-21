@@ -35,7 +35,7 @@ export default async function LessonPage({
 
   return (
     <article className="mx-auto flex w-full max-w-3xl flex-col gap-8">
-      <Link href="/learn" className="text-violet w-fit font-medium">
+      <Link href="/learn" className="text-blue w-fit font-medium">
         → לכל השיעורים
       </Link>
       <Suspense fallback={<Loading />}>
@@ -69,7 +69,7 @@ async function LessonContent({ slug }: { slug: string }) {
     <>
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
-          <Chip tone="violet">
+          <Chip tone="blue">
             שיעור {position + 1} מתוך {track.length}
           </Chip>
           <Chip>
@@ -86,7 +86,7 @@ async function LessonContent({ slug }: { slug: string }) {
       {lesson.sections.map((section, i) => (
         <section key={section.heading} className="flex flex-col gap-3">
           <h2 className="flex items-center gap-3 text-2xl font-extrabold">
-            <span className="bg-violet-soft text-violet-dark flex size-9 shrink-0 items-center justify-center rounded-xl text-lg">
+            <span className="bg-sky-soft text-blue-dark flex size-9 shrink-0 items-center justify-center rounded-xl text-lg">
               {i + 1}
             </span>
             {section.heading}
@@ -95,15 +95,15 @@ async function LessonContent({ slug }: { slug: string }) {
             {section.body}
           </p>
           {section.example && (
-            <div className="border-orange bg-orange-soft rounded-2xl border-s-4 p-5 text-lg leading-relaxed whitespace-pre-line">
+            <div className="border-pink bg-pink-soft rounded-2xl border-s-4 p-5 text-lg leading-relaxed whitespace-pre-line">
               {section.example}
             </div>
           )}
         </section>
       ))}
 
-      <Card tone="lilac" className="gap-4 p-6 sm:p-8">
-        <Chip tone="violet">תרגיל</Chip>
+      <Card tone="lavender" className="gap-4 p-6 sm:p-8">
+        <Chip tone="blue">תרגיל</Chip>
         <h2 className="text-2xl leading-snug font-extrabold">
           {lesson.exercise.question}
         </h2>
@@ -115,9 +115,9 @@ async function LessonContent({ slug }: { slug: string }) {
       {next && (
         <Link
           href={`/learn/${next.slug}`}
-          className="hover:bg-violet-soft flex flex-col gap-1 rounded-[28px] bg-white p-6 shadow-[0_12px_40px_rgba(77,40,200,0.08)] transition"
+          className="hover:bg-sky-soft flex flex-col gap-1 rounded-[28px] bg-white p-6 shadow-[0_12px_40px_rgba(77,40,200,0.08)] transition"
         >
-          <span className="text-violet text-sm font-bold">השיעור הבא ←</span>
+          <span className="text-blue text-sm font-bold">השיעור הבא ←</span>
           <span className="text-xl font-bold">{next.title}</span>
         </Link>
       )}
@@ -149,7 +149,7 @@ function PastAttempts({
                 <summary className="flex cursor-pointer items-center justify-between gap-3 font-bold">
                   <span>{formatDate(attempt.created_at)}</span>
                   {feedback && (
-                    <span className="text-violet">{feedback.score}/5</span>
+                    <span className="text-blue">{feedback.score}/5</span>
                   )}
                 </summary>
                 <div className="mt-4 flex flex-col gap-4">

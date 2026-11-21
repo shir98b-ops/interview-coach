@@ -81,7 +81,7 @@ export default function PrivacyPage() {
           </Card>
         ))}
         <p className="text-muted text-sm">עודכן לאחרונה: נובמבר 2026.</p>
-        <Link href="/" className="text-violet w-fit font-bold">
+        <Link href="/" className="text-blue w-fit font-bold">
           → חזרה לדף הבית
         </Link>
       </main>

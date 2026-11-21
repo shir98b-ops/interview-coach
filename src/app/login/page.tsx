@@ -25,7 +25,7 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
       </Card>
       <p className="text-muted text-center text-sm">
         כניסה לאתר היא הסכמה ל
-        <Link href="/privacy" className="text-violet font-bold">
+        <Link href="/privacy" className="text-blue font-bold">
           מדיניות הפרטיות
         </Link>
         .
