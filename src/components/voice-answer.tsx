@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { inputStyles } from "@/components/ui";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import Image from "next/image";
+import { buttonStyles, inputStyles } from "@/components/ui";
 import {
   appendTranscript,
   speechErrorMessage,
@@ -72,6 +79,26 @@ const pausedNotice =
 
 const noSubscription = () => () => {};
 
+const typingKey = "answer-by-typing";
+
+/** Whether the user chose to type last time, so the box opens the same way. */
+function typedLastTime(): boolean {
+  try {
+    return localStorage.getItem(typingKey) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function rememberTyping(typing: boolean) {
+  try {
+    if (typing) localStorage.setItem(typingKey, "1");
+    else localStorage.removeItem(typingKey);
+  } catch {
+    // Storage can be blocked; the choice is then just not remembered.
+  }
+}
+
 /** Support never changes on a page, and the server always says "not yet". */
 function useSpeechSupport(): "unknown" | "yes" | "no" {
   return useSyncExternalStore(
@@ -96,6 +123,8 @@ export function VoiceAnswerField({
   language: initialLanguage,
   disabled = false,
   required = true,
+  variant = "box",
+  footer,
 }: {
   id: string;
   name: string;
@@ -106,8 +135,23 @@ export function VoiceAnswerField({
   language: SpeechLanguage;
   disabled?: boolean;
   required?: boolean;
+  /**
+   * "box" puts a small microphone button over the answer box. "hero" leads
+   * with a big round microphone and opens the box once there is something
+   * to read, or when the user chooses to type.
+   */
+  variant?: "box" | "hero";
+  /** Shown under the box once it is open, such as the send button. */
+  footer?: ReactNode;
 }) {
   const support = useSpeechSupport();
+  const typedBefore = useSyncExternalStore(
+    noSubscription,
+    typedLastTime,
+    () => false,
+  );
+  const [typing, setTyping] = useState<boolean | null>(null);
+  const box = useRef<HTMLTextAreaElement>(null);
   const [value, setValue] = useState("");
   const [interim, setInterim] = useState("");
   const [listening, setListening] = useState(false);
@@ -236,6 +280,146 @@ export function VoiceAnswerField({
   }, [disabled]);
   useEffect(() => () => stopRef.current(), []);
 
+  const messages = (
+    <>
+      {listening && (
+        <p dir="auto" aria-live="polite" className="text-muted min-h-6">
+          {interim || "אפשר להתחיל לדבר. הטקסט יופיע בתיבה."}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="text-danger font-medium">
+          {error}
+        </p>
+      )}
+      {notice && !listening && !error && (
+        <p aria-live="polite" className="text-blue font-medium">
+          {notice}
+        </p>
+      )}
+    </>
+  );
+
+  if (variant === "hero") {
+    const canSpeak = support !== "no";
+    const open =
+      !canSpeak || (typing ?? typedBefore) || listening || value !== "";
+    return (
+      <div className="flex flex-1 flex-col gap-4">
+        <input
+          type="hidden"
+          name="inputMethod"
+          value={spoke ? "voice" : "text"}
+        />
+        <textarea
+          ref={box}
+          dir="auto"
+          id={id}
+          name={name}
+          required={required && open}
+          hidden={!open}
+          rows={rows}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          className={`${inputStyles} ${className}`}
+        />
+        {messages}
+        {open && footer}
+        {canSpeak && (
+          <div className="mt-auto flex flex-col items-center gap-1 pt-4 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                if (listening) return stop();
+                setTyping(false);
+                rememberTyping(false);
+                start();
+              }}
+              disabled={disabled || support !== "yes"}
+              aria-pressed={listening}
+              aria-label={listening ? "לעצור את ההקלטה" : "לענות בדיבור"}
+              className={`relative mb-3 flex h-[92px] w-[92px] items-center justify-center rounded-full ring-[10px] transition duration-200 disabled:opacity-60 motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[.98] lg:h-[108px] lg:w-[108px] ${
+                listening
+                  ? "bg-pink ring-pink-soft"
+                  : "bg-sky shadow-[0_14px_30px_rgba(18,82,176,0.18)] ring-[#dcecff]"
+              }`}
+            >
+              {listening && (
+                <span
+                  aria-hidden
+                  className="bg-pink absolute inset-0 rounded-full opacity-60 motion-safe:animate-ping"
+                />
+              )}
+              <Image
+                src="/icons/microphone.png"
+                alt=""
+                width={64}
+                height={64}
+                className="relative h-12 w-12 lg:h-14 lg:w-14"
+              />
+            </button>
+            <b className="text-lg font-black">
+              {listening ? "מקשיב... לוחצים לעצירה" : "לוחצים ומדברים"}
+            </b>
+            {!open && (
+              <button
+                type="button"
+                onClick={() => {
+                  setTyping(true);
+                  rememberTyping(true);
+                  requestAnimationFrame(() => box.current?.focus());
+                }}
+                className={`${buttonStyles.quiet} mt-3`}
+              >
+                <PencilIcon />
+                לכתוב במקום לדבר
+              </button>
+            )}
+            {!listening && (
+              <div
+                role="group"
+                aria-label="שפת הדיבור"
+                className="mt-2 flex items-center gap-1 text-sm"
+              >
+                {(Object.keys(speechLanguages) as SpeechLanguage[]).map(
+                  (code) => (
+                    <button
+                      key={code}
+                      type="button"
+                      lang={code}
+                      onClick={() => setLanguage(code)}
+                      aria-pressed={language === code}
+                      className={`rounded-full px-3 py-1 ${
+                        language === code
+                          ? "bg-sky-soft text-blue font-bold"
+                          : "text-muted hover:text-ink"
+                      }`}
+                    >
+                      {speechLanguages[code].label}
+                    </button>
+                  ),
+                )}
+              </div>
+            )}
+            {open && !listening && value !== "" && (
+              <p className="text-muted mt-2 text-sm">
+                אפשר להמשיך לדבר, או לתקן את הטקסט בתיבה לפני השליחה.
+              </p>
+            )}
+          </div>
+        )}
+        {!canSpeak && (
+          <p className="text-muted text-sm">
+            הדפדפן הזה לא תומך בתשובה בדיבור, אז אפשר להקליד. כדי לדבר, כדאי
+            לפתוח את האתר בכרום או בספארי, ולא מתוך אפליקציה כמו וואטסאפ.
+          </p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-3">
       {support === "yes" && (
@@ -306,21 +490,7 @@ export function VoiceAnswerField({
         onChange={(event) => setValue(event.target.value)}
         className={`${inputStyles} ${className}`}
       />
-      {listening && (
-        <p dir="auto" aria-live="polite" className="text-muted min-h-6">
-          {interim || "אפשר להתחיל לדבר. הטקסט יופיע בתיבה."}
-        </p>
-      )}
-      {error && (
-        <p role="alert" className="text-danger font-medium">
-          {error}
-        </p>
-      )}
-      {notice && !listening && !error && (
-        <p aria-live="polite" className="text-blue font-medium">
-          {notice}
-        </p>
-      )}
+      {messages}
       {support === "yes" && !listening && !error && !notice && (
         <p className="text-muted text-sm">
           אפשר לדבר, להקליד, או גם וגם. כדאי לעבור על הטקסט ולתקן לפני השליחה.
@@ -333,6 +503,23 @@ export function VoiceAnswerField({
         </p>
       )}
     </div>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-[18px]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" />
+    </svg>
   );
 }
 

@@ -195,15 +195,6 @@ export function ModeChoice({
 }
 
 /** A short tip under the answer box, matching the kind of question. */
-const answerTips: Record<string, string> = {
-  behavioral: "מצב, משימה, פעולה ותוצאה. ככה קל לעקוב אחרי הסיפור שלך.",
-  resume: "מצב, משימה, פעולה ותוצאה. ככה קל לעקוב אחרי הסיפור שלך.",
-  role: "לפתוח במשפט שעונה על השאלה, ואז להסביר עם דוגמה מהניסיון.",
-  technical:
-    "להסביר את ההיגיון ואת השיקולים, לא רק את התשובה הסופית. אם משהו לא ברור, לומר איזו הנחה מניחים.",
-  design:
-    "לפרק לשלבים, לומר אילו הנחות מניחים, ולהסביר כל החלטה ומה מוותרים בגללה.",
-};
 
 /** Answer one question, by typing or by speaking. */
 export function AnswerForm({
@@ -217,7 +208,7 @@ export function AnswerForm({
   questionId: string;
   isLast: boolean;
   language: SpeechLanguage;
-  /** The question's kind, which decides the tip under the answer box. */
+  /** The question's kind: coding questions get a code box. */
   kind: string;
 }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
@@ -226,9 +217,20 @@ export function AnswerForm({
   );
   const { kind: base, codeLanguage } = splitKind(kind);
   const coding = base === "coding" ? { codeLanguage } : null;
+  const submit = (
+    <Button type="submit" disabled={pending} className="w-full sm:w-fit">
+      {pending
+        ? isLast
+          ? "בודק את התשובות שלך, זה יכול לקחת עד דקה..."
+          : "שומר..."
+        : isLast
+          ? "לסיים ולקבל ציון"
+          : "לשאלה הבאה"}
+    </Button>
+  );
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={action} className="flex flex-1 flex-col gap-3">
       <input type="hidden" name="sessionId" value={sessionId} />
       <input type="hidden" name="questionId" value={questionId} />
       {coding ? (
@@ -239,34 +241,34 @@ export function AnswerForm({
         />
       ) : (
         <>
-          <label htmlFor="answer" className="text-muted font-medium">
+          <label htmlFor="answer" className="sr-only">
             התשובה שלך
           </label>
           <VoiceAnswerField
             id="answer"
             name="answer"
-            rows={10}
+            rows={8}
             maxLength={MAX_ANSWER_LENGTH}
             placeholder="התשובה, כמו שהיית עונה בראיון."
-            className="min-h-56"
+            className="min-h-48"
             language={language}
             disabled={pending}
+            variant="hero"
+            footer={
+              <>
+                {state.error && <ErrorText>{state.error}</ErrorText>}
+                {submit}
+              </>
+            }
           />
-          <p className="text-muted text-sm">
-            טיפ: {answerTips[base] ?? answerTips.behavioral}
-          </p>
         </>
       )}
-      {state.error && <ErrorText>{state.error}</ErrorText>}
-      <Button type="submit" disabled={pending} className="w-full sm:w-fit">
-        {pending
-          ? isLast
-            ? "בודק את התשובות שלך, זה יכול לקחת עד דקה..."
-            : "שומר..."
-          : isLast
-            ? "לסיים ולקבל ציון"
-            : "לשאלה הבאה"}
-      </Button>
+      {coding && (
+        <>
+          {state.error && <ErrorText>{state.error}</ErrorText>}
+          {submit}
+        </>
+      )}
     </form>
   );
 }
