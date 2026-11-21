@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import { AddressPicker } from "@/components/address-picker";
 import { Loading } from "@/components/app-shell";
 import { Card } from "@/components/ui";
-import { WelcomeTour } from "@/app/welcome/tour";
 import { nextStep, type HomeFacts } from "@/lib/home/next-step";
 import { thisWeek } from "@/lib/home/week";
 import { roundKind, scoreChange } from "@/lib/interview/progress";
@@ -142,6 +141,9 @@ async function Dashboard() {
   };
   const step = nextStep(facts);
   const newUser = Boolean(step.setup);
+  // Someone who has not even uploaded a resume starts on the welcome screen,
+  // once.
+  if (!user.tourDone && step.key === "resume") redirect("/welcome");
 
   const firstName = displayName(profile?.full_name?.trim().split(/\s+/)[0]);
   const streak = practiceStreak(finishedAt, now);
@@ -150,7 +152,6 @@ async function Dashboard() {
 
   return (
     <>
-      {!user.tourDone && <WelcomeTour />}
       <Greeting
         name={firstName}
         subtitle={newUser ? "טוב שבאת" : longDate(now)}
