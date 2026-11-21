@@ -12,7 +12,7 @@ export function Logo() {
     <Link href="/" className="flex items-center gap-2 text-lg font-black">
       <span
         aria-hidden
-        className="bg-ink text-sky flex h-[34px] w-[34px] items-center justify-center rounded-[11px]"
+        className="bg-ink flex h-[34px] w-[34px] items-center justify-center rounded-[11px] text-[#ffd94d]"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path
@@ -31,10 +31,36 @@ export function Logo() {
 }
 
 /**
+ * Feedback, the owner's dashboard and sign out. They sit at the bottom of the
+ * desktop sidebar, and on the profile page on phones.
+ */
+export function AccountLinks({
+  placement = "below",
+}: {
+  placement?: "below" | "above";
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      <Suspense fallback={null}>
+        <OwnerLink />
+      </Suspense>
+      <FeedbackButton placement={placement} />
+      <form action={signOut}>
+        <button
+          type="submit"
+          className="text-muted min-h-11 rounded-full px-4 font-medium hover:bg-[#eef1f6]"
+        >
+          יציאה
+        </button>
+      </form>
+    </div>
+  );
+}
+
+/**
  * The page frame for signed-in screens. On a computer the links sit in a
- * sidebar on the right, with the practice streak at its bottom. On phones
- * and tablets they move to a floating round bar at the bottom of the screen.
- * Feedback, the owner's dashboard and sign out stay in a small top bar.
+ * white sidebar on the right, with the practice streak at its bottom. On
+ * phones and tablets they move to a floating round bar at the bottom.
  */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -46,7 +72,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <nav aria-label="ראשי">
           <NavLinks variant="sidebar" />
         </nav>
-        <div className="mt-auto">
+        <div className="mt-auto flex flex-col gap-3">
+          <AccountLinks placement="above" />
           <Suspense fallback={null}>
             <StreakCard />
           </Suspense>
@@ -54,36 +81,17 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-h-dvh flex-col lg:ps-58">
-        <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 pt-4 sm:px-6 lg:justify-end lg:px-10">
-          <div className="lg:hidden">
-            <Logo />
-          </div>
-          <div className="flex items-center">
-            <Suspense fallback={null}>
-              <OwnerLink />
-            </Suspense>
-            <FeedbackButton />
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="text-muted hover:bg-sky-soft min-h-11 rounded-full px-4 font-medium"
-              >
-                יציאה
-              </button>
-            </form>
-          </div>
-        </header>
-        <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
+        <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-[18px] py-6 sm:px-6 lg:px-10 lg:py-10">
           {children}
         </main>
-        <div className="pb-24 lg:pb-0">
+        <div className="pb-28 lg:pb-0">
           <SiteFooter />
         </div>
       </div>
 
       <nav
         aria-label="ניווט ראשי בטלפון"
-        className="bg-ink fixed inset-x-[18px] bottom-[max(1rem,env(safe-area-inset-bottom))] z-10 mx-auto max-w-md rounded-full p-2 shadow-[0_10px_24px_rgba(20,38,58,0.25)] lg:hidden"
+        className="bg-ink fixed inset-x-[18px] bottom-[max(1rem,env(safe-area-inset-bottom))] z-10 mx-auto h-[66px] max-w-md rounded-full p-2 shadow-[0_10px_24px_rgba(20,38,58,0.25)] lg:hidden"
       >
         <NavLinks variant="tabs" />
       </nav>

@@ -63,7 +63,7 @@ async function Reviews() {
 
   if (!profile?.resume_data) {
     return (
-      <Card className="gap-4 p-8">
+      <Card tone="blue" className="gap-4 p-8">
         <h2 className="text-2xl font-extrabold">קודם מעלים קורות חיים</h2>
         <p className="text-muted text-lg">
           הדירוג נעשה על הפרטים שאישרת בפרופיל.
@@ -198,7 +198,7 @@ function ReviewDetails({
           <ol className="flex flex-col gap-3">
             {review.fixes.map((fix, i) => (
               <li key={i}>
-                <Card className="gap-3 p-5">
+                <Card tone={tileTones[(i + 1) % 4]} className="gap-3 p-5">
                   <p className="flex gap-3 font-bold">
                     <span className="bg-sky-soft text-blue-dark flex size-8 shrink-0 items-center justify-center rounded-xl">
                       {i + 1}

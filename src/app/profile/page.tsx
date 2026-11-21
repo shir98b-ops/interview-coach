@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AddressPicker } from "@/components/address-picker";
-import { Loading } from "@/components/app-shell";
+import { AccountLinks, Loading } from "@/components/app-shell";
 import {
   Button,
   ButtonLink,
@@ -168,6 +168,10 @@ async function ProfileContent({
         </div>
         <DeleteAccount />
       </Card>
+
+      <section aria-label="חשבון" className="lg:hidden">
+        <AccountLinks />
+      </section>
     </>
   );
 }

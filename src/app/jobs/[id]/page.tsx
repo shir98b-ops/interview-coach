@@ -294,7 +294,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
           <DescriptionForm jobId={job.id} current={null} />
         </Card>
       ) : (
-        <Card className="gap-6 p-6 sm:p-8">
+        <Card tone="lavender" className="gap-6 p-6 sm:p-8">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-extrabold">
               {interviews.length

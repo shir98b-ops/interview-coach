@@ -150,7 +150,7 @@ async function Report({
       </Card>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <Card>
+        <Card tone="sky">
           <h2 className="text-xl font-extrabold">פעולות</h2>
           <Counts
             rows={Object.entries(report.events)
@@ -162,7 +162,7 @@ async function Report({
           />
         </Card>
         <div className="flex flex-col gap-6">
-          <Card>
+          <Card tone="lavender">
             <h2 className="text-xl font-extrabold">איך עונים</h2>
             <Counts
               rows={Object.entries(report.answer_methods).map(([m, n]) => ({
@@ -171,7 +171,7 @@ async function Report({
               }))}
             />
           </Card>
-          <Card>
+          <Card tone="mint">
             <h2 className="text-xl font-extrabold">משתמשים לפי מכשיר</h2>
             <Counts
               rows={Object.entries(report.users_by_device).map(([d, n]) => ({
@@ -180,7 +180,7 @@ async function Report({
               }))}
             />
           </Card>
-          <Card>
+          <Card tone="pink">
             <h2 className="text-xl font-extrabold">הגעה למגבלה היומית</h2>
             <Counts
               rows={Object.entries(report.daily_limit_hits).map(([f, l]) => ({

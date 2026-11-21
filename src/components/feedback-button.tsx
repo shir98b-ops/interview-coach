@@ -7,8 +7,15 @@ import { Button, ErrorText, inputStyles } from "./ui";
 
 const initial: FeedbackState = { status: "idle" };
 
-/** A small "feedback" menu in the header that opens a short form. */
-export function FeedbackButton() {
+/**
+ * A small "feedback" menu that opens a short form, below the link or, in the
+ * desktop sidebar, above it and toward the page.
+ */
+export function FeedbackButton({
+  placement = "below",
+}: {
+  placement?: "below" | "above";
+}) {
   const [state, action, pending] = useActionState(sendFeedback, initial);
 
   return (
@@ -16,7 +23,9 @@ export function FeedbackButton() {
       <summary className="text-muted hover:bg-sky-soft flex min-h-11 cursor-pointer list-none items-center rounded-full px-4 font-medium">
         משוב
       </summary>
-      <div className="border-line fixed inset-x-4 top-16 z-20 flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-lg sm:absolute sm:inset-x-auto sm:end-0 sm:top-auto sm:mt-2 sm:w-80">
+      <div
+        className={`border-line fixed inset-x-4 top-16 z-20 flex flex-col gap-3 rounded-2xl border bg-white p-4 shadow-lg sm:absolute sm:inset-x-auto sm:w-80 ${placement === "above" ? "sm:start-0 sm:top-auto sm:bottom-full sm:mb-2" : "sm:end-0 sm:top-auto sm:mt-2"}`}
+      >
         {state.status === "sent" ? (
           <p role="status" className="text-success-ink font-bold">
             תודה! המשוב התקבל.

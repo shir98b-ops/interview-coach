@@ -9,32 +9,55 @@ import type { ComponentProps, ReactNode } from "react";
  */
 
 const buttonBase =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-extrabold transition duration-150 motion-safe:hover:-translate-y-0.5 active:translate-y-1 disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full px-6 py-2.5 text-base font-extrabold transition duration-150 motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0 motion-safe:active:scale-[.98] disabled:pointer-events-none disabled:opacity-60";
 
 export const buttonStyles = {
-  primary: `${buttonBase} bg-ink text-white shadow-[0_5px_0_#07121f] hover:shadow-[0_7px_0_#07121f] active:shadow-[0_1px_0_#07121f]`,
-  quiet: `${buttonBase} bg-white text-ink ring-2 ring-line shadow-[0_4px_0_var(--color-line)] hover:bg-sky-soft active:shadow-none`,
+  primary: `${buttonBase} bg-ink text-white hover:shadow-[0_8px_18px_rgba(20,38,58,0.25)]`,
+  quiet: `${buttonBase} border-[1.5px] border-line bg-white text-ink font-bold hover:bg-[#eef1f6]`,
 } as const;
 
 type Variant = keyof typeof buttonStyles;
 
+/** The small triangle at the end of a primary button, pointing forward. */
+function Arrow() {
+  return (
+    <svg
+      aria-hidden
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M16 5v14L5 12z" />
+    </svg>
+  );
+}
+
 export function Button({
   variant = "primary",
   className = "",
+  children,
   ...props
 }: ComponentProps<"button"> & { variant?: Variant }) {
   return (
-    <button className={`${buttonStyles[variant]} ${className}`} {...props} />
+    <button className={`${buttonStyles[variant]} ${className}`} {...props}>
+      {children}
+      {variant === "primary" && <Arrow />}
+    </button>
   );
 }
 
 export function ButtonLink({
   variant = "primary",
   className = "",
+  children,
   ...props
 }: ComponentProps<typeof Link> & { variant?: Variant }) {
   return (
-    <Link className={`${buttonStyles[variant]} ${className}`} {...props} />
+    <Link className={`${buttonStyles[variant]} ${className}`} {...props}>
+      {children}
+      {variant === "primary" && <Arrow />}
+    </Link>
   );
 }
 
@@ -52,6 +75,7 @@ const cardTones = {
   lavender: `bg-lavender ${onColor}`,
   mint: `bg-mint ${onColor}`,
   sun: `bg-sun ${onColor}`,
+  question: `bg-lavender-deep ${onColor}`,
 } as const;
 
 /** Colors for a row of tiles, so neighbors never share a color. */
@@ -81,14 +105,14 @@ export function Chip({
   children: ReactNode;
 }) {
   const tones = {
-    pink: "bg-pink-soft text-pink-ink",
-    blue: "bg-sky-soft text-blue-dark",
-    mint: "bg-success-soft text-success-ink",
-    glass: "bg-white/60 text-ink",
+    pink: "text-pink-ink",
+    blue: "text-[#0b3a80]",
+    mint: "text-success-ink",
+    glass: "text-ink",
   };
   return (
     <span
-      className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-sm font-bold ${tones[tone]}`}
+      className={`ring-ink/5 inline-flex w-fit items-center rounded-full bg-white/60 px-2.5 py-1 text-xs font-extrabold ring-1 ${tones[tone]}`}
     >
       {children}
     </span>
@@ -189,17 +213,19 @@ export function ScoreTrend({
   change: number | null;
 }) {
   return (
-    <div className="flex flex-wrap items-end gap-3">
-      <p dir="ltr" className="text-6xl leading-none font-black">
+    <div className="flex flex-wrap items-baseline gap-2.5">
+      <p dir="ltr" className="text-5xl leading-none font-black">
         {score}
-        <span className="text-2xl font-bold opacity-70">/100</span>
+        <span className="text-base font-bold text-[#3d5a80]"> /100</span>
       </p>
       {change !== null && (
-        <Chip tone={change < 0 ? "pink" : "glass"}>
+        <span
+          className={`text-sm font-extrabold ${change < 0 ? "text-pink-ink" : "text-[#1d5b36]"}`}
+        >
           {change === 0
             ? "כמו בפעם הקודמת"
             : `\u200e${change > 0 ? "+" : ""}${change} מהקודם`}
-        </Chip>
+        </span>
       )}
     </div>
   );

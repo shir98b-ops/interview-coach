@@ -57,7 +57,7 @@ async function TakeHomes() {
           <StartTakeHomeForm roles={roles} />
         </Card>
       ) : (
-        <Card className="gap-4 p-8">
+        <Card tone="blue" className="gap-4 p-8">
           <h2 className="text-2xl font-extrabold">קודם בוחרים תפקיד</h2>
           <p className="text-muted text-lg">
             מבחן הבית נכתב לפי התפקיד שאליו מתכוננים.

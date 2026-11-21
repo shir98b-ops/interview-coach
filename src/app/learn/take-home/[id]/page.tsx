@@ -77,7 +77,7 @@ async function TakeHome({
         </p>
       </header>
 
-      <Card className="gap-5 p-6 sm:p-8">
+      <Card tone="sky" className="gap-5 p-6 sm:p-8">
         {code ? (
           <RichText text={brief.context} className="text-lg leading-relaxed" />
         ) : (

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Loading } from "@/components/app-shell";
-import { ButtonLink, Card, Chip, StepBar } from "@/components/ui";
+import { ButtonLink, Card, Chip, StepBar, tileTones } from "@/components/ui";
 import {
   answerAverage,
   readFeedback,
@@ -144,7 +144,7 @@ async function SessionContent({
         {isCodingKind(current.kind) ? (
           <>
             <h1 className="sr-only">תרגיל קוד</h1>
-            <Card className="text-lg leading-relaxed">
+            <Card tone="question" className="text-lg leading-relaxed">
               <RichText text={current.text} />
             </Card>
           </>
@@ -208,7 +208,7 @@ async function SessionContent({
           </p>
         </Card>
       ) : (
-        <Card>
+        <Card tone="blue">
           <h1 className="text-2xl font-extrabold">התרגול הסתיים</h1>
           <RetryFeedbackForm sessionId={session.id} />
         </Card>
@@ -260,8 +260,8 @@ async function SessionContent({
       <ol className="flex flex-col gap-6">
         {questions.map((q, index) => (
           <li key={q.id}>
-            <Card className="gap-4">
-              <Chip tone="blue">
+            <Card tone={tileTones[index % 4]} className="gap-4">
+              <Chip tone="glass">
                 שאלה {index + 1} · {kindLabel(q.kind)}
               </Chip>
               {isCodingKind(q.kind) ? (

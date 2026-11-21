@@ -75,7 +75,7 @@ async function JobsContent() {
       )}
 
       {active.length > 0 && (
-        <Card className="gap-4 p-6 sm:p-8">
+        <Card tone="sky" className="gap-4 p-6 sm:p-8">
           <h2 className="text-2xl font-extrabold">משרות פעילות</h2>
           <JobList jobs={active} />
           {upcoming.length === 0 && (
