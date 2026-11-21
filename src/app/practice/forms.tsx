@@ -39,8 +39,11 @@ const languageNames: Record<string, string> = { en: "English", he: "עברית" 
 /** Choose a target role and start a practice interview for it. */
 export function StartPracticeForm({
   roles,
+  defaultMode = "general",
 }: {
   roles: { id: string; title: string; seniority: string | null }[];
+  /** The kind of interview to preselect, from the home's next step. */
+  defaultMode?: InterviewMode;
 }) {
   const [state, action, pending] = useActionState<FormState, FormData>(
     startPractice,
@@ -85,6 +88,7 @@ export function StartPracticeForm({
         technical={technical}
         coding={coding}
         codeLanguage={defaultCodeLanguage(selected?.title ?? "")}
+        defaultMode={defaultMode}
       />
       <label className="flex flex-col gap-2">
         <span className="text-xl font-extrabold">באיזה סוג ארגון?</span>
@@ -147,13 +151,15 @@ export function ModeChoice({
   technical,
   coding,
   codeLanguage,
+  defaultMode = "general",
 }: {
   disabled?: boolean;
   technical: boolean;
   coding: boolean;
   codeLanguage: CodeLanguage;
+  defaultMode?: InterviewMode;
 }) {
-  const [chosen, setChosen] = useState<InterviewMode>("general");
+  const [chosen, setChosen] = useState<InterviewMode>(defaultMode);
   const modes = (Object.keys(interviewModes) as InterviewMode[]).filter(
     (mode) => mode !== "coding" || coding,
   );

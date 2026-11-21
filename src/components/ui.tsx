@@ -112,7 +112,7 @@ export function Chip({
   };
   return (
     <span
-      className={`ring-ink/5 inline-flex w-fit items-center rounded-full bg-white/60 px-2.5 py-1 text-xs font-extrabold ring-1 ${tones[tone]}`}
+      className={`ring-ink/5 inline-flex w-fit items-center rounded-full bg-white/60 px-2.5 py-1 text-xs font-extrabold whitespace-nowrap ring-1 ${tones[tone]}`}
     >
       {children}
     </span>

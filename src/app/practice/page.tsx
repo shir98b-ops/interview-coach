@@ -12,11 +12,12 @@ import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { JobName } from "@/app/jobs/interview-card";
 import { scoreChange } from "@/lib/interview/progress";
+import { parseMode } from "@/lib/interview/schema";
 import { StartPracticeForm } from "./forms";
 
 export const metadata: Metadata = { title: "תרגול · Interview Coach" };
 
-export default function PracticePage() {
+export default function PracticePage({ searchParams }: PageProps<"/practice">) {
   return (
     <>
       <PageHeading
@@ -24,13 +25,19 @@ export default function PracticePage() {
         subtitle="חמש שאלות, אחת בכל פעם, לפי התפקיד וקורות החיים שלך. בסוף מקבלים ציון וטיפים לכל תשובה."
       />
       <Suspense fallback={<Loading />}>
-        <PracticeContent />
+        <PracticeContent searchParams={searchParams} />
       </Suspense>
     </>
   );
 }
 
-async function PracticeContent() {
+async function PracticeContent({
+  searchParams,
+}: {
+  searchParams: PageProps<"/practice">["searchParams"];
+}) {
+  const { mode } = await searchParams;
+  const defaultMode = parseMode(Array.isArray(mode) ? mode[0] : mode);
   const supabase = await createClient();
   const user = await getSignedInUser(supabase);
   if (!user) redirect("/login?next=/practice");
@@ -90,12 +97,12 @@ async function PracticeContent() {
       <Card className="gap-5 p-6 sm:p-8">
         {noLimits ? (
           <>
-            <StartPracticeForm roles={roles} />
+            <StartPracticeForm roles={roles} defaultMode={defaultMode} />
             <p className="text-muted text-sm">לחשבון שלך אין מגבלה יומית.</p>
           </>
         ) : usage.remaining > 0 ? (
           <>
-            <StartPracticeForm roles={roles} />
+            <StartPracticeForm roles={roles} defaultMode={defaultMode} />
             <p className="text-muted text-sm">
               נשארו לך {usage.remaining} מתוך {usage.limit} תרגולים ב־24 השעות
               הקרובות.
