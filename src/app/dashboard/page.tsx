@@ -11,6 +11,7 @@ import { getLearningState } from "@/lib/learn/progress";
 import { forAddress, lessons } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
+import { WelcomeTour } from "@/app/welcome/tour";
 
 export const metadata: Metadata = { title: "בית · Interview Coach" };
 
@@ -68,6 +69,7 @@ async function Dashboard() {
 
   return (
     <>
+      {!user.tourDone && <WelcomeTour />}
       <h1 className="text-3xl font-extrabold sm:text-4xl">
         {firstName ? `היי ${firstName}!` : "היי!"}
       </h1>
