@@ -19,7 +19,7 @@ export const buttonStyles = {
 type Variant = keyof typeof buttonStyles;
 
 /** The small triangle at the end of a primary button, pointing forward. */
-function Arrow() {
+export function Arrow() {
   return (
     <svg
       aria-hidden
