@@ -1,17 +1,32 @@
 import type { Metadata } from "next";
-import { scoreChange } from "@/lib/interview/progress";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AddressPicker } from "@/components/address-picker";
 import { Loading } from "@/components/app-shell";
-import { ButtonLink, Card, Chip, ScoreTrend } from "@/components/ui";
-import { InterviewCard } from "@/app/jobs/interview-card";
+import { Card } from "@/components/ui";
+import { WelcomeTour } from "@/app/welcome/tour";
+import { nextStep, type HomeFacts } from "@/lib/home/next-step";
+import { thisWeek } from "@/lib/home/week";
+import { roundKind, scoreChange } from "@/lib/interview/progress";
+import { isCodingRole, isTechnicalRole } from "@/lib/interview/question-bank";
+import { practiceStreak } from "@/lib/interview/streak";
 import { upcomingInterviews } from "@/lib/jobs/queries";
+import { interviewKinds } from "@/lib/jobs/schema";
+import { daysUntil } from "@/lib/jobs/time";
 import { getLearningState } from "@/lib/learn/progress";
-import { forAddress, lessons } from "@/lib/learn/lessons";
+import { forAddress } from "@/lib/learn/lessons";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedInUser } from "@/lib/supabase/user";
-import { WelcomeTour } from "@/app/welcome/tour";
+import {
+  Greeting,
+  InterviewTile,
+  LaterRow,
+  LessonTile,
+  NextStepCard,
+  ScoreTile,
+  WeekCard,
+} from "./home-parts";
 
 export const metadata: Metadata = { title: "בית · Interview Coach" };
 
@@ -23,17 +38,39 @@ export default function DashboardPage() {
   );
 }
 
+/** Upcoming interviews further away than this do not take over the home. */
+const INTERVIEW_WINDOW_DAYS = 14;
+
+type Finished = {
+  completed_at: string;
+  overall_score: number | null;
+  target_role_id: string | null;
+  job_id: string | null;
+  stage: string | null;
+  questions: { kind: string }[] | null;
+  target_roles: { title: string } | { title: string }[] | null;
+};
+
+const roundLabels: Record<string, string> = {
+  general: "ראיון כללי",
+  technical: "ראיון מקצועי",
+  design: "ניתוח מקרה",
+  coding: "תרגילי קוד",
+};
+
 async function Dashboard() {
   const supabase = await createClient();
   const user = await getSignedInUser(supabase);
   if (!user) redirect("/login");
   const now = new Date();
 
+  // Row level security limits every read to the user's own rows.
   const [
     { data: profile },
-    { count: roleCount },
-    { data: sessions },
-    { count: practiceCount },
+    { data: roles },
+    { data: finishedRows },
+    { data: reviews },
+    { data: takeHomes },
     learning,
     interviews,
   ] = await Promise.all([
@@ -42,198 +79,228 @@ async function Dashboard() {
       .select("full_name")
       .eq("user_id", user.id)
       .maybeSingle(),
-    supabase.from("target_roles").select("id", { count: "exact", head: true }),
+    supabase.from("target_roles").select("title").order("created_at").limit(1),
     supabase
       .from("sessions")
-      .select("overall_score, target_role_id, job_id, stage, questions(kind)")
-      .not("overall_score", "is", null)
+      .select(
+        "completed_at, overall_score, target_role_id, job_id, stage, questions(kind), target_roles(title)",
+      )
+      .not("completed_at", "is", null)
+      .order("completed_at", { ascending: false })
+      .limit(100),
+    supabase
+      .from("resume_reviews")
+      .select("score")
       .order("created_at", { ascending: false })
-      .limit(20),
+      .limit(1),
     supabase
-      .from("sessions")
-      .select("id", { count: "exact", head: true })
-      .not("overall_score", "is", null),
+      .from("take_homes")
+      .select("id")
+      .is("submitted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(1),
     getLearningState(supabase),
     upcomingInterviews(supabase, now, 5),
   ]);
-  const nextInterviews = interviews
-    .filter((i) => i.startsAt.getTime() + i.minutes * 60000 >= now.getTime())
-    .slice(0, 2);
 
-  const firstName = displayName(profile?.full_name?.trim().split(/\s+/)[0]);
-  const latest = sessions?.[0]?.overall_score ?? undefined;
-  const change = scoreChange(sessions ?? []);
-  const ready = Boolean(profile) && (roleCount ?? 0) > 0;
+  const finished = (finishedRows ?? []) as unknown as Finished[];
+  const finishedAt = finished.map((s) => new Date(s.completed_at));
+  const scored = finished.filter((s) => s.overall_score !== null);
+  const roleTitle = (roles?.[0]?.title as string | undefined) ?? null;
   const lesson =
     learning.recommended && forAddress(learning.recommended, user.address);
+
+  const interview = interviews.find(
+    (i) =>
+      i.startsAt.getTime() + i.minutes * 60000 >= now.getTime() &&
+      daysUntil(i.startsAt, now) <= INTERVIEW_WINDOW_DAYS,
+  );
+  const upcoming = interview
+    ? {
+        jobId: interview.jobId,
+        company: interview.company,
+        kindLabel: interviewKinds[interview.kind],
+        days: daysUntil(interview.startsAt, now),
+        whenText: shortWhen(interview.startsAt),
+        practicesForJob: finished.filter((s) => s.job_id === interview.jobId)
+          .length,
+      }
+    : null;
+
+  const facts: HomeFacts = {
+    hasResume: Boolean(profile),
+    roleTitle,
+    roundsDone: new Set(finished.map((s) => roundKind(s.questions))),
+    technicalRole: roleTitle ? isTechnicalRole(roleTitle) : false,
+    codingRole: roleTitle ? isCodingRole(roleTitle) : false,
+    resumeScore: (reviews?.[0]?.score as number | null | undefined) ?? null,
+    openTakeHome: takeHomes?.[0] ? { id: takeHomes[0].id as string } : null,
+    upcoming,
+    lesson: lesson
+      ? { slug: lesson.slug, title: lesson.title, minutes: lesson.minutes }
+      : null,
+  };
+  const step = nextStep(facts);
+  const newUser = Boolean(step.setup);
+
+  const firstName = displayName(profile?.full_name?.trim().split(/\s+/)[0]);
+  const streak = practiceStreak(finishedAt, now);
+  const week = thisWeek(now, finishedAt);
+  const latest = scored[0];
 
   return (
     <>
       {!user.tourDone && <WelcomeTour />}
-      <h1 className="text-3xl font-extrabold sm:text-4xl">
-        {firstName ? `היי ${firstName}!` : "היי!"}
-      </h1>
+      <Greeting
+        name={firstName}
+        subtitle={newUser ? "טוב שבאת" : longDate(now)}
+        streakDays={streak.days}
+      />
+
+      {newUser ? (
+        <>
+          <div className="flex flex-col gap-3">
+            <NextStepCard step={step} />
+            {step.key === "resume" && (
+              <p className="text-muted text-center text-sm">
+                קובץ PDF. הקובץ נקרא פעם אחת ולא נשמר.
+              </p>
+            )}
+          </div>
+          <section aria-labelledby="meanwhile" className="flex flex-col gap-3">
+            <h2 id="meanwhile" className="text-2xl font-black">
+              בינתיים
+            </h2>
+            <ul className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-5">
+              {lesson && (
+                <LaterRow
+                  href={`/learn/${lesson.slug}`}
+                  icon="book"
+                  tone="mint"
+                  title={
+                    step.key === "resume"
+                      ? "אין קורות חיים? מתחילים מ־STAR"
+                      : lesson.title
+                  }
+                  subtitle={`שיעור קצר · ${lesson.minutes} דקות`}
+                />
+              )}
+              {step.key === "resume" && (
+                <LaterRow
+                  href="/profile"
+                  icon="target"
+                  tone="sky"
+                  title="לבחור תפקיד שמתכוננים אליו"
+                  subtitle="2 דקות"
+                />
+              )}
+            </ul>
+          </section>
+        </>
+      ) : (
+        <>
+          <div className="grid gap-4 lg:grid-cols-[1.55fr_1fr] lg:gap-5">
+            <NextStepCard step={step} />
+            <WeekCard days={week.days} practices={week.practices} />
+          </div>
+
+          <section aria-labelledby="activity" className="flex flex-col gap-4">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 id="activity" className="text-2xl font-black">
+                הפעילות שלך
+              </h2>
+              <Link
+                href="/practice"
+                className="text-muted text-sm underline underline-offset-4"
+              >
+                הכל
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 lg:gap-5">
+              {interview && step.key !== "interview" && upcoming && (
+                <InterviewTile
+                  href={`/jobs/${interview.jobId}`}
+                  company={interview.company}
+                  when={`${upcoming.whenText} · ${upcoming.kindLabel}`}
+                  days={upcoming.days}
+                  prepDone={Math.min(upcoming.practicesForJob, 3)}
+                />
+              )}
+              {latest && (
+                <ScoreTile
+                  score={latest.overall_score as number}
+                  change={scoreChange(scored)}
+                  label={[
+                    roundLabels[roundKind(latest.questions)],
+                    roleOf(latest),
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                />
+              )}
+              {lesson && step.key !== "lesson" && (
+                <LessonTile
+                  href={`/learn/${lesson.slug}`}
+                  title={lesson.title}
+                  minutes={lesson.minutes}
+                  summary={lesson.summary}
+                />
+              )}
+            </div>
+          </section>
+        </>
+      )}
 
       {!user.address && (
-        <Card tone="lavender" className="gap-4">
+        <Card className="gap-4">
           <h2 className="text-xl font-extrabold">איך לפנות אליך?</h2>
           <p>כדי שהשאלות, המשובים והשיעורים ידברו אליך נכון.</p>
           <AddressPicker current={null} next="/dashboard" />
         </Card>
       )}
-
-      {nextInterviews.length > 0 && (
-        <Card tone="lavender" className="gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-xl font-extrabold">ראיונות קרובים</h2>
-            <ButtonLink
-              href="/jobs"
-              variant="quiet"
-              className="min-h-11 py-2 text-base"
-            >
-              לכל המשרות
-            </ButtonLink>
-          </div>
-          <ul className="flex flex-col gap-3">
-            {nextInterviews.map((interview) => (
-              <InterviewCard
-                key={interview.id}
-                interview={interview}
-                now={now}
-              />
-            ))}
-          </ul>
-        </Card>
-      )}
-
-      {!ready ? (
-        <Card tone="blue" className="gap-5 p-8">
-          <h2 className="text-2xl font-extrabold">מתכוננים לתרגול הראשון</h2>
-          <ol className="flex flex-col gap-3 text-lg">
-            <Step done={Boolean(profile)} number={1}>
-              מעלים קורות חיים ומאשרים את הפרטים
-            </Step>
-            <Step done={(roleCount ?? 0) > 0} number={2}>
-              בוחרים לאיזה תפקיד מתכוננים
-            </Step>
-            <Step done={false} number={3}>
-              מתחילים תרגול ראיון ראשון
-            </Step>
-          </ol>
-          <ButtonLink href="/profile" variant="primary" className="w-fit">
-            {profile ? "להוסיף תפקיד" : "להעלות קורות חיים"}
-          </ButtonLink>
-        </Card>
-      ) : (
-        <div className="grid gap-5 md:grid-cols-2">
-          <Card tone="blue" className="gap-3 p-7">
-            {latest !== undefined ? (
-              <>
-                <p className="text-lg font-bold">הציון האחרון שלך</p>
-                <ScoreTrend score={latest} change={change} />
-                {change !== null && change < 0 && (
-                  <p className="font-medium">
-                    ירידה קטנה היא חלק מהדרך. התרגול הבא יראה את ההתקדמות.
-                  </p>
-                )}
-              </>
-            ) : (
-              <>
-                <p className="text-2xl font-extrabold">
-                  הכל מוכן לתרגול הראשון
-                </p>
-                <p className="opacity-90">
-                  חמש שאלות, ואחריהן ציון ומשוב על כל תשובה.
-                </p>
-              </>
-            )}
-            <ButtonLink href="/practice" variant="primary" className="mt-2">
-              להתחיל תרגול
-            </ButtonLink>
-          </Card>
-
-          <div className="flex flex-col gap-5">
-            {lesson ? (
-              <Card tone="pink">
-                <Chip tone="glass">השיעור הבא בשבילך</Chip>
-                <h2 className="text-xl font-bold">{lesson.title}</h2>
-                <p className="text-muted">
-                  {lesson.minutes} דקות · {lesson.summary}
-                </p>
-                <ButtonLink
-                  href={`/learn/${lesson.slug}`}
-                  variant="quiet"
-                  className="w-fit"
-                >
-                  לשיעור
-                </ButtonLink>
-              </Card>
-            ) : (
-              <Card tone="mint">
-                <h2 className="text-xl font-bold">סיימת את כל השיעורים!</h2>
-                <p className="text-muted">אפשר לחזור לכל שיעור ולתרגל שוב.</p>
-              </Card>
-            )}
-            <div className="grid grid-cols-2 gap-5">
-              <Stat
-                tone="sky"
-                value={practiceCount ?? sessions?.length ?? 0}
-                label="תרגולים"
-              />
-              <Stat
-                tone="lavender"
-                value={`${learning.completed.size}/${lessons.length}`}
-                label="שיעורים"
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
 
-function Step({
-  done,
-  number,
-  children,
-}: {
-  done: boolean;
-  number: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <li className="flex items-center gap-3">
-      <span
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl font-extrabold ${
-          done ? "bg-mint" : "bg-sky-soft text-blue-dark"
-        }`}
-      >
-        {done ? "✓" : number}
-      </span>
-      <span className={done ? "text-muted line-through" : ""}>{children}</span>
-    </li>
-  );
+function roleOf(session: Finished): string {
+  const role = Array.isArray(session.target_roles)
+    ? session.target_roles[0]
+    : session.target_roles;
+  return role?.title ?? "";
 }
 
-function Stat({
-  tone,
-  value,
-  label,
-}: {
-  tone: "sky" | "lavender";
-  value: number | string;
-  label: string;
-}) {
-  return (
-    <Card tone={tone} className="gap-1">
-      <p className="text-3xl font-extrabold">{value}</p>
-      <p className="text-muted">{label}</p>
-    </Card>
-  );
+/** "שבת, 21 בנובמבר" */
+function longDate(date: Date): string {
+  return new Intl.DateTimeFormat("he-IL", {
+    timeZone: "Asia/Jerusalem",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  })
+    .format(date)
+    .replace(/^יום /, "");
 }
 
-/** Resumes often spell names in capitals; "SHIR" reads better as "Shir". */
+/** "שלישי · 24.11 · 10:00" */
+function shortWhen(date: Date): string {
+  const zone = { timeZone: "Asia/Jerusalem" } as const;
+  const weekday = new Intl.DateTimeFormat("he-IL", { ...zone, weekday: "long" })
+    .format(date)
+    .replace(/^יום /, "");
+  const day = new Intl.DateTimeFormat("he-IL", {
+    ...zone,
+    day: "numeric",
+    month: "numeric",
+  }).format(date);
+  const time = new Intl.DateTimeFormat("he-IL", {
+    ...zone,
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+  return `${weekday} · ${day} · ${time}`;
+}
+
+/** "SHIR" becomes "Shir"; other names stay as written. */
 function displayName(name: string | undefined): string | undefined {
   if (!name || !/^[A-Z][A-Z'-]+$/.test(name)) return name;
   return name[0] + name.slice(1).toLowerCase();
