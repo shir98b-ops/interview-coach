@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isProtectedPath } from "@/lib/auth/redirect";
+import { isProtectedPath, safeNextPath } from "@/lib/auth/redirect";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 import { getSignedInUser } from "@/lib/supabase/user";
 
@@ -32,6 +32,12 @@ export async function proxy(request: NextRequest) {
   const user = await getSignedInUser(supabase);
 
   const { pathname, search } = request.nextUrl;
+  // Signed-in users stay signed in: the home and sign-in pages take them
+  // straight into the app instead of offering to sign in again.
+  if (user && (pathname === "/" || pathname === "/login")) {
+    const next = safeNextPath(request.nextUrl.searchParams.get("next"));
+    return redirectWithCookies(new URL(next, request.url), response);
+  }
   if (!user && isProtectedPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -40,6 +46,13 @@ export async function proxy(request: NextRequest) {
   }
 
   return response;
+}
+
+/** A redirect that keeps any refreshed session cookie. */
+function redirectWithCookies(url: URL, from: NextResponse) {
+  const redirect = NextResponse.redirect(url);
+  for (const cookie of from.cookies.getAll()) redirect.cookies.set(cookie);
+  return redirect;
 }
 
 export const config = {

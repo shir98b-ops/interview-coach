@@ -15,6 +15,7 @@ describe("getSignedInUser", () => {
       id: "u1",
       email: "a@b.co",
       address: null,
+      tourDone: false,
     });
   });
 
@@ -24,6 +25,14 @@ describe("getSignedInUser", () => {
       error: null,
     });
     expect((await getSignedInUser(supabase))?.address).toBe("f");
+  });
+
+  it("remembers that the welcome tour was turned off", async () => {
+    const supabase = clientWith({
+      data: { claims: { sub: "u1", user_metadata: { tour_done: true } } },
+      error: null,
+    });
+    expect((await getSignedInUser(supabase))?.tourDone).toBe(true);
   });
 
   it("returns null when there is no valid session", async () => {

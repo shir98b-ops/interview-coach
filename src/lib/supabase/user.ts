@@ -6,6 +6,8 @@ export interface SignedInUser {
   email?: string;
   /** How to address the user in Hebrew, or null before they choose. */
   address: Address | null;
+  /** True once the user asked not to see the welcome tour again. */
+  tourDone: boolean;
 }
 
 /**
@@ -22,11 +24,11 @@ export async function getSignedInUser(
   const { data, error } = await supabase.auth.getClaims();
   if (error || !data?.claims?.sub) return null;
   const { sub, email, user_metadata } = data.claims;
+  const metadata = user_metadata as Record<string, unknown> | undefined;
   return {
     id: sub,
     email: typeof email === "string" ? email : undefined,
-    address: parseAddress(
-      (user_metadata as Record<string, unknown> | undefined)?.address,
-    ),
+    address: parseAddress(metadata?.address),
+    tourDone: metadata?.tour_done === true,
   };
 }
