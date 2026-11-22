@@ -342,7 +342,7 @@ export function VoiceAnswerField({
               aria-label={listening ? "לעצור את ההקלטה" : "לענות בדיבור"}
               className={`relative mb-3 flex h-[92px] w-[92px] items-center justify-center rounded-full ring-[10px] transition duration-200 disabled:opacity-60 motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[.98] lg:h-[108px] lg:w-[108px] ${
                 listening
-                  ? "bg-pink ring-pink-soft"
+                  ? "bg-pink ring-white/70"
                   : "bg-sky shadow-[0_14px_30px_rgba(18,82,176,0.18)] ring-[#dcecff]"
               }`}
             >
@@ -393,7 +393,7 @@ export function VoiceAnswerField({
                       aria-pressed={language === code}
                       className={`rounded-full px-3 py-1 ${
                         language === code
-                          ? "bg-sky-soft text-blue font-bold"
+                          ? "bg-sky-light text-ink font-bold"
                           : "text-muted hover:text-ink"
                       }`}
                     >
@@ -431,8 +431,8 @@ export function VoiceAnswerField({
             aria-pressed={listening}
             className={`inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 py-2 text-lg font-extrabold transition active:translate-y-0.5 disabled:opacity-60 ${
               listening
-                ? "bg-pink text-ink shadow-[0_4px_0_var(--color-pink-ink)]"
-                : "text-ink ring-line hover:bg-sky-soft bg-white ring-2"
+                ? "bg-pink text-ink shadow-[0_4px_0_rgba(20,38,58,0.14)]"
+                : "text-ink ring-line hover:bg-canvas bg-white ring-2"
             }`}
           >
             {listening ? (
@@ -461,7 +461,7 @@ export function VoiceAnswerField({
                     aria-pressed={language === code}
                     className={`rounded-full px-3 py-1 font-medium ${
                       language === code
-                        ? "bg-sky-soft text-blue"
+                        ? "bg-sky-light text-ink"
                         : "text-muted hover:text-ink"
                     }`}
                   >

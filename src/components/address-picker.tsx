@@ -22,7 +22,7 @@ export function AddressPicker({
           className={`min-h-12 rounded-2xl px-5 font-bold transition ${
             current === key
               ? "bg-blue text-white"
-              : "text-ink ring-line hover:bg-sky-soft bg-white ring-2"
+              : "text-ink ring-line hover:bg-canvas bg-white ring-2"
           }`}
         >
           {addressLabels[key]}

@@ -19,20 +19,20 @@ export function ExerciseFeedbackView({
         <Chip tone="mint">{scoreLabel(feedback.score)}</Chip>
       </div>
       {feedback.strengths && (
-        <div className="bg-success-soft rounded-2xl p-4">
+        <div className="rounded-2xl bg-white/60 p-4">
           <p className="text-success-ink font-bold">מה עבד</p>
           <p dir="auto">{feedback.strengths}</p>
         </div>
       )}
       {feedback.improvements && (
-        <div className="bg-pink-soft rounded-2xl p-4">
-          <p className="text-pink-ink font-bold">מה לשפר</p>
+        <div className="rounded-2xl bg-white/60 p-4">
+          <p className="text-ink font-bold">מה לשפר</p>
           <p dir="auto">{feedback.improvements}</p>
         </div>
       )}
       {feedback.betterAnswer && (
-        <details className="bg-sky-soft rounded-2xl p-4">
-          <summary className="text-blue-dark cursor-pointer font-bold">
+        <details className="rounded-2xl bg-white/60 p-4">
+          <summary className="text-blue cursor-pointer font-bold">
             ככה יכולה להישמע תשובה חזקה יותר
           </summary>
           <p dir="auto" className="mt-2 whitespace-pre-wrap">

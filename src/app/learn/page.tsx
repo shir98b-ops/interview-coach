@@ -103,6 +103,9 @@ async function LessonList() {
   );
 }
 
+/** Lesson cards take turns in these colors, so neighbors never match. */
+const lessonColors = ["bg-sky-light", "bg-mint", "bg-pink"];
+
 function LessonGrid({
   title,
   items,
@@ -122,12 +125,12 @@ function LessonGrid({
             <li key={lesson.slug}>
               <Link
                 href={`/learn/${lesson.slug}`}
-                className="flex h-full flex-col gap-3 rounded-[28px] bg-white p-6 shadow-[0_12px_40px_rgba(77,40,200,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(77,40,200,0.14)]"
+                className={`${lessonColors[index % lessonColors.length]} [&_.text-muted]:text-ink-soft flex h-full flex-col gap-3 rounded-[28px] p-6 transition duration-200 hover:shadow-[0_14px_28px_rgba(20,38,58,0.14)] motion-safe:hover:-translate-y-1 motion-safe:active:scale-[.98]`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <span
                     className={`flex size-10 items-center justify-center rounded-2xl font-extrabold ${
-                      done ? "bg-mint text-ink" : "bg-sky-soft text-blue-dark"
+                      done ? "bg-mint text-ink" : "text-ink bg-white/60"
                     }`}
                   >
                     {done ? "✓" : index + 1}

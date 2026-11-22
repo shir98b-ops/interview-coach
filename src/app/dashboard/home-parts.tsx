@@ -101,10 +101,10 @@ export function NextStepCard({ step }: { step: NextStep }) {
     >
       <div className="flex flex-1 flex-col gap-2.5">
         <Chip tone={step.tone === "sun" ? "glass" : "blue"}>{step.chip}</Chip>
-        <h2 className="text-[28px] leading-[1.1] font-black text-[#0b2a5c] lg:text-[38px]">
+        <h2 className="text-ink text-[28px] leading-[1.1] font-black lg:text-[38px]">
           {step.title}
         </h2>
-        <p className="text-[15px] text-[#1f3f6e]">{step.subtitle}</p>
+        <p className="text-ink text-[15px]">{step.subtitle}</p>
         {step.setup && (
           <div className="max-w-sm">
             <Bars done={step.setup.step} total={step.setup.total} />

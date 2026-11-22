@@ -93,7 +93,7 @@ async function Inbox({
             href={`/admin/feedback?days=${period}`}
             aria-current={period === days ? "page" : undefined}
             className={`rounded-full px-4 py-1 font-bold ${
-              period === days ? "bg-blue text-white" : "bg-sky-soft"
+              period === days ? "bg-blue text-white" : "bg-sky-light"
             }`}
           >
             {period} ימים
@@ -133,7 +133,7 @@ async function Inbox({
         )}
       </Card>
 
-      <Card tone="lavender" className="gap-4">
+      <Card tone="sky" className="gap-4">
         <h2 className="text-xl font-extrabold">סיכום</h2>
         {digest && saved ? (
           <>
@@ -212,7 +212,7 @@ async function Inbox({
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-sky-soft flex flex-col gap-1 rounded-2xl p-4">
+    <div className="flex flex-col gap-1 rounded-2xl bg-white/60 p-4">
       <span className="text-muted text-sm">{label}</span>
       <span className="text-2xl font-extrabold">{value}</span>
     </div>

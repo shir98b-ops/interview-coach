@@ -105,7 +105,7 @@ async function Reviews() {
             {reviews.slice(1).map((r) => (
               <li
                 key={r.id}
-                className="flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-3 shadow-[0_6px_20px_rgba(77,40,200,0.06)]"
+                className="bg-sky-light [&_.text-muted]:text-ink-soft flex items-center justify-between gap-4 rounded-2xl px-5 py-3"
               >
                 <span className="flex flex-col">
                   <span dir="auto" className="font-bold">
@@ -154,7 +154,7 @@ function ReviewDetails({
           <span className="text-2xl opacity-80"> / 100</span>
         </p>
         {change !== null && change !== 0 && (
-          <p className="text-blue-dark font-bold">
+          <p className="text-blue font-bold">
             {change > 0
               ? `עלית ${change} נקודות מהדירוג הקודם`
               : `ירדת ${-change} נקודות מהדירוג הקודם`}
@@ -167,7 +167,11 @@ function ReviewDetails({
 
       <div className="grid gap-3 sm:grid-cols-2">
         {reviewRubric.map((r, i) => (
-          <Card key={r.key} tone={tileTones[i % 4]} className="gap-1 p-5">
+          <Card
+            key={r.key}
+            tone={tileTones[i % tileTones.length]}
+            className="gap-1 p-5"
+          >
             <div className="flex items-center justify-between gap-3">
               <p className="font-bold">{r.label}</p>
               <p className="text-blue text-2xl font-extrabold">
@@ -180,7 +184,7 @@ function ReviewDetails({
       </div>
 
       {review.strengths.length > 0 && (
-        <div className="bg-success-soft rounded-2xl p-5">
+        <div className="bg-mint rounded-2xl p-5">
           <p className="text-success-ink font-bold">מה כבר עובד</p>
           <ul className="mt-1 flex list-disc flex-col gap-1 ps-5">
             {review.strengths.map((s, i) => (
@@ -198,20 +202,23 @@ function ReviewDetails({
           <ol className="flex flex-col gap-3">
             {review.fixes.map((fix, i) => (
               <li key={i}>
-                <Card tone={tileTones[(i + 1) % 4]} className="gap-3 p-5">
+                <Card
+                  tone={tileTones[(i + 1) % tileTones.length]}
+                  className="gap-3 p-5"
+                >
                   <p className="flex gap-3 font-bold">
-                    <span className="bg-sky-soft text-blue-dark flex size-8 shrink-0 items-center justify-center rounded-xl">
+                    <span className="text-ink flex size-8 shrink-0 items-center justify-center rounded-xl bg-white/60">
                       {i + 1}
                     </span>
                     <span dir="auto">{fix.issue}</span>
                   </p>
                   {fix.before && (
-                    <div className="bg-pink-soft rounded-2xl p-4">
-                      <p className="text-pink-ink text-sm font-bold">היום</p>
+                    <div className="rounded-2xl bg-white/60 p-4">
+                      <p className="text-sm font-bold">היום</p>
                       <p dir="auto">{fix.before}</p>
                     </div>
                   )}
-                  <div className="bg-success-soft rounded-2xl p-4">
+                  <div className="rounded-2xl bg-white/60 p-4">
                     <p className="text-success-ink text-sm font-bold">
                       {fix.before ? "עדיף" : "להוסיף"}
                     </p>
@@ -228,10 +235,8 @@ function ReviewDetails({
       )}
 
       {review.keywords.length > 0 && (
-        <Card tone="lavender" className="gap-3">
-          <p className="text-blue-dark font-bold">
-            מילים שמגייסים מחפשים ואין אצלך
-          </p>
+        <Card tone="sky" className="gap-3">
+          <p className="text-blue font-bold">מילים שמגייסים מחפשים ואין אצלך</p>
           <div className="flex flex-wrap gap-2">
             {review.keywords.map((k) => (
               <Chip key={k} tone="blue">

@@ -16,7 +16,7 @@ import {
 import { startTakeHome, submitTakeHome, type TakeHomeState } from "./actions";
 
 const optionStyles =
-  "flex cursor-pointer items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 font-medium transition hover:border-blue has-[:checked]:border-blue has-[:checked]:bg-sky-soft";
+  "flex cursor-pointer items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 font-medium transition hover:border-blue has-[:checked]:border-blue has-[:checked]:bg-sky-light";
 
 const languageNames: Record<string, string> = { en: "English", he: "עברית" };
 

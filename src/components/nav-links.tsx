@@ -125,7 +125,7 @@ function LinkList({
                 className={`flex min-h-12 items-center gap-3 rounded-full px-4 text-[15px] transition ${
                   active
                     ? "bg-ink font-extrabold text-white"
-                    : "text-ink-soft hover:bg-sky-soft font-semibold"
+                    : "text-ink-soft hover:bg-canvas font-semibold"
                 }`}
               >
                 {link.icon}

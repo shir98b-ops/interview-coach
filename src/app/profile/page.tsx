@@ -58,10 +58,7 @@ async function ProfileContent({
   return (
     <>
       {saved && (
-        <p
-          role="status"
-          className="bg-success-soft text-success-ink rounded-2xl p-4 font-bold"
-        >
+        <p role="status" className="bg-mint text-ink rounded-2xl p-4 font-bold">
           הפרופיל נשמר.
         </p>
       )}
@@ -77,7 +74,7 @@ async function ProfileContent({
         <AddressPicker current={user.address} next="/profile" />
       </Card>
 
-      <Card className="gap-5 p-6 sm:p-8">
+      <Card tone="sky" className="gap-5 p-6 sm:p-8">
         <h2 className="text-2xl font-extrabold">קורות חיים</h2>
         {resume && <ResumeSummary resume={resume} />}
         <ResumeFlow hasProfile={Boolean(resume)} />
@@ -97,7 +94,7 @@ async function ProfileContent({
         </Card>
       )}
 
-      <Card className="gap-5 p-6 sm:p-8">
+      <Card tone="mint" className="gap-5 p-6 sm:p-8">
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-extrabold">התפקידים שלי</h2>
           <p className="text-muted">
@@ -109,7 +106,7 @@ async function ProfileContent({
             {roles.map((role) => (
               <li
                 key={role.id}
-                className="bg-sky-soft flex items-center justify-between gap-3 rounded-2xl px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3"
               >
                 <span className="font-bold">
                   <span dir="auto">{role.title}</span>
@@ -124,7 +121,7 @@ async function ProfileContent({
                   <input type="hidden" name="id" value={role.id} />
                   <button
                     type="submit"
-                    className="text-blue hover:text-blue-dark text-sm font-bold"
+                    className="text-blue hover:text-ink text-sm font-bold"
                   >
                     הסרה
                   </button>

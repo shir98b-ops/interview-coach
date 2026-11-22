@@ -56,7 +56,7 @@ export function QuestionScreen({
           <Link
             href="/practice"
             aria-label="לצאת מהתרגול"
-            className="border-line text-ink-soft flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[1.5px] bg-white transition hover:bg-[#eef1f6]"
+            className="border-line text-ink-soft hover:bg-canvas flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[1.5px] bg-white transition"
           >
             <svg
               aria-hidden
@@ -115,7 +115,7 @@ export function QuestionScreen({
           ) : (
             <h1
               dir="auto"
-              className="w-full text-[26px] leading-[1.2] font-black text-[#0b2a5c] lg:text-[36px]"
+              className="text-ink w-full text-[26px] leading-[1.2] font-black lg:text-[36px]"
             >
               {current.text}
             </h1>

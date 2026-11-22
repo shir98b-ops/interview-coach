@@ -22,24 +22,19 @@
 
   /* Active state, links and progress */
   --color-blue: #1252b0;
-  --color-blue-dark: #0d3d85;
 
   /* Area colors */
   --color-sky: #9fcbff;
   --color-sky-light: #b9dcff;
-  --color-sky-soft: #e8f2ff;
   --color-lavender: #e6c8ff;
   --color-lavender-deep: #d7b3ff;
   --color-mint: #bdeccb;
   --color-pink: #ffc9e3;
-  --color-pink-soft: #ffeaf4;
-  --color-pink-ink: #9b2c5e;
 
   /* Upcoming interview only */
   --color-sun: #ffc85c;
   --color-sun-soft: #fff4dc;
 
-  --color-success-soft: #ddf6e5;
   --color-success-ink: #1e6b3a;
   --color-danger: #c81e3a;
 }

@@ -7,7 +7,7 @@ import { splitList, type ResumeData } from "@/lib/resume/schema";
 import { extractResumeAction, saveProfile, type ExtractState } from "./actions";
 
 const input = inputStyles;
-const linkButton = "text-sm font-bold text-blue hover:text-blue-dark";
+const linkButton = "text-sm font-bold text-blue hover:text-ink";
 
 /** Upload a resume, then review and save the extracted details. */
 export function ResumeFlow({ hasProfile }: { hasProfile: boolean }) {

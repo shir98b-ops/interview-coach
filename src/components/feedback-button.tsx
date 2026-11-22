@@ -20,7 +20,7 @@ export function FeedbackButton({
 
   return (
     <details className="relative">
-      <summary className="text-muted hover:bg-sky-soft flex min-h-11 cursor-pointer list-none items-center rounded-full px-4 font-medium">
+      <summary className="text-muted hover:bg-canvas flex min-h-11 cursor-pointer list-none items-center rounded-full px-4 font-medium">
         משוב
       </summary>
       <div
