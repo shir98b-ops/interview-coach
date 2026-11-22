@@ -45,12 +45,10 @@ export default function WelcomePage() {
       <section className="bg-sky flex items-center gap-3 rounded-[30px] p-6">
         <div className="flex flex-1 flex-col items-start gap-3">
           <Chip tone="glass">בואו נתחיל</Chip>
-          <h1 className="text-[30px] leading-[1.1] font-black text-[#0b2a5c] sm:text-[34px]">
+          <h1 className="text-ink text-[30px] leading-[1.1] font-black sm:text-[34px]">
             מגיעים לראיון מוכנים באמת
           </h1>
-          <p className="text-[#1f3f6e]">
-            שאלות שמתאימות לך ומשוב כנה על כל תשובה
-          </p>
+          <p className="text-ink">שאלות שמתאימות לך ומשוב כנה על כל תשובה</p>
         </div>
         <Icon
           name="target"
