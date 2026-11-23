@@ -9,7 +9,7 @@ import { nextStep, type HomeFacts } from "@/lib/home/next-step";
 import { thisWeek } from "@/lib/home/week";
 import { roundKind, scoreChange } from "@/lib/interview/progress";
 import {
-  electricalSpecialtyFor,
+  engineeringSpecialtyFor,
   isCodingRole,
   isTechnicalRole,
 } from "@/lib/interview/question-bank";
@@ -137,7 +137,7 @@ async function Dashboard() {
     // Chip, verification and FPGA roles take the coding step like software.
     technicalRole: roleTitle
       ? isTechnicalRole(roleTitle) ||
-        electricalSpecialtyFor(roleTitle)?.coding === true
+        engineeringSpecialtyFor(roleTitle)?.coding === true
       : false,
     codingRole: roleTitle ? isCodingRole(roleTitle) : false,
     resumeScore: (reviews?.[0]?.score as number | null | undefined) ?? null,

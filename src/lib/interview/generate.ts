@@ -10,9 +10,9 @@ import {
   bankFor,
   behavioralThemes,
   codingTopics,
-  electricalDesignProblemFor,
-  electricalSpecialtyFor,
-  electricalTopicsFor,
+  engineeringDesignProblemFor,
+  engineeringSpecialtyFor,
+  engineeringTopicsFor,
   focusAreasFor,
   hdlTopics,
   isTechnicalRole,
@@ -231,8 +231,8 @@ ${levelGuide}
 
 ${professionalBar}`;
 
-const electricalDesignInstructions = `You are a senior electrical engineer
-running a design interview. Use the design problem given below. Then write it
+const engineeringDesignInstructions = `You are a senior engineer in the
+candidate's field running a design interview. Use the design problem given below. Then write it
 as ${QUESTION_COUNT} questions, asked in this order, each of kind "design":
 
 1. State the problem with its key numbers (inputs, loads, environment, cost
@@ -241,8 +241,8 @@ as ${QUESTION_COUNT} questions, asked in this order, each of kind "design":
 2. Ask for the architecture: a block diagram described in words, the main
    blocks and the interfaces between them.
 3. Ask for one key calculation done out loud, the one this kind of design
-   lives or dies on (a power, timing, noise, link or thermal budget, a load or
-   a short-circuit level), with the numbers from the problem.
+   lives or dies on (a power, timing, noise, link, error or thermal budget, a
+   load, a failure rate or a short-circuit level), with the numbers from the problem.
 4. Ask how they would choose the main components or implementation, and what
    happens when a constraint changes (a part goes out of stock, the budget is
    cut, the temperature range grows).
@@ -297,7 +297,7 @@ function instructionsFor(
   if (mode === "professional") return professionalInstructions;
   if (mode === "case") {
     if (technical) return designInstructions;
-    return electrical ? electricalDesignInstructions : caseInstructions;
+    return electrical ? engineeringDesignInstructions : caseInstructions;
   }
   return `${instructions}
 
@@ -312,7 +312,7 @@ function startingPoint(
   mode: InterviewMode,
   technical: boolean,
 ): string {
-  const electrical = technical ? null : electricalSpecialtyFor(target.title);
+  const electrical = technical ? null : engineeringSpecialtyFor(target.title);
   if (mode === "general") {
     return `This time, build the behavioral questions around these themes:
 ${sampleBank(behavioralThemes, 2)
@@ -359,7 +359,7 @@ ${
     const topics = technical
       ? technicalTopicsFor(target.title, QUESTION_COUNT)
       : electrical
-        ? electricalTopicsFor(target.title, QUESTION_COUNT)
+        ? engineeringTopicsFor(target.title, QUESTION_COUNT)
         : sampleBank(focus, QUESTION_COUNT);
     return topics.length
       ? `<focus_areas>
@@ -381,7 +381,7 @@ stack in the job posting${
 `
       : electrical
         ? `<design_problem>
-An electrical or electronic design this company would really build, taken
+A hardware or engineering design this company would really build, taken
 from its product and the work in the job posting, in the field of
 ${electrical.label}${
             target.takeHome
@@ -403,7 +403,7 @@ Design ${designProblemFor(target.title)}.
 `
     : electrical
       ? `<design_problem>
-Design ${electricalDesignProblemFor(target.title)}.
+Design ${engineeringDesignProblemFor(target.title)}.
 </design_problem>
 `
       : `<case>
@@ -431,7 +431,7 @@ export async function generateQuestions(
   const mode = target.mode ?? "general";
   const technical = isTechnicalRole(target.title);
   const electrical =
-    !technical && electricalSpecialtyFor(target.title) !== null;
+    !technical && engineeringSpecialtyFor(target.title) !== null;
 
   let response;
   try {

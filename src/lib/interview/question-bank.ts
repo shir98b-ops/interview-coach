@@ -292,7 +292,14 @@ export const roleFamilies: RoleFamily[] = [
   {
     id: "design",
     label: "Design",
-    keywords: ["design", "designer", "ux", "ui", "researcher"],
+    keywords: [
+      "design",
+      "designer",
+      "ux",
+      "ui",
+      "ux researcher",
+      "user researcher",
+    ],
     hebrew: ["עיצוב", "מעצב(ת)?", "חווי(ה|ית) משתמש", "ממשק"],
     questions: [
       "Walk me through a project in your portfolio, from problem to result.",
@@ -330,6 +337,8 @@ export const roleFamilies: RoleFamily[] = [
       "tax",
       "fp&a",
       "investment",
+      "quant",
+      "quantitative",
     ],
     hebrew: [
       "כספים",
@@ -424,6 +433,19 @@ export const roleFamilies: RoleFamily[] = [
       "substation",
       "solar",
       "photovoltaic",
+      "robotics",
+      "mechatronics",
+      "optical",
+      "optics",
+      "photonics",
+      "laser",
+      "reliability",
+      "avionics",
+      "systems engineer",
+      "system engineer",
+      "quality engineer",
+      "validation engineer",
+      "environmental engineer",
     ],
     hebrew: [
       // In Israeli job ads, "מהנדס/ת מוצר" is a hardware or mechanical role.
@@ -454,6 +476,14 @@ export const roleFamilies: RoleFamily[] = [
       "אנטנות",
       "מתח גבוה",
       "סולארי(ת)?",
+      "מהנדס(ת)? מערכת",
+      "הנדסת מערכת",
+      "רובוטיקה",
+      "מכטרוניקה",
+      "אופטיקה",
+      "פוטוניקה",
+      "אמינות",
+      "מהנדס(ת)? איכות",
       "אנרגיה",
       "אדריכל(ית)?",
       "אדריכלות",
@@ -795,6 +825,12 @@ export const roleFamilies: RoleFamily[] = [
       "pentester",
       "infosec",
       "ciso",
+      "security researcher",
+      "vulnerability researcher",
+      "malware",
+      "reverse engineer",
+      "red team",
+      "appsec",
     ],
     hebrew: ["סייבר", "אבטחת מידע", "הגנת סייבר", "חוקר(ת)? סייבר"],
     questions: [
@@ -869,6 +905,10 @@ export const roleFamilies: RoleFamily[] = [
       "sysadmin",
       "network administrator",
       "network engineer",
+      "support engineer",
+      "technical support",
+      "database administrator",
+      "dba",
     ],
     hebrew: [
       "תמיכה טכנית",
@@ -876,6 +916,8 @@ export const roleFamilies: RoleFamily[] = [
       "מנהל(ת)? מערכות מידע",
       "סיסטם",
       "הלפדסק",
+      "תומך(ת)? טכני(ת)?",
+      "מנהל(ת)? מסדי נתונים",
       "מחשוב",
     ],
     questions: [
@@ -894,6 +936,48 @@ export const roleFamilies: RoleFamily[] = [
       "security hygiene: phishing, MFA and least privilege",
       "ticket prioritization and SLAs",
       "administering cloud and SaaS tools (Microsoft 365, Google Workspace)",
+    ],
+  },
+  {
+    id: "solutions",
+    label: "Solutions and pre-sales engineering",
+    keywords: [
+      "solutions engineer",
+      "sales engineer",
+      "pre-sales",
+      "presales",
+      "pre sales",
+      "solutions consultant",
+      "technical account manager",
+      "customer success engineer",
+      "implementation specialist",
+      "implementation engineer",
+      "implementation consultant",
+    ],
+    hebrew: [
+      "פריסייל",
+      "פרי-?סייל",
+      "מהנדס(ת)? (פתרונות|מכירות)",
+      "מיישם(ת)?",
+      "הטמעה",
+    ],
+    questions: [
+      "Walk me through a technical demo you gave. How did you tailor it to the audience?",
+      "Tell me about a deal where a technical objection almost lost it. What did you do?",
+      "How do you run a proof of concept so it ends in a decision?",
+      "How do you split the work with the account executive in a deal?",
+      "Tell me about a customer integration that went wrong. How did you fix it?",
+      "How do you pass what you hear from customers back to the product team?",
+    ],
+    focus: [
+      "technical discovery: finding the customer's real problem, environment and decision makers",
+      "a demo built around the customer's use case, not a feature tour",
+      "running a proof of concept with clear success criteria and a deadline",
+      "handling technical objections and security reviews",
+      "integration architecture: APIs, SSO, data flows and where the product fits",
+      "answering RFPs and security questionnaires",
+      "working with the account executive on deal strategy",
+      "onboarding and implementation after the deal is signed",
     ],
   },
   {
@@ -935,6 +1019,8 @@ export const roleFamilies: RoleFamily[] = [
       "supervisor",
       "engineering manager",
       "vp",
+      "cto",
+      "chief technology officer",
     ],
     hebrew: [
       "ראש צוות",
@@ -1023,12 +1109,20 @@ function isSoftwareFamily(
 ): boolean {
   if (isTechnicalRole(title)) return true;
   if (BUSINESS_DEVELOPER.test(title)) return false;
+  if (NOT_SOFTWARE_ENGINEER.test(title)) return false;
   if (/ (tester|qa) /.test(words) || / testers /.test(words)) return true;
   if (hardware) return false;
   return / engineers? /.test(words) || hebrewWord("מהנדס(ת)?").test(title);
 }
 
 const BUSINESS_DEVELOPER = /business develop|פיתוח עסקי|מפתח(ת)? עסקי/i;
+
+/**
+ * Engineers whose interviews are not software interviews: pre-sales,
+ * support and implementation engineers, and penetration testers.
+ */
+const NOT_SOFTWARE_ENGINEER =
+  /solutions engineer|sales engineer|pre-?sales|support engineer|customer success engineer|implementation engineer|penetration|pen ?tester|מהנדס(ת)? (פתרונות|מכירות|תמיכה)|פריסייל/i;
 
 /**
  * Software roles, whose professional round draws on core
@@ -1043,7 +1137,7 @@ export function isTechnicalRole(title: string): boolean {
     SOFTWARE_TITLE.test(title) ||
     QUALIFIED_ENGINEER.test(title) ||
     // Hebrew titles, such as "מפתח תוכנה" or "מהנדסת בקאנד".
-    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|מדע(ן|נית) נתונים|דאטה סיינטיסט|אלגוריתמ|קושחה|משובצות|אמבדד|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון|עסקי))/.test(
+    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|מדע(ן|נית) נתונים|דאטה סיינטיסט|אלגוריתמ|קושחה|משובצות|אמבדד|מהנדס(ת)? (בדיקות|אוטומציה)|בודק(ת)? תוכנה|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון|עסקי))/.test(
       title,
     )
   );
@@ -1051,7 +1145,7 @@ export function isTechnicalRole(title: string): boolean {
 
 /** Titles that name software work on their own. */
 const SOFTWARE_TITLE =
-  /\b(software|developer|programmer|devops|sre|site reliability|backend|back-end|frontend|front-end|full[- ]?stack|qa|ios|android|data engineer|machine learning|ml engineer|ai engineer|mlops|data scientist|computer vision|algorithms?|embedded|firmware|tech lead|engineering manager|software architect|solutions architect)\b/i;
+  /\b(software|developer|programmer|devops|sre|site reliability|backend|back-end|frontend|front-end|full[- ]?stack|qa|ios|android|data engineer|machine learning|ml engineer|ai engineer|llm engineer|genai engineer|gen ai engineer|ai developer|prompt engineer|mlops|data scientist|computer vision|algorithms?|embedded|firmware|tech lead|engineering manager|software architect|solutions architect)\b/i;
 
 /**
  * Words like "web", "cloud" or "automation" mean software only next to an
@@ -1059,7 +1153,7 @@ const SOFTWARE_TITLE =
  * developer.
  */
 const QUALIFIED_ENGINEER =
-  /\b(web|mobile|cloud|platform|automation|infrastructure|test|r&d|security|network|integration)\s+(developer|engineer|architect)s?\b/i;
+  /\b(web|mobile|cloud|platform|automation|infrastructure|test|r&d|security|network|integration|game|graphics|smart contract|blockchain|privacy|llm|genai)\s+(developer|engineer|architect)s?\b/i;
 
 /**
  * Software specialties, each with the topics its professional round covers
@@ -1148,7 +1242,9 @@ export const techSpecialties: TechSpecialty[] = [
   {
     id: "qa",
     label: "QA and test automation",
-    pattern: /\b(qa|tester|test|testing|automation)\b|בודק(ת)? תוכנה|בדיקות/i,
+    // A penetration tester is a security role, not a software tester.
+    pattern:
+      /\bqa\b|(?<!penetration |pen )\btest(er|ing)?\b|\bautomation\b|בודק(ת)? תוכנה|בדיקות/i,
     topics: [
       "a test strategy and the test pyramid for a product",
       "designing test cases: boundaries, equivalence classes and negative tests",
@@ -1188,6 +1284,51 @@ export const techSpecialties: TechSpecialty[] = [
       "data quality monitoring for 500 tables",
       "a near-real-time pipeline that computes fraud features",
       "a data lake layout with partitions, schemas and retention",
+    ],
+  },
+  {
+    id: "llm",
+    label: "LLM and generative AI applications",
+    pattern:
+      /\b(llm|genai|gen ai|generative ai|prompt engineer|ai developer|rag)\b|מודלי שפה|בינה מלאכותית יוצרת/i,
+    topics: [
+      "retrieval-augmented generation: chunking, embeddings, retrieval quality and citing sources",
+      "evaluating LLM output: test sets, automatic graders and human review",
+      "prompt design and structured outputs that the rest of the system can trust",
+      "hallucinations, prompt injection and guardrails",
+      "agents and tool use: when to give the model tools and how to keep it on track",
+      "latency and cost: model choice, caching, streaming and batching",
+      "fine-tuning versus prompting versus retrieval, and when each fits",
+      "monitoring an LLM feature in production and handling regressions",
+    ],
+    designProblems: [
+      "a customer support assistant that answers from 50,000 help-center articles",
+      "an evaluation pipeline that catches quality regressions before each release",
+      "an agent that books meetings by reading email and calendars safely",
+      "a contract review tool that flags risky clauses and cites them",
+      "a chat feature for millions of users on a strict cost budget",
+    ],
+  },
+  {
+    id: "game",
+    label: "Game development",
+    pattern: /\b(game|games|gaming|unity|unreal|graphics)\b|משחקים/i,
+    topics: [
+      "the game loop, frame budgets and keeping a steady frame rate",
+      "rendering basics: the graphics pipeline, draw calls and shaders",
+      "game physics and collision detection",
+      "memory and performance on mobile devices and consoles",
+      "multiplayer networking: latency, prediction and authoritative servers",
+      "entity-component systems and game architecture",
+      "working in Unity or Unreal: scenes, assets and scripting",
+      "live ops: updates, A/B tests and analytics in a free-to-play game",
+    ],
+    designProblems: [
+      "the multiplayer backend and client sync for a real-time 10-player mobile game",
+      "a level-streaming system for an open world on a phone with 3 GB of memory",
+      "an in-game economy and store with protection against cheating",
+      "a matchmaking service for a competitive game with millions of players",
+      "a replay system that records and plays back a match",
     ],
   },
   {
@@ -1280,7 +1421,7 @@ export function designProblemFor(
  * The order matters: a title is matched to the first specialty that fits,
  * so the narrow ones come before the general one at the end.
  */
-export const electricalSpecialties: (TechSpecialty & { coding: boolean })[] = [
+export const engineeringSpecialties: (TechSpecialty & { coding: boolean })[] = [
   {
     id: "verification",
     label: "Chip verification",
@@ -1449,6 +1590,100 @@ export const electricalSpecialties: (TechSpecialty & { coding: boolean })[] = [
     ],
   },
   {
+    id: "systems",
+    label: "Systems engineering",
+    coding: false,
+    pattern: /\bsystems? engineer(ing)?\b|מהנדס(ת)? מערכת|הנדסת מערכת/i,
+    topics: [
+      "turning a customer need into system requirements that can be tested",
+      "breaking a system into subsystems and defining the interfaces between them",
+      "budgets across the system: error, power, weight, latency or link budgets",
+      "trade-off studies between architectures, with weighted criteria",
+      "integration and test: planning the order and finding where a problem lives",
+      "requirements traceability and verification (analysis, inspection, demonstration, test)",
+      "reviews along the project (SRR, PDR, CDR) and managing changes",
+      "working across software, electronics, mechanics and the customer",
+    ],
+    designProblems: [
+      "a drone that delivers a 2 kg package 10 km in any weather",
+      "an electro-optical payload for a small surveillance satellite",
+      "a smart traffic light system for a city of 500,000 people",
+      "a ventilator that a hospital can trust for weeks without a stop",
+      "the upgrade of an existing defense system whose main sensor is being replaced",
+    ],
+  },
+  {
+    id: "robotics",
+    label: "Robotics and mechatronics",
+    coding: false,
+    pattern: /robotic|mechatronic|רובוטיקה|מכטרוניקה/i,
+    topics: [
+      "control loops: PID tuning, stability and dealing with noise and delay",
+      "kinematics and motion planning for an arm or a mobile robot",
+      "sensors and sensor fusion: encoders, IMUs, cameras, lidar and a Kalman filter",
+      "choosing motors, drives and gearing for a load",
+      "ROS and the software architecture of a robot",
+      "real-time limits and safety stops",
+      "calibration and testing a robot in the real world, not only in simulation",
+      "integrating mechanics, electronics and software into one product",
+    ],
+    designProblems: [
+      "a warehouse robot that picks boxes from shelves next to people",
+      "a robotic arm that sorts recycling on a moving conveyor",
+      "a lawn-mowing robot that must stay inside the garden and never hurt a child",
+      "a camera gimbal that stays steady on a moving vehicle",
+      "an inspection robot that climbs inside pipes",
+    ],
+  },
+  {
+    id: "optics",
+    label: "Optics and electro-optics",
+    coding: false,
+    pattern:
+      /\b(optical|optics|photonics|electro-?optic(s|al)?|laser)\b|אופטיקה|אופטי(ת)?|פוטוניקה|לייזר/i,
+    topics: [
+      "first-order optical design: focal length, aperture, field of view and resolution",
+      "aberrations and how a lens design corrects them",
+      "detectors and sensors: noise, dynamic range and the signal-to-noise budget",
+      "tolerancing and alignment for production",
+      "optical design tools (Zemax or Code V) and what to check in their results",
+      "thermal and mechanical effects on an optical system",
+      "light sources and lasers: safety, power and beam quality",
+      "measuring and testing optical performance (MTF, wavefront)",
+    ],
+    designProblems: [
+      "a camera lens for a car's lane-keeping system that works from -40°C to 85°C",
+      "a thermal imaging system that detects a person at 2 km",
+      "an optical module for an AR headset that must weigh under 50 grams",
+      "a lidar for a delivery robot on a tight cost target",
+      "an inspection system that finds 10-micron defects on a production line",
+    ],
+  },
+  {
+    id: "reliability",
+    label: "Reliability and quality engineering",
+    coding: false,
+    pattern:
+      /reliability|quality engineer|validation engineer|\b(v&v|hardware test engineer)\b|אמינות|מהנדס(ת)? (איכות|ולידציה)/i,
+    topics: [
+      "reliability prediction and MTBF, and what the number really means",
+      "FMEA: finding failure modes and ranking the risks",
+      "root cause analysis on a field failure (8D, 5 whys, fishbone)",
+      "accelerated life testing and environmental testing (HALT, thermal, vibration)",
+      "statistical process control and process capability",
+      "quality systems and standards (ISO 9001, and ISO 13485 or AS9100 where they apply)",
+      "verification and validation plans against requirements",
+      "working with suppliers on quality problems",
+    ],
+    designProblems: [
+      "the reliability program for a new outdoor product with a 10-year warranty",
+      "a field failure rate that tripled after a supplier change",
+      "the validation plan for a medical device before submission to the regulator",
+      "a test plan that proves a product survives shipping and harsh environments",
+      "cutting the scrap rate of a production line from 8% to 2%",
+    ],
+  },
+  {
     id: "electrical",
     label: "Electrical and electronics engineering",
     coding: false,
@@ -1478,11 +1713,11 @@ export const electricalSpecialties: (TechSpecialty & { coding: boolean })[] = [
  * The electrical specialty a title names. Software titles (such as an
  * embedded software engineer) keep the software rounds.
  */
-export function electricalSpecialtyFor(
+export function engineeringSpecialtyFor(
   title: string,
 ): (TechSpecialty & { coding: boolean }) | null {
   if (isTechnicalRole(title)) return null;
-  return electricalSpecialties.find((s) => s.pattern.test(title)) ?? null;
+  return engineeringSpecialties.find((s) => s.pattern.test(title)) ?? null;
 }
 
 /**
@@ -1490,7 +1725,7 @@ export function electricalSpecialtyFor(
  * system design, or an electrical engineering design.
  */
 export function hasDesignRound(title: string): boolean {
-  return isTechnicalRole(title) || electricalSpecialtyFor(title) !== null;
+  return isTechnicalRole(title) || engineeringSpecialtyFor(title) !== null;
 }
 
 /**
@@ -1498,12 +1733,12 @@ export function hasDesignRound(title: string): boolean {
  * specialty, plus one general engineering topic (standards, testing,
  * manufacturing). Empty when the title names no electrical field.
  */
-export function electricalTopicsFor(
+export function engineeringTopicsFor(
   title: string,
   count: number,
   random: () => number = Math.random,
 ): string[] {
-  const specialty = electricalSpecialtyFor(title);
+  const specialty = engineeringSpecialtyFor(title);
   if (!specialty) return [];
   const general = roleFamilies.find((f) => f.id === "hardware")!.focus ?? [];
   return [
@@ -1513,11 +1748,11 @@ export function electricalTopicsFor(
 }
 
 /** One design problem for an electrical engineer, in their specialty. */
-export function electricalDesignProblemFor(
+export function engineeringDesignProblemFor(
   title: string,
   random: () => number = Math.random,
 ): string | null {
-  const specialty = electricalSpecialtyFor(title);
+  const specialty = engineeringSpecialtyFor(title);
   return specialty ? sampleBank(specialty.designProblems, 1, random)[0] : null;
 }
 
@@ -1533,7 +1768,7 @@ export function isCodingRole(title: string): boolean {
     ) ||
     /אנליסט(ית)? (דאטה|נתונים)|מדע(ן|נית) נתונים|דאטה סיינטיסט/.test(title) ||
     // Chip design, verification and FPGA interviews include writing RTL.
-    electricalSpecialtyFor(title)?.coding === true
+    engineeringSpecialtyFor(title)?.coding === true
   );
 }
 

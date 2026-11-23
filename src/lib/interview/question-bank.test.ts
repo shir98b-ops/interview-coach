@@ -5,10 +5,10 @@ import {
   behavioralThemes,
   commonQuestions,
   designProblemFor,
-  electricalDesignProblemFor,
-  electricalSpecialties,
-  electricalSpecialtyFor,
-  electricalTopicsFor,
+  engineeringDesignProblemFor,
+  engineeringSpecialties,
+  engineeringSpecialtyFor,
+  engineeringTopicsFor,
   hasDesignRound,
   focusAreasFor,
   isCodingRole,
@@ -323,7 +323,7 @@ describe("electrical specialties", () => {
     ["Mechanical Engineer", null],
   ];
   it.each(cases)("%s → %s", (title, id) => {
-    expect(electricalSpecialtyFor(title)?.id ?? null).toBe(id);
+    expect(engineeringSpecialtyFor(title)?.id ?? null).toBe(id);
   });
 
   it("puts every electrical title in the engineering family, not software", () => {
@@ -355,25 +355,90 @@ describe("electrical specialties", () => {
   });
 
   it("draws most topics from the specialty, plus one general engineering topic", () => {
-    const topics = electricalTopicsFor("RF Engineer", 5, () => 0.3);
-    const rf = electricalSpecialties.find((s) => s.id === "rf")!;
+    const topics = engineeringTopicsFor("RF Engineer", 5, () => 0.3);
+    const rf = engineeringSpecialties.find((s) => s.id === "rf")!;
     expect(topics).toHaveLength(5);
     expect(topics.filter((t) => rf.topics.includes(t))).toHaveLength(4);
-    expect(electricalTopicsFor("Marketing Manager", 5)).toEqual([]);
+    expect(engineeringTopicsFor("Marketing Manager", 5)).toEqual([]);
   });
 
   it("picks a design problem from the specialty", () => {
-    const fpga = electricalSpecialties.find((s) => s.id === "fpga")!;
+    const fpga = engineeringSpecialties.find((s) => s.id === "fpga")!;
     expect(fpga.designProblems).toContain(
-      electricalDesignProblemFor("FPGA Engineer", () => 0.5),
+      engineeringDesignProblemFor("FPGA Engineer", () => 0.5),
     );
-    expect(electricalDesignProblemFor("Sales Manager")).toBeNull();
+    expect(engineeringDesignProblemFor("Sales Manager")).toBeNull();
   });
 
   it("has full topic and problem lists for every specialty", () => {
-    for (const s of electricalSpecialties) {
+    for (const s of engineeringSpecialties) {
       expect(s.topics.length).toBeGreaterThanOrEqual(8);
       expect(s.designProblems.length).toBeGreaterThanOrEqual(5);
     }
+  });
+});
+
+describe("titles that used to fall between the chairs", () => {
+  it.each([
+    ["Systems Engineer", "systems"],
+    ["מהנדס מערכת", "systems"],
+    ["Robotics Engineer", "robotics"],
+    ["מהנדסת מכטרוניקה", "robotics"],
+    ["Optical Engineer", "optics"],
+    ["מהנדס אופטיקה", "optics"],
+    ["Reliability Engineer", "reliability"],
+    ["מהנדסת איכות", "reliability"],
+  ])("%s gets the %s engineering specialty, not software", (title, id) => {
+    expect(engineeringSpecialtyFor(title)?.id).toBe(id);
+    expect(matchRoleFamilies(title).map((f) => f.id)).toEqual(["hardware"]);
+    expect(hasDesignRound(title)).toBe(true);
+    expect(isCodingRole(title)).toBe(false);
+  });
+
+  it("treats LLM and game roles as software specialties", () => {
+    expect(isTechnicalRole("LLM Engineer")).toBe(true);
+    expect(techSpecialtyFor("LLM Engineer")?.id).toBe("llm");
+    expect(techSpecialtyFor("Game Developer")?.id).toBe("game");
+    expect(isTechnicalRole("Smart Contract Engineer")).toBe(true);
+  });
+
+  it("sends researchers to the right field", () => {
+    expect(matchRoleFamilies("Security Researcher").map((f) => f.id)).toEqual([
+      "security",
+    ]);
+    expect(matchRoleFamilies("UX Researcher").map((f) => f.id)).toEqual([
+      "design",
+    ]);
+    expect(matchRoleFamilies("Quant Researcher").map((f) => f.id)).toEqual([
+      "finance",
+    ]);
+  });
+
+  it("keeps a penetration tester out of software testing", () => {
+    expect(techSpecialtyFor("Penetration Tester")).toBeNull();
+    expect(matchRoleFamilies("Penetration Tester").map((f) => f.id)).toEqual([
+      "security",
+    ]);
+    expect(techSpecialtyFor("QA Tester")?.id).toBe("qa");
+  });
+
+  it("gives hybrid technical roles their own tracks", () => {
+    expect(matchRoleFamilies("Solutions Engineer").map((f) => f.id)).toEqual([
+      "solutions",
+    ]);
+    expect(matchRoleFamilies("Pre-Sales Engineer").map((f) => f.id)).toContain(
+      "solutions",
+    );
+    expect(
+      matchRoleFamilies("Technical Support Engineer").map((f) => f.id),
+    ).toEqual(["it"]);
+    expect(matchRoleFamilies("תומך טכני").map((f) => f.id)).toEqual(["it"]);
+    expect(matchRoleFamilies("DBA").map((f) => f.id)).toEqual(["it"]);
+    expect(matchRoleFamilies("CTO").map((f) => f.id)).toEqual(["management"]);
+  });
+
+  it("treats a Hebrew test engineer as software QA", () => {
+    expect(isTechnicalRole("מהנדס בדיקות")).toBe(true);
+    expect(techSpecialtyFor("מהנדס בדיקות")?.id).toBe("qa");
   });
 });
