@@ -564,3 +564,19 @@ describe("life sciences and medical devices", () => {
     expect(families("Hardware Lab Technician")).toEqual(["hardware"]);
   });
 });
+
+describe("life sciences gaps", () => {
+  const families = (title: string) => matchRoleFamilies(title).map((f) => f.id);
+
+  it("sends a Hebrew regulatory title to regulatory affairs, unless it is in finance", () => {
+    expect(families("ממונה רגולציה")).toEqual(["regulatory"]);
+    expect(families("מנהלת רגולציה")).toContain("regulatory");
+    expect(families("ממונה רגולציה בחברת ביטוח")).toEqual(["legal"]);
+    expect(families("עורכת דין רגולציה")).toContain("legal");
+  });
+
+  it("treats a clinical application specialist as product support, not nursing", () => {
+    expect(families("Clinical Application Specialist")).toEqual(["solutions"]);
+    expect(families("Clinical Nurse Specialist")).toEqual(["health"]);
+  });
+});

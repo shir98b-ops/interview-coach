@@ -1145,6 +1145,13 @@ export const roleFamilies: RoleFamily[] = [
       "implementation specialist",
       "implementation engineer",
       "implementation consultant",
+      // Medical device companies' specialists who train and support
+      // clinicians on the product.
+      "clinical application specialist",
+      "clinical applications specialist",
+      "application specialist",
+      "applications specialist",
+      "field clinical specialist",
     ],
     hebrew: [
       "פריסייל",
@@ -1272,7 +1279,13 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
   const regulatory =
     !technical &&
     (matches(family("regulatory")) ||
-      (/\b(qa|quality)\b|איכות/i.test(title) && LIFE_SCIENCE.test(title)));
+      (/\b(qa|quality)\b|איכות/i.test(title) && LIFE_SCIENCE.test(title)) ||
+      // In Israeli ads a Hebrew regulatory title with no other context, such
+      // as "ממונה רגולציה", is usually in pharma, medical devices or food.
+      (hebrewWord("רגולציה|רגולטורי(ת)?").test(title) &&
+        !/ביטוח|בנק|פיננס|השקעות|אשראי|תקשורת|אנרגיה|insurance|bank|financ/i.test(
+          title,
+        )));
   const lab =
     matches(family("lab")) &&
     !matches(family("education")) &&
@@ -1289,6 +1302,7 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
     (lifeScience ||
       medtechEngineer ||
       technical ||
+      matches(family("solutions")) ||
       /medical (devices?|equipment)|(ציוד|מכשור) רפואי/i.test(title)) &&
     !(
       /\b(nurse|nursing|physician|doctor|pharmacist)s?\b/i.test(title) ||
