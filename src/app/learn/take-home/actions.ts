@@ -167,7 +167,7 @@ export async function submitTakeHome(
   const { data: takeHome } = await supabase
     .from("take_homes")
     .select(
-      "id, brief, submission, score, seniority, target_roles(title, seniority), jobs(title, company)",
+      "id, brief, submission, score, seniority, language, target_roles(title, seniority), jobs(title, company)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -209,7 +209,13 @@ export async function submitTakeHome(
     : savedRole && { title: savedRole.title, seniority };
   let feedback;
   try {
-    feedback = await evaluateTakeHome(role, brief, submission, user.address);
+    feedback = await evaluateTakeHome(
+      role,
+      brief,
+      submission,
+      user.address,
+      parseLanguage(takeHome.language),
+    );
   } catch (error) {
     refresh();
     if (error instanceof AiError) return aiError(error, "Take-home scoring");

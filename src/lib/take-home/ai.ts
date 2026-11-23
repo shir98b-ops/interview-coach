@@ -162,6 +162,7 @@ export async function evaluateTakeHome(
   brief: TakeHomeBrief,
   submission: string,
   address: Address | null = null,
+  language: InterviewLanguage | null = null,
 ): Promise<TakeHomeFeedback> {
   const code = brief.format === "code";
   let response;
@@ -204,8 +205,12 @@ ${levelScoring.replaceAll("answer", "submission")}
 
 Then say what worked, the most useful specific improvements, and the
 questions an interviewer would likely ask about it in the follow-up
-interview. Speak to the candidate directly. Write the feedback in the
-language of the brief. ${addressInstruction(address)}
+interview. Speak to the candidate directly. Write all the feedback in ${
+            language
+              ? interviewLanguages[language]
+              : "the language of the brief's text"
+          }, even when the code and the submission are in English; keep code,
+names and technical terms as they are. ${addressInstruction(address)}
 
 ${target ? roleLines(target) : "<role>Not given</role>"}
 
