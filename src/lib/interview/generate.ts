@@ -11,7 +11,7 @@ import type { SubmittedTakeHome } from "@/lib/take-home/for-interview";
 import {
   bankFor,
   behavioralThemes,
-  codingTopics,
+  codingTopicsFor,
   engineeringDesignProblemFor,
   engineeringSpecialtyFor,
   engineeringTopicsFor,
@@ -345,7 +345,7 @@ ${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
         ? sqlTopics
         : hdl
           ? hdlTopicsFor(target.title)
-          : codingTopics,
+          : codingTopicsFor(target.title),
       CODING_QUESTION_COUNT,
     );
     return `<programming_language>${codeLanguages[language]}</programming_language>

@@ -57,6 +57,19 @@ function codeTask(codeLanguage: CodeLanguage): string {
 - Put any starter code, module headers or interface definitions in
   starterCode, in English. Never include a solution.`;
   }
+  if (codeLanguage === "r" || codeLanguage === "sas") {
+    return `- Kind of task: a small, realistic analysis in
+  ${codeLanguages[codeLanguage]}, the kind statisticians and analysts are
+  sent: for example summary tables by group from a small trial or study data
+  set, a derived analysis data set, or a statistical test with its report.
+  Base it on the work of this role.
+- Give the data as a few rows per table, the variables and their meaning, and
+  what the output tables or results must show.
+- Ask for the code, the output tables, checks of the data, and a short README
+  on the methods, the assumptions and how to run it.
+- Put the data rows and any starter code in starterCode, in English. Never
+  include a solution.`;
+  }
   return `- Kind of task: a small, realistic coding project in
   ${codeLanguages[codeLanguage]}, the kind companies send to developers: for
   example a service endpoint with its logic, a data processing script, a

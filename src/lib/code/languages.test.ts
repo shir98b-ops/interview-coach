@@ -23,6 +23,8 @@ describe("code languages", () => {
     expect(defaultCodeLanguage("Design Verification Engineer")).toBe("verilog");
     expect(defaultCodeLanguage("מהנדס אימות שבבים")).toBe("verilog");
     expect(defaultCodeLanguage("FPGA Engineer (VHDL)")).toBe("vhdl");
+    expect(defaultCodeLanguage("Biostatistician")).toBe("r");
+    expect(defaultCodeLanguage("Bioinformatician")).toBe("python");
   });
 
   it("picks VHDL when an FPGA posting asks mostly for it", () => {
