@@ -54,6 +54,22 @@ export function defaultCodeLanguage(title: string): CodeLanguage {
 }
 
 /**
+ * The language for a specific job: the title's guess, except that an FPGA or
+ * chip posting that asks mostly for VHDL gets VHDL.
+ */
+export function defaultCodeLanguageForJob(
+  title: string,
+  description: string | null,
+): CodeLanguage {
+  const language = defaultCodeLanguage(title);
+  if (!isHdl(language) || !description) return language;
+  const count = (pattern: RegExp) => description.match(pattern)?.length ?? 0;
+  return count(/\bvhdl\b/gi) > count(/\b(system)?verilog\b/gi)
+    ? "vhdl"
+    : language;
+}
+
+/**
  * Builds the saved answer from the code and the optional explanation, with
  * the code in a fenced block so it is shown and read as code.
  */

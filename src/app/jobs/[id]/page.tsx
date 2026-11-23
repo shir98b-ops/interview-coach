@@ -1,4 +1,4 @@
-import { defaultCodeLanguage } from "@/lib/code/languages";
+import { defaultCodeLanguageForJob } from "@/lib/code/languages";
 import { hasDesignRound, isCodingRole } from "@/lib/interview/question-bank";
 import type { Metadata } from "next";
 import { formatDate } from "@/lib/format";
@@ -91,7 +91,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
   if (!job) notFound();
   const technical = hasDesignRound(job.title);
   const coding = isCodingRole(job.title);
-  const codeLanguage = defaultCodeLanguage(job.title);
+  const codeLanguage = defaultCodeLanguageForJob(job.title, job.description);
   const status = parseStatus(job.status);
   const now = new Date();
   // The newest plan for the job as a whole, and for each stage.

@@ -243,11 +243,11 @@ as ${QUESTION_COUNT} questions, asked in this order, each of kind "design":
 3. Ask for one key calculation done out loud, the one this kind of design
    lives or dies on (a power, timing, noise, link, error or thermal budget, a
    load, a failure rate or a short-circuit level), with the numbers from the problem.
-4. Ask how they would choose the main components or implementation, and what
-   happens when a constraint changes (a part goes out of stock, the budget is
-   cut, the temperature range grows).
-5. Ask how they would verify the design and what is most likely to fail in
-   testing, certification or the field.
+4. Change one constraint (a key part goes out of stock, the budget is cut, the
+   temperature range grows) and ask how their choice of components or
+   implementation changes.
+5. Ask what in this design is most likely to fail in testing, certification
+   or the field, and so what they would verify first.
 
 Each question after the first must make sense on its own while building on
 the same problem, the way an interviewer moves the discussion forward.
