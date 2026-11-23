@@ -11,6 +11,7 @@ const item = (position: number, score = 4) => ({
   content: score,
   structure: score,
   clarity: score,
+  seriousError: false,
   strengths: " Good example. ",
   improvements: "Add a result.",
   betterAnswer: "Situation, action, result.",
@@ -30,6 +31,12 @@ describe("feedbackByPosition", () => {
     const result = feedbackByPosition({ answers: [item(2), item(1)] }, [1, 2]);
     expect(result?.get(1)?.strengths).toBe("Good example.");
     expect(result?.size).toBe(2);
+  });
+
+  it("caps the scores of an answer with a serious professional mistake", () => {
+    const wrong = { ...item(1, 4), content: 3, clarity: 5, seriousError: true };
+    const result = feedbackByPosition({ answers: [wrong] }, [1])?.get(1);
+    expect(result).toMatchObject({ content: 2, structure: 3, clarity: 3 });
   });
 
   it("returns null when a question has no feedback", () => {

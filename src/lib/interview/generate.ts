@@ -3,17 +3,19 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import { codeLanguages, type CodeLanguage } from "@/lib/code/languages";
+import { companyContext } from "@/lib/jobs/company-context";
 import type { ResumeData } from "@/lib/resume/schema";
+import type { SubmittedTakeHome } from "@/lib/take-home/for-interview";
 import {
   bankFor,
   behavioralThemes,
   codingTopics,
   focusAreasFor,
   isTechnicalRole,
+  designProblemFor,
   sampleBank,
   sqlTopics,
-  systemDesignProblems,
-  technicalTopics,
+  technicalTopicsFor,
 } from "./question-bank";
 import {
   CODING_QUESTION_COUNT,
@@ -43,6 +45,54 @@ export interface PracticeTarget {
   organization?: OrganizationType;
   /** The programming language of a coding round. */
   codeLanguage?: CodeLanguage;
+  /** The take-home the candidate already submitted for this job. */
+  takeHome?: SubmittedTakeHome | null;
+}
+
+/** Long submissions are cut so the prompt stays within budget. */
+const TAKE_HOME_PROMPT_LIMIT = 12000;
+
+/**
+ * Real hiring processes follow a take-home with an interview that digs into
+ * it, so a practice after one starts from the candidate's own submission.
+ */
+function takeHomeLine(target: PracticeTarget, mode: InterviewMode): string {
+  const takeHome = target.takeHome;
+  if (!takeHome || mode === "coding") return "";
+  const submission =
+    takeHome.submission.length > TAKE_HOME_PROMPT_LIMIT
+      ? `${takeHome.submission.slice(0, TAKE_HOME_PROMPT_LIMIT)}\n[cut for length]`
+      : takeHome.submission;
+  return `
+The candidate already submitted a take-home assignment for this job. In real
+hiring processes the next professional interview opens with a review of it,
+so this practice does too. Base at least ${mode === "general" ? "two" : "three"} of the questions on THIS
+submission, the way the reviewer who read it would ask:
+- ask them to walk through a specific decision they made, naming the part of
+  their submission it is in;
+- challenge a weak spot the review found, without revealing the answer;
+- change a constraint (more scale, a new requirement, less time or budget)
+  and ask what in their solution would change;
+- ask about a trade-off or an alternative they did not choose.
+Refer to the submission by its real content (names, numbers, functions,
+sections), never generically. The other questions cover the rest of what this
+interview checks.
+
+<take_home title="${takeHome.title.replace(/"/g, "'")}">
+<assignment>
+${takeHome.brief}
+</assignment>
+<candidate_submission>
+${submission}
+</candidate_submission>
+<review_weak_spots>
+${takeHome.weaknesses.map((w) => `- ${w}`).join("\n")}
+</review_weak_spots>
+<reviewer_follow_up_questions>
+${takeHome.interviewQuestions.map((q) => `- ${q}`).join("\n")}
+</reviewer_follow_up_questions>
+</take_home>
+`;
 }
 
 /** Makes the questions fit the kind of organization the user applies to. */
@@ -74,7 +124,23 @@ interview. Write ${QUESTION_COUNT} questions for the candidate below.
 - Questions the candidate was already asked (listed at the end, when there
   are any) always win: never repeat or reword one of them, even if it is in
   the commonly asked list.
-- Ask one thing per question, the way a real interviewer would say it.`;
+- Ask one thing per question, the way a real interviewer would say it.
+- Tie the behavioral questions to situations typical of this role (for
+  example a difficult customer for customer success, a production incident
+  for an engineer, a missed launch date for a product manager).`;
+
+/**
+ * How real interviewers ask, in every kind of interview: one question at a
+ * time, and the candidate has to come up with what the answer should cover.
+ */
+const askLikeAnInterviewer = `Ask the way a real interviewer speaks:
+- Each question asks ONE thing: one concept, one scenario or one problem. At
+  most one short follow-up clause, never a list of sub-questions.
+- Never list the concepts, methods, terms or steps the answer should cover
+  (no "cover X, Y and Z", no "for example A, B or C"). Recalling them is what
+  the interview checks; the feedback names what was missing.
+- Keep each question short enough to say out loud in about 20 seconds, with
+  only the details needed to answer it.`;
 
 /** Difficulty follows the seniority, in every kind of interview. */
 const levelGuide = `Set the difficulty by the seniority level:
@@ -100,11 +166,18 @@ software developer each get the questions of their own profession.
 - Mix the question types: explain a core concept or method in depth, handle
   a realistic work scenario, solve a concrete professional problem, and
   compare two approaches with their trade-offs.
-- When a job posting is given, use the tools, domains and problems it names.
-- When focus areas are listed below, cover them.
+- Every question covers a different topic: no two questions on the same
+  area, law or skill.
+- When a job posting is given, cover first the duties, tools and domains it
+  names, then the core knowledge every candidate in this field is asked.
+- When focus areas are listed below, build each question on a different one.
+  They are written for a whole field: adapt each to this exact profession and
+  skip one that does not fit it.
 - Every question must be answerable out loud in a few minutes, without a
   computer (an approach, calculation or pseudo-code explained in words).
 - Ask what real interviewers in this field ask; no trivia or trick questions.
+
+${askLikeAnInterviewer}
 
 ${levelGuide}
 
@@ -123,7 +196,11 @@ ${QUESTION_COUNT} questions, asked in this order, each of kind "design":
 5. Ask about priorities and trade-offs, and how they would measure success.
 
 Each question after the first must make sense on its own while building on
-the same case, the way an interviewer moves the discussion forward.
+the same case, the way an interviewer moves the discussion forward. Present
+the case details in the first question; later questions add only the new
+fact or twist they need.
+
+${askLikeAnInterviewer}
 
 ${levelGuide}
 
@@ -143,6 +220,8 @@ ${QUESTION_COUNT} questions, asked in this order, each of kind "design":
 
 Each question after the first must make sense on its own while building on
 the same problem, the way an interviewer moves the discussion forward.
+
+${askLikeAnInterviewer}
 
 ${levelGuide}
 
@@ -184,6 +263,8 @@ function instructionsFor(mode: InterviewMode, technical: boolean): string {
   if (mode === "case") return technical ? designInstructions : caseInstructions;
   return `${instructions}
 
+${askLikeAnInterviewer}
+
 ${levelGuide}`;
 }
 
@@ -219,24 +300,34 @@ different story each time:
 ${topics.map((topic) => `- ${topic}`).join("\n")}
 ${
   target.job
-    ? "\nWhen the job posting names a domain or data, set the problems in it.\n"
+    ? "\nSet both problems in this company's product and data, as its engineers would meet them (its domain, its entities, its scale), not in a generic story.\n"
     : ""
 }`;
   }
   const focus = focusAreasFor(target.title);
   if (mode === "professional") {
-    const topics = technical ? technicalTopics : focus;
+    const topics = technical
+      ? technicalTopicsFor(target.title, QUESTION_COUNT)
+      : sampleBank(focus, QUESTION_COUNT);
     return topics.length
       ? `<focus_areas>
-${sampleBank(topics, 4)
-  .map((topic) => `- ${topic}`)
-  .join("\n")}
+${topics.map((topic) => `- ${topic}`).join("\n")}
 </focus_areas>
 `
       : "";
   }
   if (target.job) {
-    return `<case>
+    return technical
+      ? `<design_problem>
+A system this company would really build, taken from the product, scale and
+stack in the job posting${
+          target.takeHome
+            ? ", or the system the candidate's take-home started, grown to production scale"
+            : ""
+        }.
+</design_problem>
+`
+      : `<case>
 A real situation from the work of this role at the company in the job
 posting, at that company's real scale and context.
 </case>
@@ -244,7 +335,7 @@ posting, at that company's real scale and context.
   }
   return technical
     ? `<design_problem>
-Design ${sampleBank(systemDesignProblems, 1)[0]}.
+Design ${designProblemFor(target.title)}.
 </design_problem>
 `
     : `<case>
@@ -299,7 +390,9 @@ ${
     ? `
 This interview is for a specific job. Base most of the questions on the
 requirements and responsibilities in this posting, the way this company's
-interviewer would ask them:
+interviewer would ask them.
+
+${companyContext}
 
 <job_posting company="${target.job.company.replace(/"/g, "'")}">
 ${target.job.description}
@@ -317,7 +410,7 @@ ${target.stage.history}
 `
               : ""
           }
-${startingPoint(target, mode, technical)}${organizationLine(target)}${
+${startingPoint(target, mode, technical)}${organizationLine(target)}${takeHomeLine(target, mode)}${
             target.previousQuestions?.length
               ? `
 The candidate has already practiced for this role and was asked the questions

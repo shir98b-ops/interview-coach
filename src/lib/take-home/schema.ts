@@ -105,7 +105,9 @@ export const briefSchema = z.object({
   title: z.string().describe("A short title for the assignment"),
   company: z
     .string()
-    .describe("A fictional company name and one line on what it does"),
+    .describe(
+      "The company name (the hiring company when a job posting is given, else a fictional one) and one line on what it does",
+    ),
   context: z
     .string()
     .describe(

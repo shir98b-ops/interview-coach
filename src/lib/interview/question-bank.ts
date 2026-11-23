@@ -56,6 +56,16 @@ export const roleFamilies: RoleFamily[] = [
       "A key metric dropped 20% this week. How do you investigate?",
       "How do you work with engineers and designers when you disagree on a solution?",
     ],
+    focus: [
+      "product sense: designing or improving a product for a defined user",
+      "metrics: choosing a north-star metric and diagnosing a metric drop",
+      "prioritization: frameworks, trade-offs and saying no to stakeholders",
+      "experimentation: designing an A/B test and reading its results",
+      "writing a spec and working with engineering and design",
+      "user research and turning insights into decisions",
+      "estimation and market sizing done out loud",
+      "launch and go-to-market planning",
+    ],
   },
   {
     id: "project",
@@ -69,6 +79,9 @@ export const roleFamilies: RoleFamily[] = [
       "scrum",
       "logistics",
       "supply",
+      "procurement",
+      "purchasing",
+      "buyer",
     ],
     hebrew: [
       "פרויקט(ים)?",
@@ -77,6 +90,7 @@ export const roleFamilies: RoleFamily[] = [
       "תפעולי(ת)?",
       "לוגיסטיקה",
       "רכש",
+      "קניי?(ן|נית)",
       "שרשרת אספקה",
       "מתאמ(ת)?",
       "רכז(ת)?",
@@ -91,6 +105,15 @@ export const roleFamilies: RoleFamily[] = [
       "Describe a process you improved. What changed as a result?",
       "How do you handle a team member who keeps missing deadlines?",
       "How do you decide when to escalate a problem?",
+    ],
+    focus: [
+      "planning: scope, dependencies, critical path and estimates",
+      "risk management and when to escalate",
+      "stakeholder communication and status reporting",
+      "Agile and Scrum versus waterfall, and when each fits",
+      "budget, resources and tracking progress against plan",
+      "improving a process with data (for operations roles)",
+      "vendor, procurement and contract management",
     ],
   },
   {
@@ -114,6 +137,16 @@ export const roleFamilies: RoleFamily[] = [
       "What would you do if the data contradicts what a senior stakeholder believes?",
       "Which metrics would you track to measure the health of a business like ours?",
     ],
+    focus: [
+      "SQL: joins, aggregation and window functions, explained in words",
+      "statistics: significance, confidence intervals and sample size",
+      "analyzing an A/B test and its common pitfalls",
+      "designing metrics and investigating a sudden metric change",
+      "data quality: validating results before sharing them",
+      "dashboards and visualizations that do not mislead",
+      "presenting findings and a recommendation to non-technical managers",
+      "Python or Excel for analysis",
+    ],
   },
   {
     id: "marketing",
@@ -128,6 +161,8 @@ export const roleFamilies: RoleFamily[] = [
       "social media",
       "communications",
       "pr",
+      "copywriter",
+      "community",
     ],
     hebrew: [
       "שיווק",
@@ -154,6 +189,16 @@ export const roleFamilies: RoleFamily[] = [
       "Describe a campaign that did not perform. What did you change?",
       "How do you get to know a target audience?",
     ],
+    focus: [
+      "funnel economics: CAC, LTV, conversion and payback",
+      "channel strategy and budget allocation",
+      "attribution and incrementality testing",
+      "positioning, messaging and audience segmentation",
+      "campaign planning and creative testing",
+      "SEO and content strategy",
+      "marketing analytics tools (GA4, ad platforms) and reporting",
+      "privacy and consent rules (the Israeli Privacy Protection Law, GDPR) and the anti-spam rules of the Communications Law",
+    ],
   },
   {
     id: "sales",
@@ -167,7 +212,7 @@ export const roleFamilies: RoleFamily[] = [
       "sdr",
       "customer",
       "success",
-      "support",
+      "support representative",
       "service",
     ],
     hebrew: [
@@ -192,6 +237,16 @@ export const roleFamilies: RoleFamily[] = [
       "Tell me about a time you turned around an unhappy customer.",
       "How do you handle the objection that the price is too high?",
     ],
+    focus: [
+      "prospecting and the first outreach message or call",
+      "discovery and qualification frameworks (BANT, MEDDIC)",
+      "handling objections",
+      "pipeline management and forecasting",
+      "negotiation and closing",
+      "account management, renewals and expansion (for customer success roles)",
+      "CRM discipline and reporting",
+      "pitching the product in a short mock call",
+    ],
   },
   {
     id: "people",
@@ -204,6 +259,8 @@ export const roleFamilies: RoleFamily[] = [
       "talent",
       "people",
       "hiring",
+      "hrbp",
+      "payroll",
     ],
     hebrew: [
       "משאבי אנוש",
@@ -213,6 +270,7 @@ export const roleFamilies: RoleFamily[] = [
       "פיתוח ארגוני",
       "פיתוח הדרכה",
       "רכז(ת)? גיוס",
+      "שכר",
     ],
     questions: [
       "How do you assess whether a candidate is a good fit?",
@@ -244,6 +302,16 @@ export const roleFamilies: RoleFamily[] = [
       "How do you work with developers to make sure the design is built as intended?",
       "How do you balance user needs with business goals?",
     ],
+    focus: [
+      "walking through a portfolio project from problem to result",
+      "user research methods and usability testing",
+      "information architecture and interaction design",
+      "design systems and consistency across a product",
+      "accessibility (WCAG and the Israeli accessibility regulations)",
+      "trade-offs with product and engineering",
+      "measuring whether a design succeeded",
+      "critiquing an existing product",
+    ],
   },
   {
     id: "finance",
@@ -256,6 +324,12 @@ export const roleFamilies: RoleFamily[] = [
       "controller",
       "bookkeeper",
       "economist",
+      "cfo",
+      "audit",
+      "auditor",
+      "tax",
+      "fp&a",
+      "investment",
     ],
     hebrew: [
       "כספים",
@@ -274,6 +348,11 @@ export const roleFamilies: RoleFamily[] = [
       "בקר(ית)?",
       "בקרה תקציבית",
       "תקציבים",
+      "מבקר(ת)? פנים",
+      "ביקורת",
+      'סמנכ"ל(ית)? כספים',
+      "מיסוי",
+      "יוע(ץ|צת) מס",
     ],
     questions: [
       "Walk me through how you build a budget or forecast.",
@@ -356,6 +435,8 @@ export const roleFamilies: RoleFamily[] = [
       "חומרים",
       "שבבים",
       "אנרגיה",
+      "אדריכל(ית)?",
+      "אדריכלות",
     ],
     questions: [
       "Walk me through a design you took from requirements to a working product. What trade-offs did you make?",
@@ -483,6 +564,7 @@ export const roleFamilies: RoleFamily[] = [
       "clinical",
       "dentist",
       "hygienist",
+      "veterinarian",
     ],
     hebrew: [
       "אח",
@@ -496,7 +578,7 @@ export const roleFamilies: RoleFamily[] = [
       "רוקח(ת)?",
       "פיזיותרפיסט(ית)?",
       "פיזיותרפיה",
-      "מרפא(ת)? בעיסוק",
+      "מרפא(ה|ת)? בעיסוק",
       "ריפוי בעיסוק",
       "דיאטנ(ית)?",
       "דיאטן",
@@ -508,6 +590,7 @@ export const roleFamilies: RoleFamily[] = [
       "רופא(ת)? שיניים",
       "שיננ(ית)?",
       "מטפל(ת)? סיעודי(ת)?",
+      "וטרינר(ית)?",
     ],
     questions: [
       "Tell me about a time you noticed something was wrong with a patient before others did.",
@@ -518,7 +601,7 @@ export const roleFamilies: RoleFamily[] = [
       "How do you keep going after a hard shift or the loss of a patient?",
     ],
     focus: [
-      "patient safety: medication errors, the five rights of medication and reporting an adverse event",
+      "patient safety: errors in this profession's scope (for nurses, the five rights of medication) and reporting an adverse event",
       "triage and prioritizing deteriorating patients (early warning signs, ABCDE)",
       "infection control, isolation and hand hygiene",
       "informed consent and patient rights under the Israeli Patient's Rights Law",
@@ -755,10 +838,84 @@ export const roleFamilies: RoleFamily[] = [
     ],
   },
   {
+    id: "it",
+    label: "IT and system administration",
+    keywords: [
+      "it",
+      "it support",
+      "helpdesk",
+      "help desk",
+      "system administrator",
+      "sysadmin",
+      "network administrator",
+      "network engineer",
+    ],
+    hebrew: [
+      "תמיכה טכנית",
+      "מנהל(ת)? רשת",
+      "מנהל(ת)? מערכות מידע",
+      "סיסטם",
+      "הלפדסק",
+      "מחשוב",
+    ],
+    questions: [
+      "A user says they cannot connect to the network. How do you troubleshoot it?",
+      "How do you prioritize when many tickets arrive at once?",
+      "Tell me about an outage you handled. What did you learn?",
+      "How do you explain a technical problem to a non-technical user?",
+      "How do you keep systems patched and backed up?",
+      "Tell me about something you automated to save time.",
+    ],
+    focus: [
+      "troubleshooting a connectivity or login problem step by step",
+      "networking basics: DNS, DHCP, VPN, routing and firewalls",
+      "Active Directory, identities and permissions",
+      "endpoint management, patching and backups",
+      "security hygiene: phishing, MFA and least privilege",
+      "ticket prioritization and SLAs",
+      "administering cloud and SaaS tools (Microsoft 365, Google Workspace)",
+    ],
+  },
+  {
+    id: "consulting",
+    label: "Consulting and strategy",
+    keywords: ["consultant", "consulting", "strategy", "strategist"],
+    hebrew: [
+      "יוע(ץ|צת) (אסטרטגי(ת)?|עסקי(ת)?|ניהולי(ת)?|ארגוני(ת)?)",
+      "ייעוץ (אסטרטגי|עסקי|ניהולי|ארגוני)",
+      "אסטרטגיה",
+      "אסטרטג(ית)?",
+    ],
+    questions: [
+      "Why consulting, and why our firm?",
+      "Tell me about a time you solved an ambiguous problem with limited data.",
+      "Tell me about a time you had to convince a senior stakeholder.",
+      "How do you structure a problem you have never seen before?",
+      "Tell me about a recommendation you made that was not accepted.",
+      "How do you work under tight deadlines with several clients?",
+    ],
+    focus: [
+      "structuring a business problem with a hypothesis tree",
+      "market sizing done out loud",
+      "profitability analysis: revenue and cost drivers",
+      "reading a chart or a data exhibit quickly and drawing the insight",
+      "synthesizing a recommendation for a CEO in one minute",
+      "client management and handling pushback",
+    ],
+  },
+  {
     id: "management",
     label: "Management",
     // "Manager" alone is left out: a Product Manager does not manage people.
-    keywords: ["lead", "head", "director", "team leader", "supervisor"],
+    keywords: [
+      "lead",
+      "head",
+      "director",
+      "team leader",
+      "supervisor",
+      "engineering manager",
+      "vp",
+    ],
     hebrew: [
       "ראש צוות",
       "ראש תחום",
@@ -780,6 +937,15 @@ export const roleFamilies: RoleFamily[] = [
       "How do you set goals for your team?",
       "Tell me about a time you had to lead change that people resisted.",
       "How do you build trust with a new team?",
+    ],
+    focus: [
+      "hiring and building a team",
+      "performance management and difficult feedback",
+      "setting goals and priorities for a team",
+      "managing up and working with stakeholders",
+      "leading a change people resist",
+      "delegating and developing people",
+      "budget and resource decisions",
     ],
   },
 ];
@@ -848,14 +1014,237 @@ export function isTechnicalRole(title: string): boolean {
   // A business developer is a sales role, not a software one.
   if (BUSINESS_DEVELOPER.test(title)) return false;
   return (
-    /\b(software|developer|programmer|devops|sre|backend|back-end|frontend|front-end|full[- ]?stack|qa|automation|web|mobile|ios|android|cloud|platform|data engineer|machine learning|ml engineer|ai engineer)\b/i.test(
-      title,
-    ) ||
+    SOFTWARE_TITLE.test(title) ||
+    QUALIFIED_ENGINEER.test(title) ||
     // Hebrew titles, such as "מפתח תוכנה" or "מהנדסת בקאנד".
-    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון))/.test(
+    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|מדע(ן|נית) נתונים|דאטה סיינטיסט|אלגוריתמ|קושחה|משובצות|אמבדד|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון|עסקי))/.test(
       title,
     )
   );
+}
+
+/** Titles that name software work on their own. */
+const SOFTWARE_TITLE =
+  /\b(software|developer|programmer|devops|sre|site reliability|backend|back-end|frontend|front-end|full[- ]?stack|qa|ios|android|data engineer|machine learning|ml engineer|ai engineer|mlops|data scientist|computer vision|algorithms?|embedded|firmware|tech lead|engineering manager|software architect|solutions architect)\b/i;
+
+/**
+ * Words like "web", "cloud" or "automation" mean software only next to an
+ * engineering word: a Web Analyst or a Marketing Automation Manager is not a
+ * developer.
+ */
+const QUALIFIED_ENGINEER =
+  /\b(web|mobile|cloud|platform|automation|infrastructure|test|r&d|security|network|integration)\s+(developer|engineer|architect)s?\b/i;
+
+/**
+ * Software specialties, each with the topics its professional round covers
+ * and the design problems its case round uses. Titles that name none of
+ * these (backend, full stack, plain "software engineer") use the general
+ * technical topics and system design problems.
+ */
+export interface TechSpecialty {
+  id: string;
+  label: string;
+  pattern: RegExp;
+  topics: string[];
+  designProblems: string[];
+}
+
+export const techSpecialties: TechSpecialty[] = [
+  {
+    id: "frontend",
+    label: "Frontend",
+    pattern:
+      /front-?end|פרונט|\b(react|angular|vue|web developer|ui developer|ui engineer)\b/i,
+    topics: [
+      "rendering performance: the critical rendering path, reflows and Core Web Vitals",
+      "state management in a large single-page app",
+      "the JavaScript event loop, promises and async pitfalls",
+      "browser security: XSS, CSRF, Content Security Policy and where to keep tokens",
+      "accessibility: semantic HTML, ARIA, keyboard and screen readers",
+      "component design and reuse in React or a similar framework",
+      "loading performance: caching, bundling and code splitting",
+      "testing UI: unit, component and end-to-end tests",
+    ],
+    designProblems: [
+      "the front end of a collaborative spreadsheet that runs in the browser",
+      "an infinite-scroll feed client that also works offline",
+      "a component library and design system used by 20 product teams",
+      "a live dashboard that renders thousands of updates a second",
+      "a checkout front end that stays fast on slow mobile networks",
+    ],
+  },
+  {
+    id: "mobile",
+    label: "Mobile",
+    pattern:
+      /mobile|\b(ios|android|swift|kotlin|flutter|react native)\b|מובייל/i,
+    topics: [
+      "the app lifecycle and background work limits on iOS and Android",
+      "offline-first data and syncing with a server",
+      "memory, battery and app start-up performance",
+      "releasing: store review, staged rollouts, feature flags and crash reporting",
+      "networking on unreliable connections",
+      "secure storage and authentication on the device",
+      "the UI thread and avoiding dropped frames",
+      "app architecture (MVVM, clean architecture) and testing",
+    ],
+    designProblems: [
+      "a mobile chat app with offline messages and push notifications",
+      "a driver app that tracks location in the background all day",
+      "a photo-sharing app that uploads reliably on flaky networks",
+      "a banking app's sign-in, session handling and secure local storage",
+      "feature flags and staged rollouts for an app with millions of users",
+    ],
+  },
+  {
+    id: "devops",
+    label: "DevOps and infrastructure",
+    pattern:
+      /devops|\b(sre|site reliability|platform engineer|cloud engineer|infrastructure|network engineer)\b|דבאופס|תשתיות/i,
+    topics: [
+      "CI/CD design and safe deployments (blue-green, canary, rollback)",
+      "Kubernetes: scheduling, probes, resource limits and debugging a crashing pod",
+      "infrastructure as code (Terraform) and managing its state",
+      "observability, SLOs and designing alerts people trust",
+      "incident response and blameless postmortems",
+      "networking: DNS, load balancers and TLS",
+      "cloud cost optimization",
+      "secrets management and least privilege",
+    ],
+    designProblems: [
+      "a CI/CD pipeline for 50 microservices with safe rollbacks",
+      "the logging, metrics and alerting stack for a growing SaaS",
+      "a multi-region deployment with disaster recovery for a payments service",
+      "a Kubernetes platform that many teams deploy to on their own",
+      "autoscaling and cost control for a very spiky workload",
+    ],
+  },
+  {
+    id: "qa",
+    label: "QA and test automation",
+    pattern: /\b(qa|tester|test|testing|automation)\b|בודק(ת)? תוכנה|בדיקות/i,
+    topics: [
+      "a test strategy and the test pyramid for a product",
+      "designing test cases: boundaries, equivalence classes and negative tests",
+      "designing an automation framework that stays maintainable",
+      "flaky tests: their causes and how to fix them",
+      "API testing and contract testing",
+      "performance and load testing",
+      "bug reports, severity versus priority, and release decisions",
+      "testing in CI and catching problems earlier",
+    ],
+    designProblems: [
+      "a test automation framework for a web and mobile product released weekly",
+      "the testing strategy for a payments API before a major release",
+      "end-to-end and load testing for a ticket sale with 100,000 users at once",
+      "a process that detects and quarantines flaky tests in CI",
+      "quality gates for a microservices system built by 30 teams",
+    ],
+  },
+  {
+    id: "data",
+    label: "Data engineering",
+    pattern:
+      /data engineer|analytics engineer|\betl\b|big data|הנדסת נתונים|מהנדס(ת)? (נתונים|דאטה)/i,
+    topics: [
+      "data modeling for analytics: star schemas and slowly changing dimensions",
+      "batch versus streaming processing",
+      "SQL performance on large tables, partitioning and clustering",
+      "idempotent, re-runnable pipelines and backfills",
+      "orchestration (Airflow or similar) and dependencies between jobs",
+      "data quality checks and lineage",
+      "Spark: shuffles, data skew and partitioning",
+      "data warehouse versus data lake trade-offs",
+    ],
+    designProblems: [
+      "a pipeline that loads clickstream events into a warehouse for daily reports",
+      "change data capture from a production database into analytics",
+      "data quality monitoring for 500 tables",
+      "a near-real-time pipeline that computes fraud features",
+      "a data lake layout with partitions, schemas and retention",
+    ],
+  },
+  {
+    id: "ml",
+    label: "Machine learning and data science",
+    pattern:
+      /machine learning|\b(ml|ai) engineer|mlops|data scientist|computer vision|\bnlp\b|algorithm|אלגוריתמ|מדע(ן|נית) נתונים|דאטה סיינטיסט/i,
+    topics: [
+      "bias and variance, overfitting and regularization",
+      "choosing evaluation metrics, especially for imbalanced data",
+      "feature engineering and data leakage",
+      "offline versus online evaluation, and A/B testing a model",
+      "serving models in production: latency, batching and monitoring drift",
+      "classic models versus deep learning, and when each fits",
+      "working with noisy or scarce labels",
+      "explaining a model's decisions to stakeholders",
+    ],
+    designProblems: [
+      "a recommendation system for an online store's home page",
+      "a fraud detection model that scores payments in real time",
+      "a search ranking system with offline and online evaluation",
+      "a content moderation classifier with human review",
+      "a demand forecasting model retrained weekly and monitored for drift",
+    ],
+  },
+  {
+    id: "embedded",
+    label: "Embedded and firmware",
+    pattern: /embedded|firmware|\brtos\b|קושחה|משובצות|אמבדד/i,
+    topics: [
+      "interrupts, priorities and race conditions on a microcontroller",
+      "RTOS tasks, scheduling and priority inversion",
+      "memory limits: stack, heap, fragmentation and static allocation",
+      "communication buses: I2C, SPI, UART and CAN",
+      "low-power design and sleep modes",
+      "debugging hardware and firmware together (oscilloscope, JTAG, logic analyzer)",
+      "C pitfalls: volatile, undefined behavior, pointers and alignment",
+      "bootloaders and safe firmware updates",
+    ],
+    designProblems: [
+      "firmware for a battery-powered sensor that reports over Bluetooth Low Energy",
+      "over-the-air firmware updates for 100,000 devices that must never brick",
+      "a motor-control loop on a microcontroller with hard real-time limits",
+      "a data logger that survives power loss without corrupting its storage",
+      "a driver and protocol stack for a new peripheral on an RTOS",
+    ],
+  },
+];
+
+/** The specialty a software title names, if any. */
+export function techSpecialtyFor(title: string): TechSpecialty | null {
+  return techSpecialties.find((s) => s.pattern.test(title)) ?? null;
+}
+
+/**
+ * Topics for a software role's professional round: mostly its specialty,
+ * plus one general engineering topic, so practice holds the specialty's bar
+ * without losing the fundamentals every engineer is asked about.
+ */
+export function technicalTopicsFor(
+  title: string,
+  count: number,
+  random: () => number = Math.random,
+): string[] {
+  const specialty = techSpecialtyFor(title);
+  if (!specialty) return sampleBank(technicalTopics, count, random);
+  return [
+    ...sampleBank(specialty.topics, count - 1, random),
+    ...sampleBank(technicalTopics, 1, random),
+  ];
+}
+
+/** One design problem that fits a software role's specialty. */
+export function designProblemFor(
+  title: string,
+  random: () => number = Math.random,
+): string {
+  const specialty = techSpecialtyFor(title);
+  return sampleBank(
+    specialty?.designProblems ?? systemDesignProblems,
+    1,
+    random,
+  )[0];
 }
 
 /**

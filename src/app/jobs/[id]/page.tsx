@@ -57,27 +57,37 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
   if (!user) redirect(`/login?next=/jobs/${id}`);
 
   // Row level security returns nothing for another user's job.
-  const [{ data: job }, interviews, { data: preps }, { data: practices }] =
-    await Promise.all([
-      supabase
-        .from("jobs")
-        .select("id, company, title, link, description, status, notes")
-        .eq("id", id)
-        .maybeSingle(),
-      interviewsForJob(supabase, id),
-      supabase
-        .from("job_preps")
-        .select("interview_id, plan, created_at")
-        .eq("job_id", id)
-        .order("created_at", { ascending: false })
-        .limit(30),
-      supabase
-        .from("sessions")
-        .select("id, created_at, overall_score, stage")
-        .eq("job_id", id)
-        .order("created_at", { ascending: false })
-        .limit(10),
-    ]);
+  const [
+    { data: job },
+    interviews,
+    { data: preps },
+    { data: practices },
+    { count: reviewedTakeHomes },
+  ] = await Promise.all([
+    supabase
+      .from("jobs")
+      .select("id, company, title, link, description, status, notes")
+      .eq("id", id)
+      .maybeSingle(),
+    interviewsForJob(supabase, id),
+    supabase
+      .from("job_preps")
+      .select("interview_id, plan, created_at")
+      .eq("job_id", id)
+      .order("created_at", { ascending: false })
+      .limit(30),
+    supabase
+      .from("sessions")
+      .select("id, created_at, overall_score, stage")
+      .eq("job_id", id)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase
+      .from("take_homes")
+      .select("id", { count: "exact", head: true })
+      .eq("job_id", id)
+      .not("feedback", "is", null),
+  ]);
   if (!job) notFound();
   const technical = isTechnicalRole(job.title);
   const coding = isCodingRole(job.title);
@@ -317,6 +327,13 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-extrabold">תרגול ראיון למשרה</h2>
             <p>חמש שאלות שנבנות מתוך המודעה, ואחריהן ציון ומשוב על כל תשובה.</p>
+            {(reviewedTakeHomes ?? 0) > 0 && (
+              <p className="font-bold">
+                הגשת מבחן בית למשרה הזו, אז התרגול יתחיל ממנו: שאלות על ההחלטות
+                שלך, על הנקודות שהמשוב מצא ועל מה שישתנה בהיקף גדול יותר, כמו
+                בראיון ההמשך האמיתי.
+              </p>
+            )}
           </div>
           <JobPracticeForm
             jobId={job.id}

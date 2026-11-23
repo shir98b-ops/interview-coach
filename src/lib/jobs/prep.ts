@@ -2,7 +2,9 @@ import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
+import { companyContext } from "@/lib/jobs/company-context";
 import type { ResumeData } from "@/lib/resume/schema";
+import type { SubmittedTakeHome } from "@/lib/take-home/for-interview";
 import {
   prepPlanSchema,
   readPrepPlan,
@@ -46,6 +48,7 @@ export async function writePrepPlan(
   daysUntilInterview: number | null,
   address: Address | null = null,
   stage: StageForPrep | null = null,
+  takeHome: SubmittedTakeHome | null = null,
 ): Promise<PrepPlan> {
   let response;
   try {
@@ -67,30 +70,63 @@ applied to the job below. Build a focused prep plan for its interviews.
 ${stageInstructions(stage)}
 
 - summary: two or three sentences on what this role really needs, read from
-  the posting, in plain words.
+  the posting, in plain words, including what the company does and what that
+  means for the interview.
 - requirements: the 4 to 8 requirements that matter most in the posting. For
   each, rate how the resume matches (strong, partial or gap) and add a short
   note: the resume evidence to mention, or how to handle the gap honestly.
 - likelyQuestions: 5 to 8 questions this interviewer is likely to ask, tied
   to the posting. For each, why they ask it and a one-line tip for answering.
+  Unless this stage is a screen or an HR interview, at least half are the
+  professional questions an interviewer in this field asks (knowledge,
+  methods, tools, work scenarios), even when the resume has big gaps: the
+  candidate must be ready for the interview, not only for questions about
+  the gaps.
 - stories: 3 to 5 stories from the resume worth preparing in STAR form, each
   with the resume item it comes from and which requirement it shows.
 - questionsToAsk: 3 to 5 smart questions the candidate can ask at the end.
 - research: 3 to 5 specific things to check about the company before the
-  interview. Use only what the posting says about the company; do not state
-  facts about the company you are not sure of.
+  interview, as actions the candidate takes (try the product, read app
+  store reviews, look up recent news and funding, compare two competitors,
+  look at the team on LinkedIn), each tied to how it helps in this
+  interview. Do not restate the posting, and do not state facts about the
+  company you are not sure of.
 - schedule: 3 to 6 prep steps with a time label and minutes each. The app
   the candidate is using has a practice interview built from this posting,
   with a score and feedback on each answer: make at least one step a practice
-  round there (name the kind: general, professional or case), instead of a
-  mock interview with a friend.
+  round there, named in Hebrew as the app shows it ("ראיון כללי", "ראיון
+  מקצועי" or "ניתוח מקרה"), instead of a mock interview with a friend.
   ${timeframe(daysUntilInterview)}
+
+For the likely questions and the schedule: ${companyContext}
 
 Never invent experience. Speak to the candidate directly, and write
 everything in Hebrew. Keep job titles, tools and professional terms as they
 appear in the posting. ${addressInstruction(address)}
 
-<job company="${job.company.replace(/"/g, "'")}" title="${job.title.replace(/"/g, "'")}">
+${
+  takeHome
+    ? `The candidate already submitted the take-home below for this job, and
+this interview will review it. Make at least two likelyQuestions about their
+own submission (a decision to defend, a weak spot the review found, a changed
+constraint), put the submission among the stories, and make one schedule step
+re-reading it and preparing to defend and improve it.
+
+<take_home title="${takeHome.title.replace(/"/g, "'")}">
+<assignment>
+${takeHome.brief}
+</assignment>
+<candidate_submission>
+${takeHome.submission.slice(0, 12000)}
+</candidate_submission>
+<review_weak_spots>
+${takeHome.weaknesses.map((w) => `- ${w}`).join("\n")}
+</review_weak_spots>
+</take_home>
+
+`
+    : ""
+}<job company="${job.company.replace(/"/g, "'")}" title="${job.title.replace(/"/g, "'")}">
 ${job.description}
 </job>
 
