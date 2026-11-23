@@ -486,3 +486,81 @@ describe("design problems by level", () => {
     expect(systemDesignProblems).toContain(mid);
   });
 });
+
+describe("life sciences and medical devices", () => {
+  const families = (title: string) => matchRoleFamilies(title).map((f) => f.id);
+
+  it.each([
+    ["Lab Technician", "lab"],
+    ["לבורנטית", "lab"],
+    ["טכנאי מעבדה", "lab"],
+    ["Analytical Chemist", "lab"],
+    ["כימאית", "lab"],
+    ["Microbiologist", "lab"],
+    ["QC Analyst", "lab"],
+    ["Formulation Scientist", "lab"],
+    ["Regulatory Affairs Specialist", "regulatory"],
+    ["QA Specialist (GMP)", "regulatory"],
+    ["מנהלת אבטחת איכות", "regulatory"],
+    ["Pharmacovigilance Specialist", "regulatory"],
+    ["Clinical Research Associate", "clinical"],
+    ["מתאמת מחקרים קליניים", "clinical"],
+    ["מנהל ניסויים קליניים", "clinical"],
+    ["Medical Science Liaison", "clinical"],
+  ])("%s gets only the %s field", (title, id) => {
+    expect(families(title)).toEqual([id]);
+    expect(isTechnicalRole(title)).toBe(false);
+    expect(hasDesignRound(title)).toBe(false);
+  });
+
+  it.each([
+    "Medical Device Engineer",
+    "R&D Engineer, Medical Devices",
+    "מהנדס ציוד רפואי",
+    "Biomedical Engineer",
+    "Field Clinical Engineer",
+    "Sterilization Engineer",
+  ])("%s is a medical device engineer, not software or nursing", (title) => {
+    expect(engineeringSpecialtyFor(title)?.id).toBe("medical");
+    expect(families(title)).toEqual(["hardware"]);
+    expect(isCodingRole(title)).toBe(false);
+  });
+
+  it("keeps a medical device quality engineer in quality, not software QA", () => {
+    expect(families("Medical Device QA Engineer")).toEqual([
+      "hardware",
+      "regulatory",
+    ]);
+    expect(isTechnicalRole("Medical Device QA Engineer")).toBe(false);
+  });
+
+  it("treats bioinformatics as software with its own specialty", () => {
+    for (const title of [
+      "Bioinformatician",
+      "ביואינפורמטיקאי",
+      "Computational Biologist",
+    ]) {
+      expect(isTechnicalRole(title)).toBe(true);
+      expect(techSpecialtyFor(title)?.id).toBe("bioinformatics");
+    }
+  });
+
+  it("gives biostatisticians clinical topics and a coding round", () => {
+    expect(families("Biostatistician")).toEqual(["clinical"]);
+    expect(isCodingRole("Biostatistician")).toBe(true);
+    expect(isCodingRole("ביוסטטיסטיקאית")).toBe(true);
+  });
+
+  it("keeps software, nursing and teaching titles where they were", () => {
+    expect(isTechnicalRole("Software Engineer, Medical Devices")).toBe(true);
+    expect(families("Software Engineer, Medical Devices")).toEqual([
+      "engineering",
+    ]);
+    expect(techSpecialtyFor("QA Automation Engineer, Medical")?.id).toBe("qa");
+    expect(families("Registered Nurse")).toEqual(["health"]);
+    expect(families("Pharmacist")).toEqual(["health"]);
+    expect(families("Chemistry Teacher")).toEqual(["education"]);
+    expect(families("Chemical Engineer")).toEqual(["hardware"]);
+    expect(families("Hardware Lab Technician")).toEqual(["hardware"]);
+  });
+});
