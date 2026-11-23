@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { clampScore } from "@/lib/interview/feedback";
-import { matchRoleFamilies } from "@/lib/interview/question-bank";
+import {
+  electricalSpecialtyFor,
+  matchRoleFamilies,
+} from "@/lib/interview/question-bank";
 
 /**
  * Practice take-home assignments: original tasks in the style of the ones
@@ -94,6 +97,10 @@ const taskTypes: Record<string, string> = {
 export function taskTypeFor(title: string): string {
   const families = matchRoleFamilies(title);
   const types = families.map((f) => taskTypes[f.id]).filter(Boolean);
+  const electrical = electricalSpecialtyFor(title);
+  if (electrical) {
+    return `${taskTypes.hardware}. Set it in ${electrical.label}, on a problem like: ${electrical.designProblems[0]}`;
+  }
   return (
     types[0] ??
     "a business case: analyze a realistic problem for the role and recommend a plan"

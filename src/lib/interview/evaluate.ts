@@ -66,6 +66,11 @@ missing case and the complexity of the candidate's solution. The stronger
 answer for a coding problem is a correct, clean solution in the same
 programming language, in a fenced code block, followed by one or two lines on
 the approach and its complexity.
+For RTL (Verilog, SystemVerilog or VHDL), trace it cycle by cycle instead:
+judge content by correct behavior after reset and on the edge cases, structure
+by a sound micro-architecture (clean state machine, registered outputs where
+needed, no unintended latches, safe clock domain crossing), and clarity by
+synthesizable, readable code. Name the cycle or signal where it goes wrong.
 
 For each answer, also give what worked, the most useful improvements, and a
 short outline of a stronger answer built from the candidate's own experience.

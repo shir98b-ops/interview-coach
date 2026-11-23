@@ -5,6 +5,11 @@ import {
   behavioralThemes,
   commonQuestions,
   designProblemFor,
+  electricalDesignProblemFor,
+  electricalSpecialties,
+  electricalSpecialtyFor,
+  electricalTopicsFor,
+  hasDesignRound,
   focusAreasFor,
   isCodingRole,
   isTechnicalRole,
@@ -286,5 +291,89 @@ describe("software specialties", () => {
     expect(systemDesignProblems).toContain(
       designProblemFor("Backend Developer"),
     );
+  });
+});
+
+describe("electrical specialties", () => {
+  const cases: [string, string | null][] = [
+    ["Design Verification Engineer", "verification"],
+    ["מהנדס אימות שבבים", "verification"],
+    ["FPGA Engineer", "fpga"],
+    ["RTL Design Engineer", "chip"],
+    ["Physical Design Engineer", "chip"],
+    ["מהנדסת תכנון לוגי", "chip"],
+    ["RF Engineer", "rf"],
+    ["Analog Design Engineer", "analog"],
+    ["Power Electronics Engineer", "analog"],
+    ["Hardware Engineer", "board"],
+    ["PCB Layout Engineer", "board"],
+    ["מהנדס חומרה", "board"],
+    ["Power Systems Engineer", "power"],
+    ["מתכנן חשמל", "power"],
+    ["מהנדס מתח גבוה", "power"],
+    ["Electrical Engineer", "electrical"],
+    ["מהנדס חשמל", "electrical"],
+    ["מהנדסת אלקטרוניקה", "electrical"],
+    // Not electrical engineering.
+    ["חשמלאי", null],
+    ["Embedded Software Engineer", null],
+    ["Backend Developer", null],
+    ["SOC Analyst", null],
+    ["Product Designer", null],
+    ["Mechanical Engineer", null],
+  ];
+  it.each(cases)("%s → %s", (title, id) => {
+    expect(electricalSpecialtyFor(title)?.id ?? null).toBe(id);
+  });
+
+  it("puts every electrical title in the engineering family, not software", () => {
+    for (const title of [
+      "Design Verification Engineer",
+      "RTL Design Engineer",
+      "PCB Layout Engineer",
+      "Analog Design Engineer",
+      "Power Systems Engineer",
+      "מהנדס אימות שבבים",
+    ]) {
+      expect(matchRoleFamilies(title).map((f) => f.id)).toEqual(["hardware"]);
+    }
+  });
+
+  it("gives chip, verification and FPGA roles a coding round only", () => {
+    expect(isCodingRole("Design Verification Engineer")).toBe(true);
+    expect(isCodingRole("FPGA Engineer")).toBe(true);
+    expect(isCodingRole("ASIC Design Engineer")).toBe(true);
+    expect(isCodingRole("RF Engineer")).toBe(false);
+    expect(isCodingRole("Power Systems Engineer")).toBe(false);
+  });
+
+  it("gives electrical roles a design round but keeps them off software rounds", () => {
+    expect(hasDesignRound("Electrical Engineer")).toBe(true);
+    expect(hasDesignRound("FPGA Engineer")).toBe(true);
+    expect(isTechnicalRole("FPGA Engineer")).toBe(false);
+    expect(hasDesignRound("Mechanical Engineer")).toBe(false);
+  });
+
+  it("draws most topics from the specialty, plus one general engineering topic", () => {
+    const topics = electricalTopicsFor("RF Engineer", 5, () => 0.3);
+    const rf = electricalSpecialties.find((s) => s.id === "rf")!;
+    expect(topics).toHaveLength(5);
+    expect(topics.filter((t) => rf.topics.includes(t))).toHaveLength(4);
+    expect(electricalTopicsFor("Marketing Manager", 5)).toEqual([]);
+  });
+
+  it("picks a design problem from the specialty", () => {
+    const fpga = electricalSpecialties.find((s) => s.id === "fpga")!;
+    expect(fpga.designProblems).toContain(
+      electricalDesignProblemFor("FPGA Engineer", () => 0.5),
+    );
+    expect(electricalDesignProblemFor("Sales Manager")).toBeNull();
+  });
+
+  it("has full topic and problem lists for every specialty", () => {
+    for (const s of electricalSpecialties) {
+      expect(s.topics.length).toBeGreaterThanOrEqual(8);
+      expect(s.designProblems.length).toBeGreaterThanOrEqual(5);
+    }
   });
 });

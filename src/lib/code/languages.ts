@@ -13,7 +13,14 @@ export const codeLanguages = {
   kotlin: "Kotlin",
   swift: "Swift",
   sql: "SQL",
+  verilog: "Verilog / SystemVerilog",
+  vhdl: "VHDL",
 } as const;
+
+/** Hardware description languages, whose problems are RTL blocks. */
+export function isHdl(language: CodeLanguage): boolean {
+  return language === "verilog" || language === "vhdl";
+}
 
 export type CodeLanguage = keyof typeof codeLanguages;
 
@@ -26,6 +33,13 @@ export function parseCodeLanguage(value: unknown): CodeLanguage {
 /** The language a candidate for this role most likely codes in. */
 export function defaultCodeLanguage(title: string): CodeLanguage {
   const t = title.toLowerCase();
+  if (/\bvhdl\b/.test(t)) return "vhdl";
+  if (
+    /\b(fpga|verilog|rtl|asic|vlsi|uvm|chip|silicon)\b|verification engineer|design verification|logic design|שבב|אימות|וריפיקציה|תכנון לוגי/.test(
+      t,
+    )
+  )
+    return "verilog";
   if (/\b(data analyst|bi|business intelligence|analytics)\b|אנליסט/.test(t))
     return "sql";
   if (/\bios\b|swift/.test(t)) return "swift";

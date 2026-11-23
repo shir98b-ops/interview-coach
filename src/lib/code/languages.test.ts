@@ -18,6 +18,10 @@ describe("code languages", () => {
     expect(defaultCodeLanguage("iOS Developer")).toBe("swift");
     expect(defaultCodeLanguage("Java Backend Engineer")).toBe("java");
     expect(defaultCodeLanguage("Backend Developer")).toBe("python");
+    expect(defaultCodeLanguage("FPGA Engineer")).toBe("verilog");
+    expect(defaultCodeLanguage("Design Verification Engineer")).toBe("verilog");
+    expect(defaultCodeLanguage("מהנדס אימות שבבים")).toBe("verilog");
+    expect(defaultCodeLanguage("FPGA Engineer (VHDL)")).toBe("vhdl");
   });
 
   it("saves the code in a fenced block, then the explanation", () => {

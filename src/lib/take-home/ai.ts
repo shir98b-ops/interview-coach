@@ -6,7 +6,7 @@ import {
   interviewLanguages,
   type InterviewLanguage,
 } from "@/lib/interview/schema";
-import { codeLanguages, type CodeLanguage } from "@/lib/code/languages";
+import { codeLanguages, isHdl, type CodeLanguage } from "@/lib/code/languages";
 import { companyContext } from "@/lib/jobs/company-context";
 import {
   briefSchema,
@@ -37,6 +37,20 @@ function roleName(target: TakeHomeTarget): string {
 
 /** How a code take-home is written, in place of a written task. */
 function codeTask(codeLanguage: CodeLanguage): string {
+  if (isHdl(codeLanguage)) {
+    return `- Kind of task: a small, realistic RTL project in
+  ${codeLanguages[codeLanguage]}, the kind chip design, verification and FPGA
+  teams send: for example a FIFO, an arbiter, a UART, a small DMA or a
+  protocol bridge, or a verification environment for a block described in the
+  brief. Base it on the work of this role.
+- Give the block's ports with widths, clock and reset, the protocol or timing
+  rules, and an example as a short cycle-by-cycle table.
+- Ask for synthesizable code, a self-checking testbench, and a short README on
+  the micro-architecture, the assumptions and how to run the simulation.
+  Keep the scope small enough to fit in a few files pasted as text.
+- Put any starter code, module headers or interface definitions in
+  starterCode, in English. Never include a solution.`;
+  }
   return `- Kind of task: a small, realistic coding project in
   ${codeLanguages[codeLanguage]}, the kind companies send to developers: for
   example a service endpoint with its logic, a data processing script, a

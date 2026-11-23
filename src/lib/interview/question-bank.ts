@@ -410,6 +410,20 @@ export const roleFamilies: RoleFamily[] = [
       "fpga",
       "vlsi",
       "chip",
+      "silicon",
+      "rtl",
+      "verification",
+      "physical design",
+      "pcb",
+      "analog",
+      "antenna",
+      "radar",
+      "microwave",
+      "power systems",
+      "high voltage",
+      "substation",
+      "solar",
+      "photovoltaic",
     ],
     hebrew: [
       // In Israeli job ads, "מהנדס/ת מוצר" is a hardware or mechanical role.
@@ -434,6 +448,12 @@ export const roleFamilies: RoleFamily[] = [
       "אווירונאוטיקה",
       "חומרים",
       "שבבים",
+      "וריפיקציה",
+      "תכנון לוגי",
+      "אנלוגי(ת)?",
+      "אנטנות",
+      "מתח גבוה",
+      "סולארי(ת)?",
       "אנרגיה",
       "אדריכל(ית)?",
       "אדריכלות",
@@ -967,10 +987,16 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
   // A Hebrew "product engineer" designs physical products, not a product
   // manager's work.
   const productEngineer = hebrewWord("(מהנדס(ת)?|הנדסת) מוצר").test(title);
+  // An "RTL design engineer" or "mechanical design engineer" designs
+  // hardware, not user experiences.
+  const hardwareDesigner =
+    hardware &&
+    (/ engineers? /.test(words) || hebrewWord("מהנדס(ת)?").test(title));
   return roleFamilies.filter((family) =>
     family.id === "engineering"
       ? isSoftwareFamily(title, words, hardware)
-      : family.id === "product" && productEngineer
+      : (family.id === "product" && productEngineer) ||
+          (family.id === "design" && hardwareDesigner)
         ? false
         : matches(family),
   );
@@ -1248,6 +1274,254 @@ export function designProblemFor(
 }
 
 /**
+ * Electrical and electronics specialties. An electrical engineer in chip
+ * design is interviewed on very different material from one who designs
+ * power grids, so each specialty has its own topics and design problems.
+ * The order matters: a title is matched to the first specialty that fits,
+ * so the narrow ones come before the general one at the end.
+ */
+export const electricalSpecialties: (TechSpecialty & { coding: boolean })[] = [
+  {
+    id: "verification",
+    label: "Chip verification",
+    coding: true,
+    pattern:
+      /design verification|verification engineer|\b(uvm|dv engineer|formal verification)\b|אימות (שבבים|חומרה|לוגי)|מהנדס(ת)? אימות|וריפיקציה/i,
+    topics: [
+      "building a verification plan from a spec, and measuring progress with functional and code coverage",
+      "UVM architecture: agents, sequences, drivers, monitors and the scoreboard",
+      "constrained-random stimulus versus directed tests, and when each fits",
+      "SystemVerilog assertions for protocol rules and corner cases",
+      "debugging a failing simulation from waveforms and logs back to the root cause",
+      "verifying clock domain crossings and resets",
+      "reference models and checking results against them",
+      "deciding when a block is verified enough to sign off",
+    ],
+    designProblems: [
+      "the verification environment for an AXI-connected DMA engine",
+      "a coverage plan and testbench for a packet parser with many header types",
+      "verifying a multi-clock FIFO and its clock domain crossing",
+      "the test strategy for an arbiter shared by eight requesters with priorities",
+      "verification of a cache controller's coherence rules",
+    ],
+  },
+  {
+    id: "fpga",
+    label: "FPGA",
+    coding: true,
+    pattern: /\b(fpga|vhdl|verilog)\b/i,
+    topics: [
+      "writing synthesizable RTL: what infers flip-flops, latches and memories",
+      "timing closure: setup and hold, constraints and fixing failing paths",
+      "clock domain crossing: synchronizers, handshakes and asynchronous FIFOs",
+      "FPGA resources: LUTs, DSP blocks, block RAM and how a design maps to them",
+      "pipelining to raise clock frequency, and its cost in latency",
+      "state machines: encoding, safe recovery and reset strategy",
+      "simulation and on-chip debugging (testbenches, integrated logic analyzers)",
+      "interfaces such as AXI, DDR and high-speed serial links",
+    ],
+    designProblems: [
+      "an FPGA image-processing pipeline for a 4K camera at 60 frames a second",
+      "a UART-to-AXI bridge with error handling",
+      "a real-time FIR filter for a 100 MHz sampled signal",
+      "packet capture and filtering on a 10 Gb Ethernet link",
+      "a motor-control block with PWM generation and fault shutdown",
+    ],
+  },
+  {
+    id: "chip",
+    label: "Chip design (VLSI)",
+    coding: true,
+    pattern:
+      /\b(vlsi|asic|rtl|chip|silicon|physical design|logic design|digital design engineer|soc design|backend design|dft)\b|שבב|תכנון לוגי/i,
+    topics: [
+      "RTL design of a datapath and its control logic",
+      "static timing analysis: setup, hold, clock skew and false or multicycle paths",
+      "low-power design: clock gating, power domains and leakage",
+      "clock domain crossing and reset design",
+      "area, power and performance trade-offs in micro-architecture",
+      "the flow from RTL to tape-out: synthesis, place and route, sign-off",
+      "design for test: scan chains and built-in self test",
+      "reading a spec and writing a micro-architecture document",
+    ],
+    designProblems: [
+      "the micro-architecture of a pipelined multiply-accumulate unit for an AI accelerator",
+      "a round-robin arbiter for eight masters on an on-chip bus",
+      "an asynchronous FIFO between two clock domains",
+      "a low-power always-on block that wakes the chip on an event",
+      "an Ethernet MAC receive path from the PHY to memory",
+    ],
+  },
+  {
+    id: "rf",
+    label: "RF and microwave",
+    coding: false,
+    pattern:
+      /\b(rf|microwave|antenna|antennas|radar|wireless hardware)\b|אנטנ|מכ"ם|רדאר/i,
+    topics: [
+      "link budget: transmit power, path loss, antenna gain and receiver sensitivity",
+      "noise figure, cascaded noise and dynamic range",
+      "impedance matching, S-parameters and the Smith chart",
+      "linearity: compression, intermodulation and IP3",
+      "filters, mixers and oscillators: phase noise and spurious signals",
+      "antenna basics: gain, pattern, bandwidth and placement",
+      "measurement: spectrum and network analyzers, and lab debugging",
+      "meeting regulatory emission limits and EMC",
+    ],
+    designProblems: [
+      "the receive chain of a 2.4 GHz IoT radio that must reach 500 meters",
+      "a front end for a 77 GHz automotive radar",
+      "an antenna and matching network for a small wearable device",
+      "a satellite ground terminal's transmit path with tight emission limits",
+      "the RF section of a cellular modem board that fails its sensitivity test",
+    ],
+  },
+  {
+    id: "analog",
+    label: "Analog and power electronics",
+    coding: false,
+    pattern:
+      /analog|mixed[- ]signal|power electronics|power supply|power supplies|\b(dc-dc|smps)\b|אנלוג|אלקטרוניקת הספק|ספק(י)? כוח/i,
+    topics: [
+      "op-amp circuits: gain, bandwidth, offset and stability",
+      "switching converters: buck and boost topologies, efficiency and ripple",
+      "transistor basics: biasing, MOSFET switching losses and thermal limits",
+      "feedback loops and stability: phase margin and compensation",
+      "noise sources and grounding in sensitive measurement circuits",
+      "ADC and DAC selection: resolution, sampling and anti-aliasing filters",
+      "protection: over-current, over-voltage, inrush and ESD",
+      "thermal design and component derating for reliability",
+    ],
+    designProblems: [
+      "a 12 V to 3.3 V, 5 A power supply for a battery-powered device",
+      "the signal chain for a precision temperature sensor read by a 16-bit ADC",
+      "a motor driver for a 48 V e-bike with current limiting",
+      "a battery charger and power path for a medical wearable",
+      "an isolated power supply that must pass medical safety standards",
+    ],
+  },
+  {
+    id: "board",
+    label: "Board and hardware design",
+    coding: false,
+    pattern:
+      /\b(board|pcb|hardware) (design|designer|engineer)|\b(pcb|layout engineer|signal integrity|hardware engineer)\b|תכנון כרטיסים|כרטיס(ים)? אלקטרוני|מהנדס(ת)? חומרה|חומרה/i,
+    topics: [
+      "schematic design: choosing components and reading datasheets critically",
+      "PCB layout: stack-up, grounding, return paths and placement",
+      "signal integrity on high-speed lines: impedance, reflections and crosstalk",
+      "power integrity: decoupling and power distribution",
+      "EMC: designing to pass emissions and immunity tests",
+      "bring-up and debugging a new board in the lab",
+      "design for manufacturing and test, and working with the assembly house",
+      "component shortages, second sources and lifecycle",
+    ],
+    designProblems: [
+      "the main board of an IoT gateway with Wi-Fi, LTE and Ethernet",
+      "a board with a processor and DDR4 memory that must pass EMC on the first try",
+      "a rugged controller board for an industrial machine at 70°C",
+      "a sensor board that must run two years on a coin cell",
+      "re-designing a board around a processor that went end-of-life",
+    ],
+  },
+  {
+    id: "power",
+    label: "Power systems and energy",
+    coding: false,
+    pattern:
+      /power systems?|high voltage|substation|\bgrid\b|renewable|solar|photovoltaic|protection engineer|electrical design engineer|מתח (גבוה|עליון)|תחנ(ה|ות)( ה)?משנה|רשת החשמל|חברת החשמל|אנרגי(ה|ות) מתחדש|סולאר|פוטו-?וולטאי|תכנון חשמל|מתכנ(ן|נת) חשמל/i,
+    topics: [
+      "load calculations, cable sizing and voltage drop",
+      "short-circuit calculations and choosing protective devices",
+      "protection coordination and selectivity",
+      "earthing and safety under the Israeli Electricity Law and its regulations",
+      "transformers, power factor and harmonics",
+      "solar and storage systems: sizing, inverters and grid connection",
+      "reliability and redundancy in a critical facility",
+      "commissioning, testing and working with the utility",
+    ],
+    designProblems: [
+      "the electrical supply for a new data center with 2 MW of IT load",
+      "a 5 MW solar field with storage and its connection to the grid",
+      "the low-voltage distribution of a 20-storey residential building",
+      "upgrading a factory whose power factor and harmonics are fined by the utility",
+      "the protection scheme for a 22 kV substation feeding an industrial zone",
+    ],
+  },
+  {
+    id: "electrical",
+    label: "Electrical and electronics engineering",
+    coding: false,
+    pattern:
+      /electrical|electronics?\b|electronic engineer|חשמל(?!אי)|אלקטרוניקה/i,
+    topics: [
+      "circuit analysis done out loud: a resistor network, an RC filter or a transient",
+      "op-amps and transistors: how a basic amplifier or switch works",
+      "digital logic: gates, flip-flops, state machines and timing",
+      "signals: frequency response, sampling and filtering",
+      "power: efficiency, heat and choosing a power supply",
+      "choosing components from datasheets by specs, cost and availability",
+      "lab debugging with an oscilloscope and a multimeter",
+      "testing, failure analysis and root cause",
+    ],
+    designProblems: [
+      "a battery-powered device that measures and reports temperature",
+      "the control electronics of a smart home appliance",
+      "a system that drives and monitors a set of motors safely",
+      "the power and protection for a device sold in Europe and the US",
+      "an electronic product whose field return rate suddenly tripled",
+    ],
+  },
+];
+
+/**
+ * The electrical specialty a title names. Software titles (such as an
+ * embedded software engineer) keep the software rounds.
+ */
+export function electricalSpecialtyFor(
+  title: string,
+): (TechSpecialty & { coding: boolean }) | null {
+  if (isTechnicalRole(title)) return null;
+  return electricalSpecialties.find((s) => s.pattern.test(title)) ?? null;
+}
+
+/**
+ * Roles whose case round is a design interview on one problem: software
+ * system design, or an electrical engineering design.
+ */
+export function hasDesignRound(title: string): boolean {
+  return isTechnicalRole(title) || electricalSpecialtyFor(title) !== null;
+}
+
+/**
+ * Topics for an electrical engineer's professional round: mostly the
+ * specialty, plus one general engineering topic (standards, testing,
+ * manufacturing). Empty when the title names no electrical field.
+ */
+export function electricalTopicsFor(
+  title: string,
+  count: number,
+  random: () => number = Math.random,
+): string[] {
+  const specialty = electricalSpecialtyFor(title);
+  if (!specialty) return [];
+  const general = roleFamilies.find((f) => f.id === "hardware")!.focus ?? [];
+  return [
+    ...sampleBank(specialty.topics, count - 1, random),
+    ...sampleBank(general, 1, random),
+  ];
+}
+
+/** One design problem for an electrical engineer, in their specialty. */
+export function electricalDesignProblemFor(
+  title: string,
+  random: () => number = Math.random,
+): string | null {
+  const specialty = electricalSpecialtyFor(title);
+  return specialty ? sampleBank(specialty.designProblems, 1, random)[0] : null;
+}
+
+/**
  * Roles whose interviews usually include writing code: software roles, and
  * data roles that are tested in SQL or Python.
  */
@@ -1257,7 +1531,9 @@ export function isCodingRole(title: string): boolean {
     /\b(data (analyst|scientist)|analytics engineer|bi (developer|analyst)|business intelligence|quant(itative)?)\b/i.test(
       title,
     ) ||
-    /אנליסט(ית)? (דאטה|נתונים)|מדע(ן|נית) נתונים|דאטה סיינטיסט/.test(title)
+    /אנליסט(ית)? (דאטה|נתונים)|מדע(ן|נית) נתונים|דאטה סיינטיסט/.test(title) ||
+    // Chip design, verification and FPGA interviews include writing RTL.
+    electricalSpecialtyFor(title)?.coding === true
   );
 }
 
@@ -1282,6 +1558,25 @@ export const codingTopics = [
   "transforming nested JSON-like data into a flat report",
   "binary search on sorted data or on an answer range",
   "heaps: top-k items or scheduling by priority",
+];
+
+/**
+ * RTL problems for chip design, verification and FPGA roles, written in
+ * Verilog, SystemVerilog or VHDL.
+ */
+export const hdlTopics = [
+  "a finite state machine for a simple protocol or controller",
+  "a synchronous FIFO with full and empty flags",
+  "a counter, timer or PWM generator with enable and reset",
+  "a button debouncer or edge detector",
+  "a two-flop synchronizer or a handshake across clock domains",
+  "a round-robin or fixed-priority arbiter",
+  "a shift register, serializer or deserializer",
+  "a small ALU or a pipelined arithmetic block",
+  "a UART transmitter or receiver",
+  "a self-checking testbench for a given block",
+  "SystemVerilog assertions for a valid/ready handshake",
+  "a register file or a simple memory-mapped register block",
 ];
 
 /** SQL problems for data roles, over small tables given in the question. */

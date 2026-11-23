@@ -1,5 +1,5 @@
 import { defaultCodeLanguage } from "@/lib/code/languages";
-import { isCodingRole, isTechnicalRole } from "@/lib/interview/question-bank";
+import { hasDesignRound, isCodingRole } from "@/lib/interview/question-bank";
 import type { Metadata } from "next";
 import { formatDate } from "@/lib/format";
 import Link from "next/link";
@@ -89,7 +89,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
       .not("feedback", "is", null),
   ]);
   if (!job) notFound();
-  const technical = isTechnicalRole(job.title);
+  const technical = hasDesignRound(job.title);
   const coding = isCodingRole(job.title);
   const codeLanguage = defaultCodeLanguage(job.title);
   const status = parseStatus(job.status);
