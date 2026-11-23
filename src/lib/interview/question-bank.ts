@@ -1415,13 +1415,15 @@ export function technicalTopicsFor(
 export function designProblemFor(
   title: string,
   random: () => number = Math.random,
+  seniority: string | null = null,
 ): string {
   const specialty = techSpecialtyFor(title);
-  return sampleBank(
-    specialty?.designProblems ?? systemDesignProblems,
-    1,
-    random,
-  )[0];
+  const problems =
+    specialty?.designProblems ??
+    (seniority === "Entry level"
+      ? juniorSystemDesignProblems
+      : systemDesignProblems);
+  return sampleBank(problems, 1, random)[0];
 }
 
 /**
@@ -2006,6 +2008,22 @@ export const systemDesignProblems = [
   "a job scheduler that runs millions of delayed and recurring tasks",
   "a hotel or flight booking system that prevents double booking",
   "a leaderboard for a mobile game with millions of players",
+];
+
+/**
+ * Design problems for juniors and graduates: one service and its data, the
+ * size of a first feature at a startup, where the basics done right matter
+ * more than global scale.
+ */
+export const juniorSystemDesignProblems = [
+  "a URL shortener for one company's marketing team",
+  "the backend of a to-do app with users, lists and reminders",
+  "an API for a small library that lends books to its members",
+  "a booking system for the meeting rooms of one office",
+  "a leaderboard for a mobile game with 10,000 players",
+  "a service that sends a daily summary email to each user of an app",
+  "the backend of a simple online store with a cart and orders",
+  "a feedback form service that saves answers and shows a summary to admins",
 ];
 
 /**

@@ -310,6 +310,13 @@ ${askLikeAnInterviewer}
 ${levelGuide}`;
 }
 
+/** Shrinks a design problem to the size juniors are really asked. */
+function entryScale(target: PracticeTarget): string {
+  return target.seniority === "Entry level"
+    ? "\nThe candidate is Entry level: set it as a small first version with the numbers given, the size a junior would really be asked, and keep each step to the basics done right."
+    : "";
+}
+
 /** The material each kind of interview starts from. */
 function startingPoint(
   target: PracticeTarget,
@@ -406,12 +413,12 @@ posting, at that company's real scale and context.
   }
   return technical
     ? `<design_problem>
-Design ${designProblemFor(target.title)}.
+Design ${designProblemFor(target.title, Math.random, target.seniority)}.${entryScale(target)}
 </design_problem>
 `
     : electrical
       ? `<design_problem>
-Design ${engineeringDesignProblemFor(target.title)}.
+Design ${engineeringDesignProblemFor(target.title)}.${entryScale(target)}
 </design_problem>
 `
       : `<case>

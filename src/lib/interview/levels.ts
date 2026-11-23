@@ -25,7 +25,7 @@ export const levelDefinitions = `- Entry level (students, new graduates and up t
 export function levelLine(seniority: Seniority | null): string {
   return seniority
     ? `<level>${seniority}. The candidate chose this level: it wins over the level of the job posting and of the resume.</level>`
-    : `<level>Not chosen. Use the level the job posting asks for; without a posting, the level the resume shows (years of experience and titles); else Mid level.</level>`;
+    : `<level>Not chosen. Use the level the job posting asks for; without a posting, the level the resume shows, counting only years of work in this profession or a close one (a career changer or a graduate without such work is Entry level); else Mid level.</level>`;
 }
 
 /** How feedback is judged at each level, for interviews and take-homes. */

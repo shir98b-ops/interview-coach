@@ -5,6 +5,8 @@ import {
   behavioralThemes,
   commonQuestions,
   designProblemFor,
+  juniorSystemDesignProblems,
+  systemDesignProblems,
   engineeringDesignProblemFor,
   engineeringSpecialties,
   engineeringSpecialtyFor,
@@ -19,7 +21,6 @@ import {
   matchRoleFamilies,
   previousQuestionList,
   sampleBank,
-  systemDesignProblems,
   techSpecialtyFor,
   technicalTopics,
   technicalTopicsFor,
@@ -470,5 +471,18 @@ describe("RTL coding problems", () => {
     expect(hdlTopicsFor("מהנדס אימות שבבים")).toBe(hdlVerificationTopics);
     expect(hdlTopicsFor("FPGA Engineer")).toBe(hdlDesignTopics);
     expect(hdlTopicsFor("ASIC Design Engineer")).toBe(hdlDesignTopics);
+  });
+});
+
+describe("design problems by level", () => {
+  it("gives juniors a first-feature design problem, not a global-scale one", () => {
+    const junior = designProblemFor(
+      "Backend Developer",
+      () => 0.4,
+      "Entry level",
+    );
+    const mid = designProblemFor("Backend Developer", () => 0.4, "Mid level");
+    expect(juniorSystemDesignProblems).toContain(junior);
+    expect(systemDesignProblems).toContain(mid);
   });
 });
