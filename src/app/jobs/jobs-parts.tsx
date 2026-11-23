@@ -136,7 +136,7 @@ export function JobRow({
     <li>
       <Link
         href={`/jobs/${job.id}`}
-        className={`${color} flex items-center gap-4 rounded-[26px] p-4 transition duration-200 hover:shadow-[0_14px_28px_rgba(20,38,58,0.14)] motion-safe:hover:-translate-y-1 lg:px-6`}
+        className={`${color} flex items-center gap-4 rounded-[26px] p-4 transition duration-200 hover:shadow-[0_14px_28px_rgba(20,38,58,0.14)] motion-safe:hover:-translate-y-1 motion-safe:active:scale-[.98] lg:px-6 [&_img]:transition motion-safe:hover:[&_img]:scale-[1.08] motion-safe:hover:[&_img]:rotate-0`}
       >
         <Icon name="briefcase" size={46} className="-rotate-8" />
         <span className="flex min-w-0 flex-1 flex-col lg:max-w-56">

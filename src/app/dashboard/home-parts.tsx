@@ -20,9 +20,12 @@ const toneBg: Record<StepTone, string> = {
   sun: "bg-sun",
 };
 
-/** Cards that are links lift a little under the mouse. */
+/**
+ * Cards that are links lift a little under the mouse and straighten their
+ * icon. A tap presses them in slightly, so phones feel the touch.
+ */
 const lift =
-  "transition duration-200 motion-safe:hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(20,38,58,0.14)] [&_img]:transition motion-safe:hover:[&_img]:scale-[1.08] motion-safe:hover:[&_img]:rotate-0";
+  "transition duration-200 motion-safe:hover:-translate-y-1 hover:shadow-[0_14px_28px_rgba(20,38,58,0.14)] [&_img]:transition motion-safe:hover:[&_img]:scale-[1.08] motion-safe:hover:[&_img]:rotate-0 motion-safe:active:scale-[.98]";
 
 /** A row of segments, filled up to `done`, on a colored card. */
 function Bars({ done, total }: { done: number; total: number }) {
