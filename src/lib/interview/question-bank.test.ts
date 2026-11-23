@@ -87,6 +87,9 @@ describe("matchRoleFamilies", () => {
     expect(ids("מלצרית")).toEqual(["service"]);
     expect(ids("עובד עירייה")).toEqual(["public"]);
     expect(ids("Security Engineer")).toEqual(["engineering", "security"]);
+    expect(ids("SOC Analyst")).toEqual(["security"]);
+    expect(ids("אנליסט SOC")).toEqual(["security"]);
+    expect(ids("Cyber Data Analyst")).toEqual(["data", "security"]);
     expect(ids("מנהלת משרד")).toEqual(["admin"]);
   });
 
@@ -323,7 +326,17 @@ describe("electrical specialties", () => {
     ["Backend Developer", null],
     ["SOC Analyst", null],
     ["Product Designer", null],
-    ["Mechanical Engineer", null],
+    ["Chemical Engineer", null],
+    // Mechanical and civil engineering.
+    ["Mechanical Engineer", "mechanical"],
+    ["מהנדס מכונות", "mechanical"],
+    ["מהנדסת מכנית", "mechanical"],
+    ["Mechatronics Engineer", "robotics"],
+    ["Civil Engineer", "civil"],
+    ["Structural Engineer", "civil"],
+    ["מהנדס בניין", "civil"],
+    ["מהנדסת אזרחית", "civil"],
+    ["קונסטרוקטור", "civil"],
   ];
   it.each(cases)("%s → %s", (title, id) => {
     expect(engineeringSpecialtyFor(title)?.id ?? null).toBe(id);
@@ -337,6 +350,7 @@ describe("electrical specialties", () => {
       "Analog Design Engineer",
       "Power Systems Engineer",
       "מהנדס אימות שבבים",
+      "Junior Board Design Engineer",
     ]) {
       expect(matchRoleFamilies(title).map((f) => f.id)).toEqual(["hardware"]);
     }
@@ -354,7 +368,9 @@ describe("electrical specialties", () => {
     expect(hasDesignRound("Electrical Engineer")).toBe(true);
     expect(hasDesignRound("FPGA Engineer")).toBe(true);
     expect(isTechnicalRole("FPGA Engineer")).toBe(false);
-    expect(hasDesignRound("Mechanical Engineer")).toBe(false);
+    expect(hasDesignRound("Mechanical Engineer")).toBe(true);
+    expect(isCodingRole("Mechanical Engineer")).toBe(false);
+    expect(hasDesignRound("Chemical Engineer")).toBe(false);
   });
 
   it("draws most topics from the specialty, plus one general engineering topic", () => {

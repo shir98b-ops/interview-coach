@@ -80,6 +80,8 @@ export const sessions = pgTable(
     }),
     /** The interview stage practiced for, such as "hr" or "professional". */
     stage: text("stage"),
+    /** The level the user chose, such as "Entry level"; null reads it from the posting or resume. */
+    seniority: text("seniority"),
     overallScore: smallint("overall_score"),
     createdAt: createdAt(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
@@ -150,6 +152,8 @@ export const takeHomes = pgTable(
       onDelete: "set null",
     }),
     difficulty: text("difficulty").notNull(),
+    /** The level the user chose, such as "Entry level"; null reads it from the posting. */
+    seniority: text("seniority"),
     language: text("language").notNull(),
     brief: jsonb("brief").notNull(),
     submission: text("submission"),

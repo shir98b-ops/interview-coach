@@ -4,6 +4,8 @@ import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
 import { codeLanguages, isHdl, type CodeLanguage } from "@/lib/code/languages";
 import { companyContext } from "@/lib/jobs/company-context";
+import { parseSeniority } from "@/lib/format";
+import { levelDefinitions, levelLine } from "./levels";
 import type { ResumeData } from "@/lib/resume/schema";
 import type { SubmittedTakeHome } from "@/lib/take-home/for-interview";
 import {
@@ -120,8 +122,7 @@ interview. Write ${QUESTION_COUNT} questions for the candidate below.
 - Mix the kinds: at least two behavioral questions, at least one question on
   the skills and judgment the role needs, and at least one that digs into a
   specific item on the candidate's resume.
-- Match the seniority level. If none is given, aim for the level the resume
-  suggests.
+- Match the level given below.
 - Stay close to what real interviewers ask. Base about two questions on the
   commonly asked questions listed below, adapting them to the role and the
   candidate's background; do not invent unusual or trick questions.
@@ -147,12 +148,14 @@ const askLikeAnInterviewer = `Ask the way a real interviewer speaks:
   only the details needed to answer it.`;
 
 /** Difficulty follows the seniority, in every kind of interview. */
-const levelGuide = `Set the difficulty by the seniority level:
-- Entry level: fundamentals, and how they would handle common situations.
-- Mid level: independent work, real depth and trade-offs.
-- Senior: complex and ambiguous situations, leading others, strategic judgment.
-- Manager: leading teams, priorities, budgets and people decisions.
-If no seniority is given, infer it from the job posting, else aim for mid level.`;
+const levelGuide = `Set the difficulty by the level given below, and make it a real
+interview for that level, the way interviewers really talk to candidates at
+it:
+${levelDefinitions}
+In a case or design round, size the problem to the level too: an Entry level
+candidate gets a small, well-defined problem with the numbers given (one
+feature, one service, one block, one client), and each step asks for the
+basics done right; a Senior one gets an open problem at real scale.`;
 
 /** Shared by the professional and case rounds: hold the real-world bar. */
 const professionalBar = `Hold the bar of a real interview in this profession
@@ -279,12 +282,13 @@ Put code, signatures and table rows in fenced code blocks (\`\`\`), and keep
 code, names and values in English even when the statement is in another
 language. Do not include a solution or hints.
 
-Set the difficulty by the seniority level, as in a real coding interview:
-- Entry level: one clear idea, solvable in about 20 minutes.
+Set the difficulty by the level given below, as in a real coding interview:
+- Entry level: the problems companies give juniors and graduates: one clear
+  idea with basic data structures (arrays, strings, maps), solvable in about
+  20 minutes, with the edge cases stated.
 - Mid level: needs the right data structure and handling of edge cases.
 - Senior and above: a harder main problem where efficiency and clean design
   both matter, with a follow-up constraint stated in the problem.
-If no seniority is given, infer it from the job posting, else aim for mid level.
 
 ${professionalBar}`;
 
@@ -411,7 +415,8 @@ Design ${engineeringDesignProblemFor(target.title)}.
 </design_problem>
 `
       : `<case>
-Choose a realistic, demanding situation that people in this role face, typical
+Choose a realistic situation that people in this role face at the level given,
+as demanding as a real case interview for that level, typical
 of the organization type below if one is given. Pick a different case each time.${
           focus.length
             ? `
@@ -429,9 +434,7 @@ export async function generateQuestions(
   language: InterviewLanguage = "en",
   address: Address | null = null,
 ): Promise<{ kind: QuestionKind; text: string }[]> {
-  const role = target.seniority
-    ? `${target.title} (${target.seniority})`
-    : target.title;
+  const role = target.title;
   const mode = target.mode ?? "general";
   const technical = isTechnicalRole(target.title);
   const electrical =
@@ -459,6 +462,7 @@ naturally, not word for word). Keep the role title and professional terms as
 they are commonly used in that language. ${addressInstruction(address)}
 
 <role>${role}</role>
+${levelLine(parseSeniority(target.seniority))}
 ${
   target.job
     ? `

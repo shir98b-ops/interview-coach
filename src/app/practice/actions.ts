@@ -38,6 +38,7 @@ import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { track } from "@/lib/analytics/record";
+import { parseSeniority } from "@/lib/format";
 import { parseAnswerMethod } from "@/lib/analytics/events";
 
 export type FormState = { error: string | null };
@@ -77,6 +78,9 @@ export async function startPractice(
   const requestedMode = parseMode(formData.get("mode"));
   const codeLanguage = parseCodeLanguage(formData.get("codeLanguage"));
   const organization = parseOrganizationType(formData.get("organization"));
+  // The level the user chose; left on automatic, it is read from the posting
+  // or the resume.
+  const chosenLevel = parseSeniority(formData.get("seniority"));
   const { supabase, user } = await requireUser();
 
   const [{ data: profile }, { data: savedRole }, { data: job }] =
@@ -123,7 +127,7 @@ export async function startPractice(
     ? {
         id: null,
         title: job.title,
-        seniority: null,
+        seniority: chosenLevel,
         job: job.description
           ? { company: job.company, description: job.description }
           : null,
@@ -136,7 +140,7 @@ export async function startPractice(
           : null,
         takeHome,
       }
-    : savedRole;
+    : savedRole && { ...savedRole, seniority: chosenLevel };
   const usage = await getUsage(supabase);
   if (usage.remaining === 0 && !hasNoLimits(user.email)) {
     track("limit_reached", { feature: "interview" }, { supabase, user });
@@ -209,6 +213,7 @@ export async function startPractice(
       target_role_id: role.id,
       job_id: job?.id ?? null,
       stage: job ? stageKind : null,
+      seniority: role.seniority,
     })
     .select("id")
     .single();
@@ -333,7 +338,9 @@ async function scoreSession(
   const [{ data: session }, { data: rows }] = await Promise.all([
     supabase
       .from("sessions")
-      .select("id, target_roles(title, seniority), jobs(title, company)")
+      .select(
+        "id, seniority, target_roles(title, seniority), jobs(title, company)",
+      )
       .eq("id", sessionId)
       .maybeSingle(),
     supabase
@@ -374,9 +381,7 @@ async function scoreSession(
   );
   const roleName = job
     ? `${job.title} at ${job.company}`
-    : role
-      ? `${role.title}${role.seniority ? ` (${role.seniority})` : ""}`
-      : "Not specified";
+    : (role?.title ?? "Not specified");
 
   let feedback;
   try {
@@ -384,6 +389,8 @@ async function scoreSession(
       roleName,
       items.map((item) => ({ ...item, answer: item.answer!.text })),
       address,
+      // Interviews from before the level choice use the role's level.
+      parseSeniority(session.seniority ?? role?.seniority),
     );
   } catch (error) {
     if (error instanceof AiError) {
