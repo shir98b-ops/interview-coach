@@ -10,6 +10,8 @@ import {
   type AnswerFeedback,
 } from "./feedback";
 import { splitKind } from "./schema";
+import type { Seniority } from "@/lib/format";
+import { levelLine, levelScoring } from "./levels";
 
 export interface AnsweredQuestion {
   position: number;
@@ -35,6 +37,8 @@ structure and weak on content; a correct answer that rambles is strong on
 content and weak on clarity. Give all three the same score only when the
 answer really is equally strong or weak on each.
 
+${levelScoring}
+
 Mark seriousError when the answer holds a mistake that would end it in a real
 interview: one that would harm a patient, client or user, lose data or money,
 break the law or a safety rule, or shows a core concept of the profession
@@ -48,9 +52,9 @@ them: content is professional accuracy, depth and judgment (the right
 methods, rules, tools and trade-offs for this profession); structure is a
 logical approach (understand, analyze, act, check), not a STAR story. Point
 out any professional mistake plainly, and make the stronger answer outline
-professionally correct. Score these like a demanding interviewer: do not
-inflate, and a vague, shallow or partly wrong answer scores 2 or lower on
-content.
+professionally correct. Score these like a demanding interviewer for this
+level: do not inflate, and a vague, shallow or partly wrong answer scores 2 or
+lower on content.
 
 Answers to coding problems (kind "coding") are judged as a senior engineer
 would judge them in a coding interview. You cannot run the code, so trace it
@@ -73,7 +77,8 @@ needed, no unintended latches, safe clock domain crossing), and clarity by
 synthesizable, readable code. Name the cycle or signal where it goes wrong.
 
 For each answer, also give what worked, the most useful improvements, and a
-short outline of a stronger answer built from the candidate's own experience.
+short outline of a stronger answer built from the candidate's own experience,
+at the level they are practicing for.
 Speak to the candidate directly ("you"). Write the feedback in the language
 the interview was held in, the language of the questions.`;
 
@@ -82,6 +87,7 @@ export async function evaluateInterview(
   role: string,
   items: AnsweredQuestion[],
   address: Address | null = null,
+  seniority: Seniority | null = null,
 ): Promise<Map<number, AnswerFeedback>> {
   const transcript = items
     .map(
@@ -118,6 +124,7 @@ ${item.answer}
 ${addressInstruction(address)}
 
 <role>${role}</role>
+${levelLine(seniority)}
 
 ${transcript}`,
         },

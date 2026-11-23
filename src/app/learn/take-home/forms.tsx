@@ -6,6 +6,7 @@ import { CodeEditor, CodeLanguageSelect } from "@/components/code-editor";
 import { defaultCodeLanguage, type CodeLanguage } from "@/lib/code/languages";
 import { isCodingRole } from "@/lib/interview/question-bank";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
+import { LevelSelect } from "@/components/level-select";
 import { interviewLanguages } from "@/lib/interview/schema";
 import {
   MAX_CODE_SUBMISSION_LENGTH,
@@ -53,6 +54,12 @@ export function StartTakeHomeForm({
           </label>
         ))}
       </fieldset>
+      <LevelSelect
+        key={`level-${roleId}`}
+        defaultValue={selected?.seniority}
+        disabled={pending}
+        className="text-xl font-extrabold sm:w-80"
+      />
       {coding && (
         <TakeHomeFormatChoice
           key={roleId}

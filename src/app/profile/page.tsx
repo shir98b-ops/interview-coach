@@ -147,7 +147,7 @@ async function ProfileContent({
             <option value="">כל דרגה</option>
             {seniorityLevels.map((s) => (
               <option key={s.value} value={s.value}>
-                {s.label}
+                {s.label} ({s.years})
               </option>
             ))}
           </select>

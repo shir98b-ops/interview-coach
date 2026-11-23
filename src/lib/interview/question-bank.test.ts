@@ -5,6 +5,8 @@ import {
   behavioralThemes,
   commonQuestions,
   designProblemFor,
+  juniorSystemDesignProblems,
+  systemDesignProblems,
   engineeringDesignProblemFor,
   engineeringSpecialties,
   engineeringSpecialtyFor,
@@ -19,7 +21,6 @@ import {
   matchRoleFamilies,
   previousQuestionList,
   sampleBank,
-  systemDesignProblems,
   techSpecialtyFor,
   technicalTopics,
   technicalTopicsFor,
@@ -87,6 +88,9 @@ describe("matchRoleFamilies", () => {
     expect(ids("מלצרית")).toEqual(["service"]);
     expect(ids("עובד עירייה")).toEqual(["public"]);
     expect(ids("Security Engineer")).toEqual(["engineering", "security"]);
+    expect(ids("SOC Analyst")).toEqual(["security"]);
+    expect(ids("אנליסט SOC")).toEqual(["security"]);
+    expect(ids("Cyber Data Analyst")).toEqual(["data", "security"]);
     expect(ids("מנהלת משרד")).toEqual(["admin"]);
   });
 
@@ -323,7 +327,17 @@ describe("electrical specialties", () => {
     ["Backend Developer", null],
     ["SOC Analyst", null],
     ["Product Designer", null],
-    ["Mechanical Engineer", null],
+    ["Chemical Engineer", null],
+    // Mechanical and civil engineering.
+    ["Mechanical Engineer", "mechanical"],
+    ["מהנדס מכונות", "mechanical"],
+    ["מהנדסת מכנית", "mechanical"],
+    ["Mechatronics Engineer", "robotics"],
+    ["Civil Engineer", "civil"],
+    ["Structural Engineer", "civil"],
+    ["מהנדס בניין", "civil"],
+    ["מהנדסת אזרחית", "civil"],
+    ["קונסטרוקטור", "civil"],
   ];
   it.each(cases)("%s → %s", (title, id) => {
     expect(engineeringSpecialtyFor(title)?.id ?? null).toBe(id);
@@ -337,6 +351,7 @@ describe("electrical specialties", () => {
       "Analog Design Engineer",
       "Power Systems Engineer",
       "מהנדס אימות שבבים",
+      "Junior Board Design Engineer",
     ]) {
       expect(matchRoleFamilies(title).map((f) => f.id)).toEqual(["hardware"]);
     }
@@ -354,7 +369,9 @@ describe("electrical specialties", () => {
     expect(hasDesignRound("Electrical Engineer")).toBe(true);
     expect(hasDesignRound("FPGA Engineer")).toBe(true);
     expect(isTechnicalRole("FPGA Engineer")).toBe(false);
-    expect(hasDesignRound("Mechanical Engineer")).toBe(false);
+    expect(hasDesignRound("Mechanical Engineer")).toBe(true);
+    expect(isCodingRole("Mechanical Engineer")).toBe(false);
+    expect(hasDesignRound("Chemical Engineer")).toBe(false);
   });
 
   it("draws most topics from the specialty, plus one general engineering topic", () => {
@@ -454,5 +471,18 @@ describe("RTL coding problems", () => {
     expect(hdlTopicsFor("מהנדס אימות שבבים")).toBe(hdlVerificationTopics);
     expect(hdlTopicsFor("FPGA Engineer")).toBe(hdlDesignTopics);
     expect(hdlTopicsFor("ASIC Design Engineer")).toBe(hdlDesignTopics);
+  });
+});
+
+describe("design problems by level", () => {
+  it("gives juniors a first-feature design problem, not a global-scale one", () => {
+    const junior = designProblemFor(
+      "Backend Developer",
+      () => 0.4,
+      "Entry level",
+    );
+    const mid = designProblemFor("Backend Developer", () => 0.4, "Mid level");
+    expect(juniorSystemDesignProblems).toContain(junior);
+    expect(systemDesignProblems).toContain(mid);
   });
 });

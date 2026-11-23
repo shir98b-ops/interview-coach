@@ -20,6 +20,7 @@ import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
 import { track } from "@/lib/analytics/record";
+import { parseSeniority } from "@/lib/format";
 
 export type TakeHomeState = { error: string | null };
 
@@ -53,6 +54,7 @@ export async function startTakeHome(
   const language = parseLanguage(formData.get("language"));
   const requestedFormat = parseFormat(formData.get("format"));
   const codeLanguage = parseCodeLanguage(formData.get("codeLanguage"));
+  const chosenLevel = parseSeniority(formData.get("seniority"));
 
   const jobId = String(formData.get("jobId") ?? "");
   const [{ data: savedRole }, { data: job }, { data: recent }] =
@@ -79,12 +81,12 @@ export async function startTakeHome(
     ? {
         id: null,
         title: job.title,
-        seniority: null,
+        seniority: chosenLevel,
         job: job.description
           ? { company: job.company, description: job.description }
           : null,
       }
-    : savedRole;
+    : savedRole && { ...savedRole, seniority: chosenLevel };
   if (!role) {
     return {
       error: jobId ? "המשרה לא נמצאה." : "צריך לבחור אחד מהתפקידים שלך.",
@@ -132,6 +134,7 @@ export async function startTakeHome(
       target_role_id: role.id,
       job_id: job?.id ?? null,
       difficulty,
+      seniority: role.seniority,
       language,
       brief,
     })
@@ -163,7 +166,9 @@ export async function submitTakeHome(
   // Row level security returns nothing for another user's take-home.
   const { data: takeHome } = await supabase
     .from("take_homes")
-    .select("id, brief, submission, score, target_roles(title, seniority)")
+    .select(
+      "id, brief, submission, score, seniority, language, target_roles(title, seniority), jobs(title, company)",
+    )
     .eq("id", id)
     .maybeSingle();
   const brief = readBrief(takeHome?.brief);
@@ -189,13 +194,28 @@ export async function submitTakeHome(
     }
   }
 
-  const role = takeHome.target_roles as unknown as {
+  const savedRole = takeHome.target_roles as unknown as {
     title: string;
     seniority: string | null;
   } | null;
+  const job = takeHome.jobs as unknown as {
+    title: string;
+    company: string;
+  } | null;
+  // Scored at the level it was written for; older take-homes use the role's.
+  const seniority = parseSeniority(takeHome.seniority ?? savedRole?.seniority);
+  const role = job
+    ? { title: `${job.title} at ${job.company}`, seniority }
+    : savedRole && { title: savedRole.title, seniority };
   let feedback;
   try {
-    feedback = await evaluateTakeHome(role, brief, submission, user.address);
+    feedback = await evaluateTakeHome(
+      role,
+      brief,
+      submission,
+      user.address,
+      parseLanguage(takeHome.language),
+    );
   } catch (error) {
     refresh();
     if (error instanceof AiError) return aiError(error, "Take-home scoring");

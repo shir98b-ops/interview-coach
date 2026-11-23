@@ -8,6 +8,12 @@ import {
 } from "@/lib/interview/schema";
 import { codeLanguages, isHdl, type CodeLanguage } from "@/lib/code/languages";
 import { companyContext } from "@/lib/jobs/company-context";
+import { parseSeniority } from "@/lib/format";
+import {
+  levelDefinitions,
+  levelLine,
+  levelScoring,
+} from "@/lib/interview/levels";
 import {
   briefSchema,
   codeBriefSchema,
@@ -29,10 +35,10 @@ export interface TakeHomeTarget {
   job?: { company: string; description: string } | null;
 }
 
-function roleName(target: TakeHomeTarget): string {
-  return target.seniority
-    ? `${target.title} (${target.seniority})`
-    : target.title;
+/** The role and the level the take-home is for. */
+function roleLines(target: TakeHomeTarget): string {
+  return `<role>${target.title}</role>
+${levelLine(parseSeniority(target.seniority))}`;
 }
 
 /** How a code take-home is written, in place of a written task. */
@@ -101,13 +107,19 @@ ${
   the answer can be written as text (no files, no code to run).`
 }
 - Difficulty: ${difficulties[difficulty].prompt}.
+- Match the level given below, as companies do for that level:
+${levelDefinitions}
+  An Entry level take-home checks the fundamentals on a clear, scoped task
+  with all the data given and explicit deliverables; a Senior one leaves
+  scope, trade-offs and open questions to the candidate. The time limit comes
+  from the difficulty; the depth expected comes from the level.
 - Give realistic, specific details and numbers so the candidate has something
   to work with, and leave room for judgment.
 - Write it in ${interviewLanguages[language]}, the way a native-speaking
   hiring manager would. Keep professional terms as commonly used.
   ${addressInstruction(address)}
 
-<role>${roleName(target)}</role>${
+${roleLines(target)}${
             target.job
               ? `
 
@@ -150,6 +162,7 @@ export async function evaluateTakeHome(
   brief: TakeHomeBrief,
   submission: string,
   address: Address | null = null,
+  language: InterviewLanguage | null = null,
 ): Promise<TakeHomeFeedback> {
   const code = brief.format === "code";
   let response;
@@ -188,12 +201,18 @@ Scale: 1 = missing, 2 = weak, 3 = acceptable but generic, 4 = strong,
 5 = would move the candidate forward. Be honest and consistent: a submission
 that skips tasks cannot score above 2 on solution.
 
+${levelScoring.replaceAll("answer", "submission")}
+
 Then say what worked, the most useful specific improvements, and the
 questions an interviewer would likely ask about it in the follow-up
-interview. Speak to the candidate directly. Write the feedback in the
-language of the brief. ${addressInstruction(address)}
+interview. Speak to the candidate directly. Write all the feedback in ${
+            language
+              ? interviewLanguages[language]
+              : "the language of the brief's text"
+          }, even when the code and the submission are in English; keep code,
+names and technical terms as they are. ${addressInstruction(address)}
 
-<role>${target ? roleName(target) : "Not given"}</role>
+${target ? roleLines(target) : "<role>Not given</role>"}
 
 <brief>
 ${JSON.stringify(brief, null, 2)}

@@ -1,5 +1,6 @@
 "use client";
 
+import { LevelSelect } from "@/components/level-select";
 import { useActionState, useRef, useState, useTransition } from "react";
 import { CodeLanguageSelect } from "@/components/code-editor";
 import { FileField } from "@/components/file-field";
@@ -328,6 +329,7 @@ export function JobPracticeForm({
       {modes && mode === "coding" && (
         <CodeLanguageSelect defaultValue={codeLanguage} />
       )}
+      <LevelSelect fromJob className="sm:w-60" />
       <label className="flex flex-col gap-1 font-bold sm:w-60">
         שפת הראיון
         <select name="language" defaultValue="en" className={inputStyles}>
@@ -430,6 +432,7 @@ export function JobTakeHomeForm({
         <TakeHomeFormatChoice disabled={pending} codeLanguage={codeLanguage} />
       )}
       <div className="grid gap-3 sm:grid-cols-2">
+        <LevelSelect fromJob />
         <label className="flex flex-col gap-1 font-bold">
           רמת קושי
           <select

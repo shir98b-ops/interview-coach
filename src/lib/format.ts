@@ -26,11 +26,18 @@ export function durationLabel(minutes: number): string {
 
 /** Stored in English, because the AI and the question bank use them. */
 export const seniorityLevels = [
-  { value: "Entry level", label: "התחלתי" },
-  { value: "Mid level", label: "ביניים" },
-  { value: "Senior", label: "בכיר" },
-  { value: "Manager", label: "ניהולי" },
+  { value: "Entry level", label: "התחלתי", years: "בלי ניסיון עד שנתיים" },
+  { value: "Mid level", label: "ביניים", years: "2 עד 5 שנים" },
+  { value: "Senior", label: "בכיר", years: "5 שנים ומעלה" },
+  { value: "Manager", label: "ניהולי", years: "ניהול צוות" },
 ] as const;
+
+export type Seniority = (typeof seniorityLevels)[number]["value"];
+
+/** A seniority level from a form, or null for "set it from the posting". */
+export function parseSeniority(value: unknown): Seniority | null {
+  return seniorityLevels.find((s) => s.value === value)?.value ?? null;
+}
 
 export function seniorityLabel(value: string): string {
   return seniorityLevels.find((s) => s.value === value)?.label ?? value;

@@ -424,6 +424,10 @@ export const roleFamilies: RoleFamily[] = [
       "verification",
       "physical design",
       "pcb",
+      "board design",
+      "board designer",
+      "layout engineer",
+      "signal integrity",
       "analog",
       "antenna",
       "radar",
@@ -1078,11 +1082,17 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
   const hardwareDesigner =
     hardware &&
     (/ engineers? /.test(words) || hebrewWord("מהנדס(ת)?").test(title));
+  // A SOC or security analyst analyzes alerts and incidents, not business
+  // data.
+  const securityAnalyst =
+    matches(roleFamilies.find((f) => f.id === "security")!) &&
+    !/data|נתונים|דאטה/i.test(title);
   return roleFamilies.filter((family) =>
     family.id === "engineering"
       ? isSoftwareFamily(title, words, hardware)
       : (family.id === "product" && productEngineer) ||
-          (family.id === "design" && hardwareDesigner)
+          (family.id === "design" && hardwareDesigner) ||
+          (family.id === "data" && securityAnalyst)
         ? false
         : matches(family),
   );
@@ -1405,13 +1415,15 @@ export function technicalTopicsFor(
 export function designProblemFor(
   title: string,
   random: () => number = Math.random,
+  seniority: string | null = null,
 ): string {
   const specialty = techSpecialtyFor(title);
-  return sampleBank(
-    specialty?.designProblems ?? systemDesignProblems,
-    1,
-    random,
-  )[0];
+  const problems =
+    specialty?.designProblems ??
+    (seniority === "Entry level"
+      ? juniorSystemDesignProblems
+      : systemDesignProblems);
+  return sampleBank(problems, 1, random)[0];
 }
 
 /**
@@ -1684,6 +1696,54 @@ export const engineeringSpecialties: (TechSpecialty & { coding: boolean })[] = [
     ],
   },
   {
+    id: "mechanical",
+    label: "Mechanical engineering",
+    coding: false,
+    pattern:
+      /\bmechanical\b|מהנדס(ת)? מכונות|הנדסת מכונות|מהנדס(ת)? מכני(ת)?|תכנון מכני|מתכנן(ת)? מכני(ת)?/i,
+    topics: [
+      "stress, strain and choosing a safety factor for a loaded part",
+      "material selection: strength, stiffness, weight, cost and the environment",
+      "fatigue and why parts break after many cycles below their strength",
+      "tolerances, fits and GD&T on a drawing, and their cost in manufacturing",
+      "heat transfer: conduction, convection and cooling an electronics box",
+      "design for manufacturing: machining, sheet metal, injection molding and 3D printing",
+      "fasteners, bearings and choosing a standard part over a custom one",
+      "CAD and FEA: what a simulation can and cannot tell you, and checking it by hand",
+    ],
+    designProblems: [
+      "a bracket that holds a 5 kg camera on a vibrating drone arm",
+      "a sealed aluminum enclosure for outdoor electronics that dissipates 40 W",
+      "a hinge for a laptop lid that must survive 20,000 open and close cycles",
+      "a plastic housing for a handheld device that survives a 1.5 m drop",
+      "a simple jig that holds parts in place for drilling on a production line",
+    ],
+  },
+  {
+    id: "civil",
+    label: "Civil and structural engineering",
+    coding: false,
+    pattern:
+      /\b(civil|structural|construction engineer)\b|מהנדס(ת)? (אזרחי(ת)?|בניין|מבנים|ביצוע|קונסטרוקציה)|הנדסה אזרחית|הנדסת בניין|קונסטרוקטור(ית)?/i,
+    topics: [
+      "loads on a building: dead, live, wind and seismic, and how they combine",
+      "reinforced concrete: why the steel is where it is, and cracking",
+      "steel structures: beams, columns, buckling and connections",
+      "foundations and soil: reading a soil report and choosing a foundation",
+      "the Israeli building standards and codes, such as SI 413 for earthquakes",
+      "site supervision: quality control, inspections and safety on site",
+      "planning and managing a construction schedule, budget and subcontractors",
+      "drainage, roads and infrastructure basics",
+    ],
+    designProblems: [
+      "a reinforced concrete slab for a 6 m by 8 m room in a residential building",
+      "a steel canopy over a school entrance in a windy coastal city",
+      "the foundation of a four-story building on clay soil",
+      "a retaining wall 3 m high next to a road",
+      "adding a floor on top of an existing 1970s building",
+    ],
+  },
+  {
     id: "electrical",
     label: "Electrical and electronics engineering",
     coding: false,
@@ -1948,6 +2008,22 @@ export const systemDesignProblems = [
   "a job scheduler that runs millions of delayed and recurring tasks",
   "a hotel or flight booking system that prevents double booking",
   "a leaderboard for a mobile game with millions of players",
+];
+
+/**
+ * Design problems for juniors and graduates: one service and its data, the
+ * size of a first feature at a startup, where the basics done right matter
+ * more than global scale.
+ */
+export const juniorSystemDesignProblems = [
+  "a URL shortener for one company's marketing team",
+  "the backend of a to-do app with users, lists and reminders",
+  "an API for a small library that lends books to its members",
+  "a booking system for the meeting rooms of one office",
+  "a leaderboard for a mobile game with 10,000 players",
+  "a service that sends a daily summary email to each user of an app",
+  "the backend of a simple online store with a cart and orders",
+  "a feedback form service that saves answers and shows a summary to admins",
 ];
 
 /**

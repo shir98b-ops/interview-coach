@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Button, ErrorText, inputStyles } from "@/components/ui";
 import { VoiceAnswerField } from "@/components/voice-answer";
+import { LevelSelect } from "@/components/level-select";
 import { seniorityLabel } from "@/lib/format";
 import { CodeEditor, CodeLanguageSelect } from "@/components/code-editor";
 import {
@@ -90,6 +91,12 @@ export function StartPracticeForm({
         codeLanguage={defaultCodeLanguage(selected?.title ?? "")}
         defaultMode={defaultMode}
       />
+      <LevelSelect
+        key={roleId}
+        defaultValue={selected?.seniority}
+        disabled={pending}
+        className="text-xl font-extrabold sm:w-80"
+      />
       <label className="flex flex-col gap-2">
         <span className="text-xl font-extrabold">באיזה סוג ארגון?</span>
         <select
@@ -107,8 +114,7 @@ export function StartPracticeForm({
           )}
         </select>
         <span className="text-muted text-sm">
-          השאלות והתרחישים יתאימו לסוג הארגון. רמת הקושי נקבעת לפי הבכירות של
-          התפקיד.
+          השאלות והתרחישים יתאימו לסוג הארגון.
         </span>
       </label>
       <fieldset className="flex flex-col gap-3" disabled={pending}>
