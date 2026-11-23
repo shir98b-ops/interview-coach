@@ -80,6 +80,11 @@ const taskTypes: Record<string, string> = {
     "a teaching plan: a lesson or unit plan for a described class with mixed levels, including activities, differentiation and how learning is assessed",
   health:
     "a clinical case: a patient's history, vital signs and results in the brief, asking for priorities, a care plan, what to monitor and when to escalate",
+  lab: "a lab case: an experiment or a test result with a small table of data in the brief that does not look right, asking what may have gone wrong, how to investigate it, what to repeat and how to document it",
+  regulatory:
+    "a quality or regulatory case: a deviation, a complaint or a planned product change in the brief, asking for the investigation, the risk assessment, the regulatory impact (what must be reported, revalidated or resubmitted) and a CAPA plan",
+  clinical:
+    "a clinical trial case: a site visit report or a protocol excerpt with findings in the brief, asking for the issues against GCP, what must be reported and by when, and an action plan for the site",
   legal:
     "a legal memo: a short set of facts and a contract clause in the brief, asking for the issues, the risks, the relevant Israeli law and a recommendation to a non-lawyer client",
   service:

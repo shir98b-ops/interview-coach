@@ -666,6 +666,194 @@ export const roleFamilies: RoleFamily[] = [
     ],
   },
   {
+    id: "lab",
+    label: "Laboratory and life sciences research",
+    // Matched in matchRoleFamilies, so a chemistry teacher stays a teacher
+    // and an electronics lab technician stays in hardware.
+    keywords: [
+      "lab technician",
+      "laboratory technician",
+      "lab assistant",
+      "laboratory assistant",
+      "lab analyst",
+      "laboratory analyst",
+      "lab scientist",
+      "laboratory scientist",
+      "lab manager",
+      "laboratory",
+      "chemist",
+      "biologist",
+      "microbiologist",
+      "biochemist",
+      "biotechnologist",
+      "immunologist",
+      "geneticist",
+      "chemistry",
+      "biology",
+      "microbiology",
+      "biochemistry",
+      "biotechnology",
+      "biotech",
+      "molecular",
+      "cell culture",
+      "genomics",
+      "histology",
+      "histotechnologist",
+      "qc analyst",
+      "quality control analyst",
+      "qc chemist",
+      "qc microbiologist",
+      "formulation",
+      "protein",
+      "antibody",
+      "assay",
+      "analytical development",
+      "process development scientist",
+    ],
+    hebrew: [
+      "לבורנט(ית|ים)?",
+      "טכנאי(ת)? מעבדה",
+      "מעבד(ה|ת|ות)",
+      "כימאי(ת|ים)?",
+      "כימיה (אנליטית|אורגנית)",
+      "ביולוג(ית|ים)?",
+      "ביולוגיה",
+      "מיקרוביולוג(ית|ים)?",
+      "מיקרוביולוגיה",
+      "ביוכימאי(ת)?",
+      "ביוכימיה",
+      "ביוטכנולוג(ית|יה)?",
+      "גנטיקה",
+      "גנומיקה",
+      "תרבי(ת|יות) תאים",
+      "אנליסט(ית)? (QC|בקרת איכות)",
+    ],
+    questions: [
+      "Walk me through an experiment or analysis you ran, from preparation to results. What would you do differently?",
+      "Tell me about a time a result was out of specification or did not make sense. What did you do?",
+      "How do you make sure your work is documented so someone else could repeat it?",
+      "Which instruments and techniques have you used hands-on, and how did you troubleshoot them?",
+      "How do you work safely with hazardous chemicals or biological materials?",
+      "Tell me about a time you had many samples or deadlines at once. How did you plan the work?",
+    ],
+    focus: [
+      "working to SOPs under Good Laboratory and Manufacturing Practice (GLP, GMP), and what to do when an SOP does not fit the situation",
+      "data integrity and documentation: ALCOA+, lab notebooks and electronic records (21 CFR Part 11)",
+      "an out-of-specification or unexpected result: checking the sample, the method and the instrument before any retest",
+      "analytical methods of the field (HPLC, GC, spectroscopy, PCR or ELISA) and method validation: accuracy, precision, linearity, LOD and LOQ",
+      "aseptic technique, contamination control and cell culture or microbiology basics",
+      "lab safety: chemical and biological hazards, safety data sheets, waste, and the Israeli Dangerous Substances regulations",
+      "calibration and maintenance of instruments, and traceability of samples and reagents",
+      "experimental design: controls, replicates and reading results critically",
+    ],
+  },
+  {
+    id: "regulatory",
+    label: "Regulatory affairs and quality in life sciences",
+    // Also matched in matchRoleFamilies for a quality title in a medical,
+    // pharma or biotech context, such as "QA Specialist (GMP)".
+    keywords: [
+      "regulatory affairs",
+      "regulatory specialist",
+      "regulatory associate",
+      "regulatory manager",
+      "ra specialist",
+      "ra manager",
+      "ra associate",
+      "qa ra",
+      "ra qa",
+      "qara",
+      "gmp",
+      "gxp",
+      "pharmacovigilance",
+      "drug safety",
+      "qualified person",
+    ],
+    hebrew: [
+      // Software QA titles say תוכנה, and are matched as software first.
+      "אבטחת איכות",
+      "רגולציה ו?אבטחת איכות",
+      "רגולציה (רפואית|של תרופות|מכשור רפואי)",
+      "רוקח(ת)? (ממונה|אחראי(ת)?)",
+      "פרמקוביג'?ילנס",
+      "בטיחות תרופות",
+    ],
+    questions: [
+      "Tell me about a deviation or a complaint you investigated. How did you find the root cause and close the CAPA?",
+      "How would you prepare for an inspection by the FDA, a notified body or the Israeli Ministry of Health?",
+      "Tell me about a time you had to stop a release that was not compliant. How did you handle the pressure?",
+      "How do you keep up with changes in regulations and standards?",
+      "Walk me through a submission, a technical file or a batch release you worked on.",
+      "How do you explain a regulatory requirement to engineers or scientists who see it as paperwork?",
+    ],
+    focus: [
+      "quality management systems: ISO 13485 for medical devices, or GMP (EU GMP, 21 CFR 210 and 211) for drugs, as fits the company",
+      "deviations, CAPA and root cause, and how to tell whether a CAPA really worked",
+      "risk management under ISO 14971, and linking each risk to a design control and a test",
+      "change control: which changes need new verification, a notification or a new submission",
+      "regulatory pathways: FDA 510(k), De Novo and PMA, CE marking under the EU MDR, and registration in the Israeli Ministry of Health medical device registry (AMAR)",
+      "drug registration with the Ministry of Health Pharmaceutical Division, and pharmacovigilance: adverse event reports and their deadlines",
+      "audits and inspections: preparing, hosting and answering findings",
+      "documents and records: SOPs, batch or device history records, and data integrity",
+      "complaint handling and post-market surveillance",
+    ],
+  },
+  {
+    id: "clinical",
+    label: "Clinical research",
+    keywords: [
+      "clinical research",
+      "clinical trial",
+      "clinical study",
+      "clinical studies",
+      "clinical operations",
+      "clinical project manager",
+      "clinical data manager",
+      "cra",
+      "crc",
+      "study coordinator",
+      "study manager",
+      "trial manager",
+      "research coordinator",
+      "research nurse",
+      "medical science liaison",
+      "msl",
+      "medical writer",
+      "medical writing",
+      "biostatistician",
+      "biostatistics",
+    ],
+    hebrew: [
+      "מחקר(ים)? קליני(ים)?",
+      "ניסוי(ים)? קליני(ים)?",
+      "מתא(ם|מת) מחקר(ים)?",
+      "רכז(ת)? מחקר(ים)?",
+      "מלווה מחקר(ים)?",
+      "ביוסטטיסטיקאי(ת)?",
+      "ביוסטטיסטיקה",
+      "כתיבה רפואית",
+      "כותב(ת)? רפואי(ת)?",
+    ],
+    questions: [
+      "Walk me through how a participant goes from screening to the end of a study at a site.",
+      "What would you do if you found that a participant signed an outdated version of the consent form?",
+      "Tell me about a time a site was behind on recruitment or data entry. What did you do?",
+      "A serious adverse event is reported to you late on a Thursday. What do you do, and by when?",
+      "How do you work with an investigator who has no time for the study?",
+      "How do you keep track of many sites, visits and deadlines at once?",
+    ],
+    focus: [
+      "ICH Good Clinical Practice (E6) and the duties of the investigator, the sponsor and the monitor",
+      "informed consent: versions, re-consent and vulnerable participants, under the Israeli Ministry of Health procedure for clinical trials in humans and the Helsinki committees",
+      "adverse events and serious adverse events: definitions, causality and reporting deadlines",
+      "protocol deviations, source data verification and preparing for a monitoring visit or an audit",
+      "trial documents: the protocol, the investigator's brochure, the trial master file and case report forms",
+      "recruitment and retention of participants, and checking whether a site can run the study",
+      "participant privacy and data protection in research, under the Israeli Privacy Protection Law and GDPR where it applies",
+      "trial design basics in plain words: phases, randomization, blinding and endpoints",
+    ],
+  },
+  {
     id: "legal",
     label: "Law and compliance",
     keywords: [
@@ -957,6 +1145,13 @@ export const roleFamilies: RoleFamily[] = [
       "implementation specialist",
       "implementation engineer",
       "implementation consultant",
+      // Medical device companies' specialists who train and support
+      // clinicians on the product.
+      "clinical application specialist",
+      "clinical applications specialist",
+      "application specialist",
+      "applications specialist",
+      "field clinical specialist",
     ],
     hebrew: [
       "פריסייל",
@@ -1073,29 +1268,116 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
       (keyword) =>
         words.includes(` ${keyword} `) || words.includes(` ${keyword}s `),
     ) || (family.hebrew ?? []).some((word) => hebrewWord(word).test(title));
-  const hardware = matches(roleFamilies.find((f) => f.id === "hardware")!);
+  const family = (id: string) => roleFamilies.find((f) => f.id === id)!;
+  const engineer =
+    / engineers? /.test(words) || hebrewWord("מהנדס(ת)?").test(title);
+  // A medical device or biomedical engineer designs physical products.
+  const technical = isTechnicalRole(title);
+  const medtechEngineer = !technical && MEDTECH_ENGINEER.test(title);
+  // A QA or quality title in a medical, pharma or biotech company is quality
+  // assurance under the regulator, not software testing.
+  const regulatory =
+    !technical &&
+    (matches(family("regulatory")) ||
+      (/\b(qa|quality)\b|איכות/i.test(title) && LIFE_SCIENCE.test(title)) ||
+      // In Israeli ads a Hebrew regulatory title with no other context, such
+      // as "ממונה רגולציה", is usually in pharma, medical devices or food.
+      (hebrewWord("רגולציה|רגולטורי(ת)?").test(title) &&
+        !/ביטוח|בנק|פיננס|השקעות|אשראי|תקשורת|אנרגיה|insurance|bank|financ/i.test(
+          title,
+        )));
+  const lab =
+    matches(family("lab")) &&
+    !matches(family("education")) &&
+    !/electronic|hardware|\b(rf|pcb)\b|אלקטרוניקה|חומרה/i.test(title);
+  const clinical = matches(family("clinical"));
+  const lifeScience = lab || regulatory || clinical;
+  // A chemist or QC analyst works in a lab, not as a chemical engineer.
+  const hardware =
+    (matches(family("hardware")) || medtechEngineer) &&
+    !(lifeScience && !engineer);
+  // A clinical research associate or a lab scientist is not a nurse, unless
+  // the title also says so.
+  const careGiver = !(
+    (lifeScience ||
+      medtechEngineer ||
+      technical ||
+      matches(family("solutions")) ||
+      /medical (devices?|equipment)|(ציוד|מכשור) רפואי/i.test(title)) &&
+    !(
+      /\b(nurse|nursing|physician|doctor|pharmacist)s?\b/i.test(title) ||
+      hebrewWord("אח|אחות|סיעוד|רופא(ה)?|רוקח(ת)?").test(title)
+    )
+  );
+  // A regulatory affairs specialist is not a lawyer, unless the title also
+  // says so.
+  const lawyer =
+    !regulatory ||
+    /lawyer|attorney|counsel|legal|עורך|עורכת|עו"ד|משפט/i.test(title);
   // A Hebrew "product engineer" designs physical products, not a product
   // manager's work.
   const productEngineer = hebrewWord("(מהנדס(ת)?|הנדסת) מוצר").test(title);
   // An "RTL design engineer" or "mechanical design engineer" designs
   // hardware, not user experiences.
-  const hardwareDesigner =
-    hardware &&
-    (/ engineers? /.test(words) || hebrewWord("מהנדס(ת)?").test(title));
-  // A SOC or security analyst analyzes alerts and incidents, not business
-  // data.
-  const securityAnalyst =
-    matches(roleFamilies.find((f) => f.id === "security")!) &&
-    !/data|נתונים|דאטה/i.test(title);
-  return roleFamilies.filter((family) =>
-    family.id === "engineering"
-      ? isSoftwareFamily(title, words, hardware)
-      : (family.id === "product" && productEngineer) ||
-          (family.id === "design" && hardwareDesigner) ||
-          (family.id === "data" && securityAnalyst)
-        ? false
-        : matches(family),
-  );
+  const hardwareDesigner = hardware && engineer;
+  const dataWord = /data|נתונים|דאטה/i.test(title);
+  // A SOC or security analyst analyzes alerts and incidents, and a QC analyst
+  // or a clinical research associate works in a lab or a trial, not on
+  // business data.
+  const notDataAnalyst =
+    (matches(family("security")) || lifeScience) && !dataWord;
+  // A clinical research coordinator coordinates a study, not a project.
+  const studyCoordinator =
+    clinical && !/project|program|פרויקט|תוכני(ת|ות)/i.test(title);
+  return roleFamilies.filter((f) => {
+    switch (f.id) {
+      case "engineering":
+        return isSoftwareFamily(title, words, hardware);
+      case "hardware":
+        return hardware;
+      case "lab":
+        return lab;
+      case "regulatory":
+        return regulatory;
+      case "health":
+        return careGiver && matches(f);
+      case "legal":
+        return lawyer && matches(f);
+      case "product":
+        return !productEngineer && matches(f);
+      case "project":
+        return !studyCoordinator && matches(f);
+      case "design":
+        return !hardwareDesigner && matches(f);
+      case "data":
+        return !notDataAnalyst && matches(f);
+      default:
+        return matches(f);
+    }
+  });
+}
+
+/**
+ * Medical device and biomedical engineers, whose interviews are about
+ * design controls, risk and medical safety standards.
+ */
+const MEDTECH_ENGINEER =
+  /(biomedical|medical devices?|medical equipment|clinical|sterilization|\bcqv)\b.*engineer|engineer.*\b(medical|biomedical)\b|מהנדס(ת)?.*(רפואי|ביו-?רפואי)|הנדס(ה|ת) (ביו-?)?רפואי(ת)?/i;
+
+/** Words that set a title in medicine, pharma or biotech. */
+const LIFE_SCIENCE =
+  /\b(gmp|gxp|glp|pharma\w*|medical|biomedical|clinical|regulatory|biotech\w*|life sciences?)\b|רפואי|רגולציה|תרופות|פארמה|ביוטק/i;
+
+/**
+ * Software work, which keeps a software title technical even in a medical
+ * or pharma company.
+ */
+const SOFTWARE_WORK =
+  /software|developer|programmer|firmware|embedded|automation|algorithm|computer vision|machine learning|data (engineer|scientist)|bioinformatic|devops|\b(ml|ai|sre|ios|android|web|cloud|frontend|backend|full[- ]?stack)\b|תוכנה|מפתח|מתכנת|אלגוריתמ|אוטומציה|ביואינפורמטיק/i;
+
+/** A title in medicine, pharma or biotech that is not software work. */
+function isLifeScienceNonSoftware(title: string): boolean {
+  return LIFE_SCIENCE.test(title) && !SOFTWARE_WORK.test(title);
 }
 
 const HEBREW_LETTER = "\\u05D0-\\u05EA";
@@ -1118,6 +1400,7 @@ function isSoftwareFamily(
   hardware: boolean,
 ): boolean {
   if (isTechnicalRole(title)) return true;
+  if (isLifeScienceNonSoftware(title)) return false;
   if (BUSINESS_DEVELOPER.test(title)) return false;
   if (NOT_SOFTWARE_ENGINEER.test(title)) return false;
   if (/ (tester|qa) /.test(words) || / testers /.test(words)) return true;
@@ -1143,11 +1426,14 @@ export function isTechnicalRole(title: string): boolean {
   // the questions of their own field.
   // A business developer is a sales role, not a software one.
   if (BUSINESS_DEVELOPER.test(title)) return false;
+  // A QA specialist in a pharma plant or an R&D engineer of medical devices
+  // is not a software engineer.
+  if (isLifeScienceNonSoftware(title)) return false;
   return (
     SOFTWARE_TITLE.test(title) ||
     QUALIFIED_ENGINEER.test(title) ||
     // Hebrew titles, such as "מפתח תוכנה" or "מהנדסת בקאנד".
-    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|מדע(ן|נית) נתונים|דאטה סיינטיסט|אלגוריתמ|קושחה|משובצות|אמבדד|מהנדס(ת)? (בדיקות|אוטומציה)|בודק(ת)? תוכנה|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון|עסקי))/.test(
+    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|מדע(ן|נית) נתונים|דאטה סיינטיסט|אלגוריתמ|ביואינפורמטיק|קושחה|משובצות|אמבדד|מהנדס(ת)? (בדיקות|אוטומציה)|בודק(ת)? תוכנה|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון|עסקי))/.test(
       title,
     )
   );
@@ -1155,7 +1441,7 @@ export function isTechnicalRole(title: string): boolean {
 
 /** Titles that name software work on their own. */
 const SOFTWARE_TITLE =
-  /\b(software|developer|programmer|devops|sre|site reliability|backend|back-end|frontend|front-end|full[- ]?stack|qa|ios|android|data engineer|machine learning|ml engineer|ai engineer|llm engineer|genai engineer|gen ai engineer|ai developer|prompt engineer|mlops|data scientist|computer vision|algorithms?|embedded|firmware|tech lead|engineering manager|software architect|solutions architect)\b/i;
+  /\b(software|developer|programmer|devops|sre|site reliability|backend|back-end|frontend|front-end|full[- ]?stack|qa|ios|android|data engineer|machine learning|ml engineer|ai engineer|llm engineer|genai engineer|gen ai engineer|ai developer|prompt engineer|mlops|data scientist|computer vision|algorithms?|bioinformatics|bioinformatician|computational biolog(y|ist)|embedded|firmware|tech lead|engineering manager|software architect|solutions architect)\b/i;
 
 /**
  * Words like "web", "cloud" or "automation" mean software only next to an
@@ -1180,6 +1466,28 @@ export interface TechSpecialty {
 }
 
 export const techSpecialties: TechSpecialty[] = [
+  {
+    id: "bioinformatics",
+    label: "Bioinformatics",
+    pattern: /bioinformatic|computational biolog|ביואינפורמטיק/i,
+    topics: [
+      "sequencing data and its formats (FASTQ, BAM, VCF): alignment and variant calling",
+      "a reproducible pipeline (Snakemake or Nextflow): versions, failures and reruns",
+      "quality control of sequencing data, and spotting batch effects",
+      "RNA-seq differential expression: normalization, multiple testing and reading the results",
+      "statistics for biology: p-values, false discovery rate and sample size",
+      "large files and compute: clusters, cloud and memory limits",
+      "public databases and reference genomes, and keeping their versions consistent",
+      "explaining results to biologists and choosing what to validate in the lab",
+    ],
+    designProblems: [
+      "a pipeline that turns each day's sequencing runs from the lab into variant reports",
+      "an RNA-seq analysis service that biologists run on their own experiments",
+      "storage and search for 50,000 genomes with their clinical data",
+      "a single-cell analysis workflow that must give the same results a year later",
+      "a quality dashboard that flags bad samples before analysis",
+    ],
+  },
   {
     id: "frontend",
     label: "Frontend",
@@ -1672,6 +1980,29 @@ export const engineeringSpecialties: (TechSpecialty & { coding: boolean })[] = [
     ],
   },
   {
+    id: "medical",
+    label: "Medical device engineering",
+    coding: false,
+    pattern: MEDTECH_ENGINEER,
+    topics: [
+      "design controls: user needs, design inputs and outputs, verification versus validation, and the design history file",
+      "risk management under ISO 14971: hazards, risk controls and residual risk",
+      "electrical safety and EMC of medical equipment (IEC 60601-1 and 60601-1-2)",
+      "usability engineering (IEC 62366) and use errors",
+      "biocompatibility (ISO 10993), sterilization and cleaning validation",
+      "software in a medical device (IEC 62304) and cybersecurity basics",
+      "how the regulatory pathway shapes engineering work: FDA 510(k), the EU MDR and the Israeli AMAR registration",
+      "process validation (IQ, OQ, PQ) and moving a design into manufacturing",
+    ],
+    designProblems: [
+      "a home blood pressure monitor for elderly users, from user needs to the verification plan",
+      "the alarm system of an infusion pump, with the risk analysis behind each alarm",
+      "a single-use surgical instrument that must be sterilized and stay sterile on the shelf",
+      "a wearable patch that records heart rhythm for 14 days",
+      "the IQ, OQ and PQ plan for a new sealing machine on a sterile packaging line",
+    ],
+  },
+  {
     id: "reliability",
     label: "Reliability and quality engineering",
     coding: false,
@@ -1826,7 +2157,10 @@ export function isCodingRole(title: string): boolean {
     /\b(data (analyst|scientist)|analytics engineer|bi (developer|analyst)|business intelligence|quant(itative)?)\b/i.test(
       title,
     ) ||
-    /אנליסט(ית)? (דאטה|נתונים)|מדע(ן|נית) נתונים|דאטה סיינטיסט/.test(title) ||
+    /אנליסט(ית)? (דאטה|נתונים)|מדע(ן|נית) נתונים|דאטה סיינטיסט|ביוסטטיסטיק/.test(
+      title,
+    ) ||
+    /\bbiostatistic/i.test(title) ||
     // Chip design, verification and FPGA interviews include writing RTL.
     engineeringSpecialtyFor(title)?.coding === true
   );
