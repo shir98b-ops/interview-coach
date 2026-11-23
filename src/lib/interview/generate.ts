@@ -2,7 +2,7 @@ import "server-only";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { addressInstruction, type Address } from "@/lib/address";
 import { AiError, createAiClient, toAiError } from "@/lib/ai/client";
-import { codeLanguages, type CodeLanguage } from "@/lib/code/languages";
+import { codeLanguages, isHdl, type CodeLanguage } from "@/lib/code/languages";
 import { companyContext } from "@/lib/jobs/company-context";
 import type { ResumeData } from "@/lib/resume/schema";
 import type { SubmittedTakeHome } from "@/lib/take-home/for-interview";
@@ -10,7 +10,11 @@ import {
   bankFor,
   behavioralThemes,
   codingTopics,
+  engineeringDesignProblemFor,
+  engineeringSpecialtyFor,
+  engineeringTopicsFor,
   focusAreasFor,
+  hdlTopicsFor,
   isTechnicalRole,
   designProblemFor,
   sampleBank,
@@ -227,6 +231,33 @@ ${levelGuide}
 
 ${professionalBar}`;
 
+const engineeringDesignInstructions = `You are a senior engineer in the
+candidate's field running a design interview. Use the design problem given below. Then write it
+as ${QUESTION_COUNT} questions, asked in this order, each of kind "design":
+
+1. State the problem with its key numbers (inputs, loads, environment, cost
+   or size limits) and ask the candidate which requirements and specs they
+   would pin down before designing.
+2. Ask for the architecture: a block diagram described in words, the main
+   blocks and the interfaces between them.
+3. Ask for one key calculation done out loud, the one this kind of design
+   lives or dies on (a power, timing, noise, link, error or thermal budget, a
+   load, a failure rate or a short-circuit level), with the numbers from the problem.
+4. Change one constraint (a key part goes out of stock, the budget is cut, the
+   temperature range grows) and ask how their choice of components or
+   implementation changes.
+5. Ask what in this design is most likely to fail in testing, certification
+   or the field, and so what they would verify first.
+
+Each question after the first must make sense on its own while building on
+the same problem, the way an interviewer moves the discussion forward.
+
+${askLikeAnInterviewer}
+
+${levelGuide}
+
+${professionalBar}`;
+
 const codingInstructions = `You are a senior engineer running the coding round
 of an interview. Write ${CODING_QUESTION_COUNT} coding problems (kind "coding")
 in the programming language given below: the first a focused warm-up, the
@@ -257,10 +288,17 @@ If no seniority is given, infer it from the job posting, else aim for mid level.
 
 ${professionalBar}`;
 
-function instructionsFor(mode: InterviewMode, technical: boolean): string {
+function instructionsFor(
+  mode: InterviewMode,
+  technical: boolean,
+  electrical: boolean,
+): string {
   if (mode === "coding") return codingInstructions;
   if (mode === "professional") return professionalInstructions;
-  if (mode === "case") return technical ? designInstructions : caseInstructions;
+  if (mode === "case") {
+    if (technical) return designInstructions;
+    return electrical ? engineeringDesignInstructions : caseInstructions;
+  }
   return `${instructions}
 
 ${askLikeAnInterviewer}
@@ -274,6 +312,7 @@ function startingPoint(
   mode: InterviewMode,
   technical: boolean,
 ): string {
+  const electrical = technical ? null : engineeringSpecialtyFor(target.title);
   if (mode === "general") {
     return `This time, build the behavioral questions around these themes:
 ${sampleBank(behavioralThemes, 2)
@@ -289,12 +328,27 @@ ${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
   }
   if (mode === "coding") {
     const language = target.codeLanguage ?? "python";
+    const hdl = isHdl(language);
     const topics = sampleBank(
-      language === "sql" ? sqlTopics : codingTopics,
+      language === "sql"
+        ? sqlTopics
+        : hdl
+          ? hdlTopicsFor(target.title)
+          : codingTopics,
       CODING_QUESTION_COUNT,
     );
     return `<programming_language>${codeLanguages[language]}</programming_language>
-
+${
+  hdl
+    ? `
+These are RTL problems, as in a chip design, verification or FPGA interview.
+Ask for a synthesizable module (or a testbench, when the kind says so), and
+state its ports with their widths, the clock and reset (synchronous or not,
+active level), the timing of the outputs, and one example as a short
+cycle-by-cycle table in place of "Input:" and "Output:".
+`
+    : ""
+}
 Build the problems around these kinds of problem, one each, and pick a
 different story each time:
 ${topics.map((topic) => `- ${topic}`).join("\n")}
@@ -308,7 +362,9 @@ ${
   if (mode === "professional") {
     const topics = technical
       ? technicalTopicsFor(target.title, QUESTION_COUNT)
-      : sampleBank(focus, QUESTION_COUNT);
+      : electrical
+        ? engineeringTopicsFor(target.title, QUESTION_COUNT)
+        : sampleBank(focus, QUESTION_COUNT);
     return topics.length
       ? `<focus_areas>
 ${topics.map((topic) => `- ${topic}`).join("\n")}
@@ -327,7 +383,18 @@ stack in the job posting${
         }.
 </design_problem>
 `
-      : `<case>
+      : electrical
+        ? `<design_problem>
+A hardware or engineering design this company would really build, taken
+from its product and the work in the job posting, in the field of
+${electrical.label}${
+            target.takeHome
+              ? ", or the design the candidate's take-home started, taken further"
+              : ""
+          }.
+</design_problem>
+`
+        : `<case>
 A real situation from the work of this role at the company in the job
 posting, at that company's real scale and context.
 </case>
@@ -338,14 +405,19 @@ posting, at that company's real scale and context.
 Design ${designProblemFor(target.title)}.
 </design_problem>
 `
-    : `<case>
+    : electrical
+      ? `<design_problem>
+Design ${engineeringDesignProblemFor(target.title)}.
+</design_problem>
+`
+      : `<case>
 Choose a realistic, demanding situation that people in this role face, typical
 of the organization type below if one is given. Pick a different case each time.${
-        focus.length
-          ? `
+          focus.length
+            ? `
 Set it in this area of the profession: ${sampleBank(focus, 1)[0]}.`
-          : ""
-      }
+            : ""
+        }
 </case>
 `;
 }
@@ -362,6 +434,8 @@ export async function generateQuestions(
     : target.title;
   const mode = target.mode ?? "general";
   const technical = isTechnicalRole(target.title);
+  const electrical =
+    !technical && engineeringSpecialtyFor(target.title) !== null;
 
   let response;
   try {
@@ -377,7 +451,7 @@ export async function generateQuestions(
       messages: [
         {
           role: "user",
-          content: `${instructionsFor(mode, technical)}
+          content: `${instructionsFor(mode, technical, electrical)}
 
 Write the questions in ${interviewLanguages[language]}, phrased the way a
 native-speaking interviewer would ask them (translate the listed questions

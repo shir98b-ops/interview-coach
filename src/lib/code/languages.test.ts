@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   codeAnswerText,
   defaultCodeLanguage,
+  defaultCodeLanguageForJob,
   parseCodeLanguage,
 } from "./languages";
 
@@ -18,6 +19,23 @@ describe("code languages", () => {
     expect(defaultCodeLanguage("iOS Developer")).toBe("swift");
     expect(defaultCodeLanguage("Java Backend Engineer")).toBe("java");
     expect(defaultCodeLanguage("Backend Developer")).toBe("python");
+    expect(defaultCodeLanguage("FPGA Engineer")).toBe("verilog");
+    expect(defaultCodeLanguage("Design Verification Engineer")).toBe("verilog");
+    expect(defaultCodeLanguage("מהנדס אימות שבבים")).toBe("verilog");
+    expect(defaultCodeLanguage("FPGA Engineer (VHDL)")).toBe("vhdl");
+  });
+
+  it("picks VHDL when an FPGA posting asks mostly for it", () => {
+    const posting =
+      "Design blocks on FPGAs in VHDL. Requirements: VHDL or Verilog.";
+    expect(defaultCodeLanguageForJob("FPGA Engineer", posting)).toBe("vhdl");
+    expect(
+      defaultCodeLanguageForJob("FPGA Engineer", "SystemVerilog, UVM"),
+    ).toBe("verilog");
+    expect(defaultCodeLanguageForJob("Backend Developer", "VHDL")).toBe(
+      "python",
+    );
+    expect(defaultCodeLanguageForJob("FPGA Engineer", null)).toBe("verilog");
   });
 
   it("saves the code in a fenced block, then the explanation", () => {

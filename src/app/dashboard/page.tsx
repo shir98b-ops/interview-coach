@@ -8,7 +8,11 @@ import { Card } from "@/components/ui";
 import { nextStep, type HomeFacts } from "@/lib/home/next-step";
 import { thisWeek } from "@/lib/home/week";
 import { roundKind, scoreChange } from "@/lib/interview/progress";
-import { isCodingRole, isTechnicalRole } from "@/lib/interview/question-bank";
+import {
+  engineeringSpecialtyFor,
+  isCodingRole,
+  isTechnicalRole,
+} from "@/lib/interview/question-bank";
 import { practiceStreak } from "@/lib/interview/streak";
 import { upcomingInterviews } from "@/lib/jobs/queries";
 import { interviewKinds } from "@/lib/jobs/schema";
@@ -130,7 +134,11 @@ async function Dashboard() {
     hasResume: Boolean(profile),
     roleTitle,
     roundsDone: new Set(finished.map((s) => roundKind(s.questions))),
-    technicalRole: roleTitle ? isTechnicalRole(roleTitle) : false,
+    // Chip, verification and FPGA roles take the coding step like software.
+    technicalRole: roleTitle
+      ? isTechnicalRole(roleTitle) ||
+        engineeringSpecialtyFor(roleTitle)?.coding === true
+      : false,
     codingRole: roleTitle ? isCodingRole(roleTitle) : false,
     resumeScore: (reviews?.[0]?.score as number | null | undefined) ?? null,
     openTakeHome: takeHomes?.[0] ? { id: takeHomes[0].id as string } : null,

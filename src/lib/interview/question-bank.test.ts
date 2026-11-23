@@ -5,6 +5,14 @@ import {
   behavioralThemes,
   commonQuestions,
   designProblemFor,
+  engineeringDesignProblemFor,
+  engineeringSpecialties,
+  engineeringSpecialtyFor,
+  engineeringTopicsFor,
+  hasDesignRound,
+  hdlDesignTopics,
+  hdlTopicsFor,
+  hdlVerificationTopics,
   focusAreasFor,
   isCodingRole,
   isTechnicalRole,
@@ -286,5 +294,165 @@ describe("software specialties", () => {
     expect(systemDesignProblems).toContain(
       designProblemFor("Backend Developer"),
     );
+  });
+});
+
+describe("electrical specialties", () => {
+  const cases: [string, string | null][] = [
+    ["Design Verification Engineer", "verification"],
+    ["מהנדס אימות שבבים", "verification"],
+    ["FPGA Engineer", "fpga"],
+    ["RTL Design Engineer", "chip"],
+    ["Physical Design Engineer", "chip"],
+    ["מהנדסת תכנון לוגי", "chip"],
+    ["RF Engineer", "rf"],
+    ["Analog Design Engineer", "analog"],
+    ["Power Electronics Engineer", "analog"],
+    ["Hardware Engineer", "board"],
+    ["PCB Layout Engineer", "board"],
+    ["מהנדס חומרה", "board"],
+    ["Power Systems Engineer", "power"],
+    ["מתכנן חשמל", "power"],
+    ["מהנדס מתח גבוה", "power"],
+    ["Electrical Engineer", "electrical"],
+    ["מהנדס חשמל", "electrical"],
+    ["מהנדסת אלקטרוניקה", "electrical"],
+    // Not electrical engineering.
+    ["חשמלאי", null],
+    ["Embedded Software Engineer", null],
+    ["Backend Developer", null],
+    ["SOC Analyst", null],
+    ["Product Designer", null],
+    ["Mechanical Engineer", null],
+  ];
+  it.each(cases)("%s → %s", (title, id) => {
+    expect(engineeringSpecialtyFor(title)?.id ?? null).toBe(id);
+  });
+
+  it("puts every electrical title in the engineering family, not software", () => {
+    for (const title of [
+      "Design Verification Engineer",
+      "RTL Design Engineer",
+      "PCB Layout Engineer",
+      "Analog Design Engineer",
+      "Power Systems Engineer",
+      "מהנדס אימות שבבים",
+    ]) {
+      expect(matchRoleFamilies(title).map((f) => f.id)).toEqual(["hardware"]);
+    }
+  });
+
+  it("gives chip, verification and FPGA roles a coding round only", () => {
+    expect(isCodingRole("Design Verification Engineer")).toBe(true);
+    expect(isCodingRole("FPGA Engineer")).toBe(true);
+    expect(isCodingRole("ASIC Design Engineer")).toBe(true);
+    expect(isCodingRole("RF Engineer")).toBe(false);
+    expect(isCodingRole("Power Systems Engineer")).toBe(false);
+  });
+
+  it("gives electrical roles a design round but keeps them off software rounds", () => {
+    expect(hasDesignRound("Electrical Engineer")).toBe(true);
+    expect(hasDesignRound("FPGA Engineer")).toBe(true);
+    expect(isTechnicalRole("FPGA Engineer")).toBe(false);
+    expect(hasDesignRound("Mechanical Engineer")).toBe(false);
+  });
+
+  it("draws most topics from the specialty, plus one general engineering topic", () => {
+    const topics = engineeringTopicsFor("RF Engineer", 5, () => 0.3);
+    const rf = engineeringSpecialties.find((s) => s.id === "rf")!;
+    expect(topics).toHaveLength(5);
+    expect(topics.filter((t) => rf.topics.includes(t))).toHaveLength(4);
+    expect(engineeringTopicsFor("Marketing Manager", 5)).toEqual([]);
+  });
+
+  it("picks a design problem from the specialty", () => {
+    const fpga = engineeringSpecialties.find((s) => s.id === "fpga")!;
+    expect(fpga.designProblems).toContain(
+      engineeringDesignProblemFor("FPGA Engineer", () => 0.5),
+    );
+    expect(engineeringDesignProblemFor("Sales Manager")).toBeNull();
+  });
+
+  it("has full topic and problem lists for every specialty", () => {
+    for (const s of engineeringSpecialties) {
+      expect(s.topics.length).toBeGreaterThanOrEqual(8);
+      expect(s.designProblems.length).toBeGreaterThanOrEqual(5);
+    }
+  });
+});
+
+describe("titles that used to fall between the chairs", () => {
+  it.each([
+    ["Systems Engineer", "systems"],
+    ["מהנדס מערכת", "systems"],
+    ["Robotics Engineer", "robotics"],
+    ["מהנדסת מכטרוניקה", "robotics"],
+    ["Optical Engineer", "optics"],
+    ["מהנדס אופטיקה", "optics"],
+    ["Reliability Engineer", "reliability"],
+    ["מהנדסת איכות", "reliability"],
+  ])("%s gets the %s engineering specialty, not software", (title, id) => {
+    expect(engineeringSpecialtyFor(title)?.id).toBe(id);
+    expect(matchRoleFamilies(title).map((f) => f.id)).toEqual(["hardware"]);
+    expect(hasDesignRound(title)).toBe(true);
+    expect(isCodingRole(title)).toBe(false);
+  });
+
+  it("treats LLM and game roles as software specialties", () => {
+    expect(isTechnicalRole("LLM Engineer")).toBe(true);
+    expect(techSpecialtyFor("LLM Engineer")?.id).toBe("llm");
+    expect(techSpecialtyFor("Game Developer")?.id).toBe("game");
+    expect(isTechnicalRole("Smart Contract Engineer")).toBe(true);
+  });
+
+  it("sends researchers to the right field", () => {
+    expect(matchRoleFamilies("Security Researcher").map((f) => f.id)).toEqual([
+      "security",
+    ]);
+    expect(matchRoleFamilies("UX Researcher").map((f) => f.id)).toEqual([
+      "design",
+    ]);
+    expect(matchRoleFamilies("Quant Researcher").map((f) => f.id)).toEqual([
+      "finance",
+    ]);
+  });
+
+  it("keeps a penetration tester out of software testing", () => {
+    expect(techSpecialtyFor("Penetration Tester")).toBeNull();
+    expect(matchRoleFamilies("Penetration Tester").map((f) => f.id)).toEqual([
+      "security",
+    ]);
+    expect(techSpecialtyFor("QA Tester")?.id).toBe("qa");
+  });
+
+  it("gives hybrid technical roles their own tracks", () => {
+    expect(matchRoleFamilies("Solutions Engineer").map((f) => f.id)).toEqual([
+      "solutions",
+    ]);
+    expect(matchRoleFamilies("Pre-Sales Engineer").map((f) => f.id)).toContain(
+      "solutions",
+    );
+    expect(
+      matchRoleFamilies("Technical Support Engineer").map((f) => f.id),
+    ).toEqual(["it"]);
+    expect(matchRoleFamilies("תומך טכני").map((f) => f.id)).toEqual(["it"]);
+    expect(matchRoleFamilies("DBA").map((f) => f.id)).toEqual(["it"]);
+    expect(matchRoleFamilies("CTO").map((f) => f.id)).toEqual(["management"]);
+  });
+
+  it("treats a Hebrew test engineer as software QA", () => {
+    expect(isTechnicalRole("מהנדס בדיקות")).toBe(true);
+    expect(techSpecialtyFor("מהנדס בדיקות")?.id).toBe("qa");
+  });
+});
+
+describe("RTL coding problems", () => {
+  it("gives verification engineers verification problems, and designers design problems", () => {
+    expect(hdlTopicsFor("Design Verification Engineer")).toBe(
+      hdlVerificationTopics,
+    );
+    expect(hdlTopicsFor("מהנדס אימות שבבים")).toBe(hdlVerificationTopics);
+    expect(hdlTopicsFor("FPGA Engineer")).toBe(hdlDesignTopics);
+    expect(hdlTopicsFor("ASIC Design Engineer")).toBe(hdlDesignTopics);
   });
 });

@@ -292,7 +292,14 @@ export const roleFamilies: RoleFamily[] = [
   {
     id: "design",
     label: "Design",
-    keywords: ["design", "designer", "ux", "ui", "researcher"],
+    keywords: [
+      "design",
+      "designer",
+      "ux",
+      "ui",
+      "ux researcher",
+      "user researcher",
+    ],
     hebrew: ["עיצוב", "מעצב(ת)?", "חווי(ה|ית) משתמש", "ממשק"],
     questions: [
       "Walk me through a project in your portfolio, from problem to result.",
@@ -330,6 +337,8 @@ export const roleFamilies: RoleFamily[] = [
       "tax",
       "fp&a",
       "investment",
+      "quant",
+      "quantitative",
     ],
     hebrew: [
       "כספים",
@@ -410,6 +419,33 @@ export const roleFamilies: RoleFamily[] = [
       "fpga",
       "vlsi",
       "chip",
+      "silicon",
+      "rtl",
+      "verification",
+      "physical design",
+      "pcb",
+      "analog",
+      "antenna",
+      "radar",
+      "microwave",
+      "power systems",
+      "high voltage",
+      "substation",
+      "solar",
+      "photovoltaic",
+      "robotics",
+      "mechatronics",
+      "optical",
+      "optics",
+      "photonics",
+      "laser",
+      "reliability",
+      "avionics",
+      "systems engineer",
+      "system engineer",
+      "quality engineer",
+      "validation engineer",
+      "environmental engineer",
     ],
     hebrew: [
       // In Israeli job ads, "מהנדס/ת מוצר" is a hardware or mechanical role.
@@ -434,6 +470,20 @@ export const roleFamilies: RoleFamily[] = [
       "אווירונאוטיקה",
       "חומרים",
       "שבבים",
+      "וריפיקציה",
+      "תכנון לוגי",
+      "אנלוגי(ת)?",
+      "אנטנות",
+      "מתח גבוה",
+      "סולארי(ת)?",
+      "מהנדס(ת)? מערכת",
+      "הנדסת מערכת",
+      "רובוטיקה",
+      "מכטרוניקה",
+      "אופטיקה",
+      "פוטוניקה",
+      "אמינות",
+      "מהנדס(ת)? איכות",
       "אנרגיה",
       "אדריכל(ית)?",
       "אדריכלות",
@@ -775,6 +825,12 @@ export const roleFamilies: RoleFamily[] = [
       "pentester",
       "infosec",
       "ciso",
+      "security researcher",
+      "vulnerability researcher",
+      "malware",
+      "reverse engineer",
+      "red team",
+      "appsec",
     ],
     hebrew: ["סייבר", "אבטחת מידע", "הגנת סייבר", "חוקר(ת)? סייבר"],
     questions: [
@@ -849,6 +905,10 @@ export const roleFamilies: RoleFamily[] = [
       "sysadmin",
       "network administrator",
       "network engineer",
+      "support engineer",
+      "technical support",
+      "database administrator",
+      "dba",
     ],
     hebrew: [
       "תמיכה טכנית",
@@ -856,6 +916,8 @@ export const roleFamilies: RoleFamily[] = [
       "מנהל(ת)? מערכות מידע",
       "סיסטם",
       "הלפדסק",
+      "תומך(ת)? טכני(ת)?",
+      "מנהל(ת)? מסדי נתונים",
       "מחשוב",
     ],
     questions: [
@@ -874,6 +936,48 @@ export const roleFamilies: RoleFamily[] = [
       "security hygiene: phishing, MFA and least privilege",
       "ticket prioritization and SLAs",
       "administering cloud and SaaS tools (Microsoft 365, Google Workspace)",
+    ],
+  },
+  {
+    id: "solutions",
+    label: "Solutions and pre-sales engineering",
+    keywords: [
+      "solutions engineer",
+      "sales engineer",
+      "pre-sales",
+      "presales",
+      "pre sales",
+      "solutions consultant",
+      "technical account manager",
+      "customer success engineer",
+      "implementation specialist",
+      "implementation engineer",
+      "implementation consultant",
+    ],
+    hebrew: [
+      "פריסייל",
+      "פרי-?סייל",
+      "מהנדס(ת)? (פתרונות|מכירות)",
+      "מיישם(ת)?",
+      "הטמעה",
+    ],
+    questions: [
+      "Walk me through a technical demo you gave. How did you tailor it to the audience?",
+      "Tell me about a deal where a technical objection almost lost it. What did you do?",
+      "How do you run a proof of concept so it ends in a decision?",
+      "How do you split the work with the account executive in a deal?",
+      "Tell me about a customer integration that went wrong. How did you fix it?",
+      "How do you pass what you hear from customers back to the product team?",
+    ],
+    focus: [
+      "technical discovery: finding the customer's real problem, environment and decision makers",
+      "a demo built around the customer's use case, not a feature tour",
+      "running a proof of concept with clear success criteria and a deadline",
+      "handling technical objections and security reviews",
+      "integration architecture: APIs, SSO, data flows and where the product fits",
+      "answering RFPs and security questionnaires",
+      "working with the account executive on deal strategy",
+      "onboarding and implementation after the deal is signed",
     ],
   },
   {
@@ -915,6 +1019,8 @@ export const roleFamilies: RoleFamily[] = [
       "supervisor",
       "engineering manager",
       "vp",
+      "cto",
+      "chief technology officer",
     ],
     hebrew: [
       "ראש צוות",
@@ -967,10 +1073,16 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
   // A Hebrew "product engineer" designs physical products, not a product
   // manager's work.
   const productEngineer = hebrewWord("(מהנדס(ת)?|הנדסת) מוצר").test(title);
+  // An "RTL design engineer" or "mechanical design engineer" designs
+  // hardware, not user experiences.
+  const hardwareDesigner =
+    hardware &&
+    (/ engineers? /.test(words) || hebrewWord("מהנדס(ת)?").test(title));
   return roleFamilies.filter((family) =>
     family.id === "engineering"
       ? isSoftwareFamily(title, words, hardware)
-      : family.id === "product" && productEngineer
+      : (family.id === "product" && productEngineer) ||
+          (family.id === "design" && hardwareDesigner)
         ? false
         : matches(family),
   );
@@ -997,12 +1109,20 @@ function isSoftwareFamily(
 ): boolean {
   if (isTechnicalRole(title)) return true;
   if (BUSINESS_DEVELOPER.test(title)) return false;
+  if (NOT_SOFTWARE_ENGINEER.test(title)) return false;
   if (/ (tester|qa) /.test(words) || / testers /.test(words)) return true;
   if (hardware) return false;
   return / engineers? /.test(words) || hebrewWord("מהנדס(ת)?").test(title);
 }
 
 const BUSINESS_DEVELOPER = /business develop|פיתוח עסקי|מפתח(ת)? עסקי/i;
+
+/**
+ * Engineers whose interviews are not software interviews: pre-sales,
+ * support and implementation engineers, and penetration testers.
+ */
+const NOT_SOFTWARE_ENGINEER =
+  /solutions engineer|sales engineer|pre-?sales|support engineer|customer success engineer|implementation engineer|penetration|pen ?tester|מהנדס(ת)? (פתרונות|מכירות|תמיכה)|פריסייל/i;
 
 /**
  * Software roles, whose professional round draws on core
@@ -1017,7 +1137,7 @@ export function isTechnicalRole(title: string): boolean {
     SOFTWARE_TITLE.test(title) ||
     QUALIFIED_ENGINEER.test(title) ||
     // Hebrew titles, such as "מפתח תוכנה" or "מהנדסת בקאנד".
-    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|מדע(ן|נית) נתונים|דאטה סיינטיסט|אלגוריתמ|קושחה|משובצות|אמבדד|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון|עסקי))/.test(
+    /מפתח|מתכנת|תוכנה|בקאנד|פרונטאנד|פולסטאק|דבאופס|הנדסת נתונים|מהנדס(ת)? נתונים|מדע(ן|נית) נתונים|דאטה סיינטיסט|אלגוריתמ|קושחה|משובצות|אמבדד|מהנדס(ת)? (בדיקות|אוטומציה)|בודק(ת)? תוכנה|פיתוח(?! (ארגוני|הדרכה|מוצר|קהילה|לקוחות|הון|עסקי))/.test(
       title,
     )
   );
@@ -1025,7 +1145,7 @@ export function isTechnicalRole(title: string): boolean {
 
 /** Titles that name software work on their own. */
 const SOFTWARE_TITLE =
-  /\b(software|developer|programmer|devops|sre|site reliability|backend|back-end|frontend|front-end|full[- ]?stack|qa|ios|android|data engineer|machine learning|ml engineer|ai engineer|mlops|data scientist|computer vision|algorithms?|embedded|firmware|tech lead|engineering manager|software architect|solutions architect)\b/i;
+  /\b(software|developer|programmer|devops|sre|site reliability|backend|back-end|frontend|front-end|full[- ]?stack|qa|ios|android|data engineer|machine learning|ml engineer|ai engineer|llm engineer|genai engineer|gen ai engineer|ai developer|prompt engineer|mlops|data scientist|computer vision|algorithms?|embedded|firmware|tech lead|engineering manager|software architect|solutions architect)\b/i;
 
 /**
  * Words like "web", "cloud" or "automation" mean software only next to an
@@ -1033,7 +1153,7 @@ const SOFTWARE_TITLE =
  * developer.
  */
 const QUALIFIED_ENGINEER =
-  /\b(web|mobile|cloud|platform|automation|infrastructure|test|r&d|security|network|integration)\s+(developer|engineer|architect)s?\b/i;
+  /\b(web|mobile|cloud|platform|automation|infrastructure|test|r&d|security|network|integration|game|graphics|smart contract|blockchain|privacy|llm|genai)\s+(developer|engineer|architect)s?\b/i;
 
 /**
  * Software specialties, each with the topics its professional round covers
@@ -1122,7 +1242,9 @@ export const techSpecialties: TechSpecialty[] = [
   {
     id: "qa",
     label: "QA and test automation",
-    pattern: /\b(qa|tester|test|testing|automation)\b|בודק(ת)? תוכנה|בדיקות/i,
+    // A penetration tester is a security role, not a software tester.
+    pattern:
+      /\bqa\b|(?<!penetration |pen )\btest(er|ing)?\b|\bautomation\b|בודק(ת)? תוכנה|בדיקות/i,
     topics: [
       "a test strategy and the test pyramid for a product",
       "designing test cases: boundaries, equivalence classes and negative tests",
@@ -1162,6 +1284,51 @@ export const techSpecialties: TechSpecialty[] = [
       "data quality monitoring for 500 tables",
       "a near-real-time pipeline that computes fraud features",
       "a data lake layout with partitions, schemas and retention",
+    ],
+  },
+  {
+    id: "llm",
+    label: "LLM and generative AI applications",
+    pattern:
+      /\b(llm|genai|gen ai|generative ai|prompt engineer|ai developer|rag)\b|מודלי שפה|בינה מלאכותית יוצרת/i,
+    topics: [
+      "retrieval-augmented generation: chunking, embeddings, retrieval quality and citing sources",
+      "evaluating LLM output: test sets, automatic graders and human review",
+      "prompt design and structured outputs that the rest of the system can trust",
+      "hallucinations, prompt injection and guardrails",
+      "agents and tool use: when to give the model tools and how to keep it on track",
+      "latency and cost: model choice, caching, streaming and batching",
+      "fine-tuning versus prompting versus retrieval, and when each fits",
+      "monitoring an LLM feature in production and handling regressions",
+    ],
+    designProblems: [
+      "a customer support assistant that answers from 50,000 help-center articles",
+      "an evaluation pipeline that catches quality regressions before each release",
+      "an agent that books meetings by reading email and calendars safely",
+      "a contract review tool that flags risky clauses and cites them",
+      "a chat feature for millions of users on a strict cost budget",
+    ],
+  },
+  {
+    id: "game",
+    label: "Game development",
+    pattern: /\b(game|games|gaming|unity|unreal|graphics)\b|משחקים/i,
+    topics: [
+      "the game loop, frame budgets and keeping a steady frame rate",
+      "rendering basics: the graphics pipeline, draw calls and shaders",
+      "game physics and collision detection",
+      "memory and performance on mobile devices and consoles",
+      "multiplayer networking: latency, prediction and authoritative servers",
+      "entity-component systems and game architecture",
+      "working in Unity or Unreal: scenes, assets and scripting",
+      "live ops: updates, A/B tests and analytics in a free-to-play game",
+    ],
+    designProblems: [
+      "the multiplayer backend and client sync for a real-time 10-player mobile game",
+      "a level-streaming system for an open world on a phone with 3 GB of memory",
+      "an in-game economy and store with protection against cheating",
+      "a matchmaking service for a competitive game with millions of players",
+      "a replay system that records and plays back a match",
     ],
   },
   {
@@ -1248,6 +1415,348 @@ export function designProblemFor(
 }
 
 /**
+ * Electrical and electronics specialties. An electrical engineer in chip
+ * design is interviewed on very different material from one who designs
+ * power grids, so each specialty has its own topics and design problems.
+ * The order matters: a title is matched to the first specialty that fits,
+ * so the narrow ones come before the general one at the end.
+ */
+export const engineeringSpecialties: (TechSpecialty & { coding: boolean })[] = [
+  {
+    id: "verification",
+    label: "Chip verification",
+    coding: true,
+    pattern:
+      /design verification|verification engineer|\b(uvm|dv engineer|formal verification)\b|אימות (שבבים|חומרה|לוגי)|מהנדס(ת)? אימות|וריפיקציה/i,
+    topics: [
+      "building a verification plan from a spec, and measuring progress with functional and code coverage",
+      "UVM architecture: agents, sequences, drivers, monitors and the scoreboard",
+      "constrained-random stimulus versus directed tests, and when each fits",
+      "SystemVerilog assertions for protocol rules and corner cases",
+      "debugging a failing simulation from waveforms and logs back to the root cause",
+      "verifying clock domain crossings and resets",
+      "reference models and checking results against them",
+      "deciding when a block is verified enough to sign off",
+    ],
+    designProblems: [
+      "the verification environment for an AXI-connected DMA engine",
+      "a coverage plan and testbench for a packet parser with many header types",
+      "verifying a multi-clock FIFO and its clock domain crossing",
+      "the test strategy for an arbiter shared by eight requesters with priorities",
+      "verification of a cache controller's coherence rules",
+    ],
+  },
+  {
+    id: "fpga",
+    label: "FPGA",
+    coding: true,
+    pattern: /\b(fpga|vhdl|verilog)\b/i,
+    topics: [
+      "writing synthesizable RTL: what infers flip-flops, latches and memories",
+      "timing closure: setup and hold, constraints and fixing failing paths",
+      "clock domain crossing: synchronizers, handshakes and asynchronous FIFOs",
+      "FPGA resources: LUTs, DSP blocks, block RAM and how a design maps to them",
+      "pipelining to raise clock frequency, and its cost in latency",
+      "state machines: encoding, safe recovery and reset strategy",
+      "simulation and on-chip debugging (testbenches, integrated logic analyzers)",
+      "interfaces such as AXI, DDR and high-speed serial links",
+    ],
+    designProblems: [
+      "an FPGA image-processing pipeline for a 4K camera at 60 frames a second",
+      "a UART-to-AXI bridge with error handling",
+      "a real-time FIR filter for a 100 MHz sampled signal",
+      "packet capture and filtering on a 10 Gb Ethernet link",
+      "a motor-control block with PWM generation and fault shutdown",
+    ],
+  },
+  {
+    id: "chip",
+    label: "Chip design (VLSI)",
+    coding: true,
+    pattern:
+      /\b(vlsi|asic|rtl|chip|silicon|physical design|logic design|digital design engineer|soc design|backend design|dft)\b|שבב|תכנון לוגי/i,
+    topics: [
+      "RTL design of a datapath and its control logic",
+      "static timing analysis: setup, hold, clock skew and false or multicycle paths",
+      "low-power design: clock gating, power domains and leakage",
+      "clock domain crossing and reset design",
+      "area, power and performance trade-offs in micro-architecture",
+      "the flow from RTL to tape-out: synthesis, place and route, sign-off",
+      "design for test: scan chains and built-in self test",
+      "reading a spec and writing a micro-architecture document",
+    ],
+    designProblems: [
+      "the micro-architecture of a pipelined multiply-accumulate unit for an AI accelerator",
+      "a round-robin arbiter for eight masters on an on-chip bus",
+      "an asynchronous FIFO between two clock domains",
+      "a low-power always-on block that wakes the chip on an event",
+      "an Ethernet MAC receive path from the PHY to memory",
+    ],
+  },
+  {
+    id: "rf",
+    label: "RF and microwave",
+    coding: false,
+    pattern:
+      /\b(rf|microwave|antenna|antennas|radar|wireless hardware)\b|אנטנ|מכ"ם|רדאר/i,
+    topics: [
+      "link budget: transmit power, path loss, antenna gain and receiver sensitivity",
+      "noise figure, cascaded noise and dynamic range",
+      "impedance matching, S-parameters and the Smith chart",
+      "linearity: compression, intermodulation and IP3",
+      "filters, mixers and oscillators: phase noise and spurious signals",
+      "antenna basics: gain, pattern, bandwidth and placement",
+      "measurement: spectrum and network analyzers, and lab debugging",
+      "meeting regulatory emission limits and EMC",
+    ],
+    designProblems: [
+      "the receive chain of a 2.4 GHz IoT radio that must reach 500 meters",
+      "a front end for a 77 GHz automotive radar",
+      "an antenna and matching network for a small wearable device",
+      "a satellite ground terminal's transmit path with tight emission limits",
+      "the RF section of a cellular modem board that fails its sensitivity test",
+    ],
+  },
+  {
+    id: "analog",
+    label: "Analog and power electronics",
+    coding: false,
+    pattern:
+      /analog|mixed[- ]signal|power electronics|power supply|power supplies|\b(dc-dc|smps)\b|אנלוג|אלקטרוניקת הספק|ספק(י)? כוח/i,
+    topics: [
+      "op-amp circuits: gain, bandwidth, offset and stability",
+      "switching converters: buck and boost topologies, efficiency and ripple",
+      "transistor basics: biasing, MOSFET switching losses and thermal limits",
+      "feedback loops and stability: phase margin and compensation",
+      "noise sources and grounding in sensitive measurement circuits",
+      "ADC and DAC selection: resolution, sampling and anti-aliasing filters",
+      "protection: over-current, over-voltage, inrush and ESD",
+      "thermal design and component derating for reliability",
+    ],
+    designProblems: [
+      "a 12 V to 3.3 V, 5 A power supply for a battery-powered device",
+      "the signal chain for a precision temperature sensor read by a 16-bit ADC",
+      "a motor driver for a 48 V e-bike with current limiting",
+      "a battery charger and power path for a medical wearable",
+      "an isolated power supply that must pass medical safety standards",
+    ],
+  },
+  {
+    id: "board",
+    label: "Board and hardware design",
+    coding: false,
+    pattern:
+      /\b(board|pcb|hardware) (design|designer|engineer)|\b(pcb|layout engineer|signal integrity|hardware engineer)\b|תכנון כרטיסים|כרטיס(ים)? אלקטרוני|מהנדס(ת)? חומרה|חומרה/i,
+    topics: [
+      "schematic design: choosing components and reading datasheets critically",
+      "PCB layout: stack-up, grounding, return paths and placement",
+      "signal integrity on high-speed lines: impedance, reflections and crosstalk",
+      "power integrity: decoupling and power distribution",
+      "EMC: designing to pass emissions and immunity tests",
+      "bring-up and debugging a new board in the lab",
+      "design for manufacturing and test, and working with the assembly house",
+      "component shortages, second sources and lifecycle",
+    ],
+    designProblems: [
+      "the main board of an IoT gateway with Wi-Fi, LTE and Ethernet",
+      "a board with a processor and DDR4 memory that must pass EMC on the first try",
+      "a rugged controller board for an industrial machine at 70°C",
+      "a sensor board that must run two years on a coin cell",
+      "re-designing a board around a processor that went end-of-life",
+    ],
+  },
+  {
+    id: "power",
+    label: "Power systems and energy",
+    coding: false,
+    pattern:
+      /power systems?|high voltage|substation|\bgrid\b|renewable|solar|photovoltaic|protection engineer|electrical design engineer|מתח (גבוה|עליון)|תחנ(ה|ות)( ה)?משנה|רשת החשמל|חברת החשמל|אנרגי(ה|ות) מתחדש|סולאר|פוטו-?וולטאי|תכנון חשמל|מתכנ(ן|נת) חשמל/i,
+    topics: [
+      "load calculations, cable sizing and voltage drop",
+      "short-circuit calculations and choosing protective devices",
+      "protection coordination and selectivity",
+      "earthing and safety under the Israeli Electricity Law and its regulations",
+      "transformers, power factor and harmonics",
+      "solar and storage systems: sizing, inverters and grid connection",
+      "reliability and redundancy in a critical facility",
+      "commissioning, testing and working with the utility",
+    ],
+    designProblems: [
+      "the electrical supply for a new data center with 2 MW of IT load",
+      "a 5 MW solar field with storage and its connection to the grid",
+      "the low-voltage distribution of a 20-storey residential building",
+      "upgrading a factory whose power factor and harmonics are fined by the utility",
+      "the protection scheme for a 22 kV substation feeding an industrial zone",
+    ],
+  },
+  {
+    id: "systems",
+    label: "Systems engineering",
+    coding: false,
+    pattern: /\bsystems? engineer(ing)?\b|מהנדס(ת)? מערכת|הנדסת מערכת/i,
+    topics: [
+      "turning a customer need into system requirements that can be tested",
+      "breaking a system into subsystems and defining the interfaces between them",
+      "budgets across the system: error, power, weight, latency or link budgets",
+      "trade-off studies between architectures, with weighted criteria",
+      "integration and test: planning the order and finding where a problem lives",
+      "requirements traceability and verification (analysis, inspection, demonstration, test)",
+      "reviews along the project (SRR, PDR, CDR) and managing changes",
+      "working across software, electronics, mechanics and the customer",
+    ],
+    designProblems: [
+      "a drone that delivers a 2 kg package 10 km in any weather",
+      "an electro-optical payload for a small surveillance satellite",
+      "a smart traffic light system for a city of 500,000 people",
+      "a ventilator that a hospital can trust for weeks without a stop",
+      "the upgrade of an existing defense system whose main sensor is being replaced",
+    ],
+  },
+  {
+    id: "robotics",
+    label: "Robotics and mechatronics",
+    coding: false,
+    pattern: /robotic|mechatronic|רובוטיקה|מכטרוניקה/i,
+    topics: [
+      "control loops: PID tuning, stability and dealing with noise and delay",
+      "kinematics and motion planning for an arm or a mobile robot",
+      "sensors and sensor fusion: encoders, IMUs, cameras, lidar and a Kalman filter",
+      "choosing motors, drives and gearing for a load",
+      "ROS and the software architecture of a robot",
+      "real-time limits and safety stops",
+      "calibration and testing a robot in the real world, not only in simulation",
+      "integrating mechanics, electronics and software into one product",
+    ],
+    designProblems: [
+      "a warehouse robot that picks boxes from shelves next to people",
+      "a robotic arm that sorts recycling on a moving conveyor",
+      "a lawn-mowing robot that must stay inside the garden and never hurt a child",
+      "a camera gimbal that stays steady on a moving vehicle",
+      "an inspection robot that climbs inside pipes",
+    ],
+  },
+  {
+    id: "optics",
+    label: "Optics and electro-optics",
+    coding: false,
+    pattern:
+      /\b(optical|optics|photonics|electro-?optic(s|al)?|laser)\b|אופטיקה|אופטי(ת)?|פוטוניקה|לייזר/i,
+    topics: [
+      "first-order optical design: focal length, aperture, field of view and resolution",
+      "aberrations and how a lens design corrects them",
+      "detectors and sensors: noise, dynamic range and the signal-to-noise budget",
+      "tolerancing and alignment for production",
+      "optical design tools (Zemax or Code V) and what to check in their results",
+      "thermal and mechanical effects on an optical system",
+      "light sources and lasers: safety, power and beam quality",
+      "measuring and testing optical performance (MTF, wavefront)",
+    ],
+    designProblems: [
+      "a camera lens for a car's lane-keeping system that works from -40°C to 85°C",
+      "a thermal imaging system that detects a person at 2 km",
+      "an optical module for an AR headset that must weigh under 50 grams",
+      "a lidar for a delivery robot on a tight cost target",
+      "an inspection system that finds 10-micron defects on a production line",
+    ],
+  },
+  {
+    id: "reliability",
+    label: "Reliability and quality engineering",
+    coding: false,
+    pattern:
+      /reliability|quality engineer|validation engineer|\b(v&v|hardware test engineer)\b|אמינות|מהנדס(ת)? (איכות|ולידציה)/i,
+    topics: [
+      "reliability prediction and MTBF, and what the number really means",
+      "FMEA: finding failure modes and ranking the risks",
+      "root cause analysis on a field failure (8D, 5 whys, fishbone)",
+      "accelerated life testing and environmental testing (HALT, thermal, vibration)",
+      "statistical process control and process capability",
+      "quality systems and standards (ISO 9001, and ISO 13485 or AS9100 where they apply)",
+      "verification and validation plans against requirements",
+      "working with suppliers on quality problems",
+    ],
+    designProblems: [
+      "the reliability program for a new outdoor product with a 10-year warranty",
+      "a field failure rate that tripled after a supplier change",
+      "the validation plan for a medical device before submission to the regulator",
+      "a test plan that proves a product survives shipping and harsh environments",
+      "cutting the scrap rate of a production line from 8% to 2%",
+    ],
+  },
+  {
+    id: "electrical",
+    label: "Electrical and electronics engineering",
+    coding: false,
+    pattern:
+      /electrical|electronics?\b|electronic engineer|חשמל(?!אי)|אלקטרוניקה/i,
+    topics: [
+      "circuit analysis done out loud: a resistor network, an RC filter or a transient",
+      "op-amps and transistors: how a basic amplifier or switch works",
+      "digital logic: gates, flip-flops, state machines and timing",
+      "signals: frequency response, sampling and filtering",
+      "power: efficiency, heat and choosing a power supply",
+      "choosing components from datasheets by specs, cost and availability",
+      "lab debugging with an oscilloscope and a multimeter",
+      "testing, failure analysis and root cause",
+    ],
+    designProblems: [
+      "a battery-powered device that measures and reports temperature",
+      "the control electronics of a smart home appliance",
+      "a system that drives and monitors a set of motors safely",
+      "the power and protection for a device sold in Europe and the US",
+      "an electronic product whose field return rate suddenly tripled",
+    ],
+  },
+];
+
+/**
+ * The electrical specialty a title names. Software titles (such as an
+ * embedded software engineer) keep the software rounds.
+ */
+export function engineeringSpecialtyFor(
+  title: string,
+): (TechSpecialty & { coding: boolean }) | null {
+  if (isTechnicalRole(title)) return null;
+  return engineeringSpecialties.find((s) => s.pattern.test(title)) ?? null;
+}
+
+/**
+ * Roles whose case round is a design interview on one problem: software
+ * system design, or an electrical engineering design.
+ */
+export function hasDesignRound(title: string): boolean {
+  return isTechnicalRole(title) || engineeringSpecialtyFor(title) !== null;
+}
+
+/**
+ * Topics for an electrical engineer's professional round: mostly the
+ * specialty, plus one general engineering topic (standards, testing,
+ * manufacturing). Empty when the title names no electrical field.
+ */
+export function engineeringTopicsFor(
+  title: string,
+  count: number,
+  random: () => number = Math.random,
+): string[] {
+  const specialty = engineeringSpecialtyFor(title);
+  if (!specialty) return [];
+  const general = roleFamilies.find((f) => f.id === "hardware")!.focus ?? [];
+  return [
+    ...sampleBank(specialty.topics, count - 1, random),
+    ...sampleBank(general, 1, random),
+  ];
+}
+
+/** One design problem for an electrical engineer, in their specialty. */
+export function engineeringDesignProblemFor(
+  title: string,
+  random: () => number = Math.random,
+): string | null {
+  const specialty = engineeringSpecialtyFor(title);
+  return specialty ? sampleBank(specialty.designProblems, 1, random)[0] : null;
+}
+
+/**
  * Roles whose interviews usually include writing code: software roles, and
  * data roles that are tested in SQL or Python.
  */
@@ -1257,7 +1766,9 @@ export function isCodingRole(title: string): boolean {
     /\b(data (analyst|scientist)|analytics engineer|bi (developer|analyst)|business intelligence|quant(itative)?)\b/i.test(
       title,
     ) ||
-    /אנליסט(ית)? (דאטה|נתונים)|מדע(ן|נית) נתונים|דאטה סיינטיסט/.test(title)
+    /אנליסט(ית)? (דאטה|נתונים)|מדע(ן|נית) נתונים|דאטה סיינטיסט/.test(title) ||
+    // Chip design, verification and FPGA interviews include writing RTL.
+    engineeringSpecialtyFor(title)?.coding === true
   );
 }
 
@@ -1283,6 +1794,38 @@ export const codingTopics = [
   "binary search on sorted data or on an answer range",
   "heaps: top-k items or scheduling by priority",
 ];
+
+/** RTL design problems for chip design and FPGA roles. */
+export const hdlDesignTopics = [
+  "a finite state machine for a simple protocol or controller",
+  "a synchronous FIFO with full and empty flags",
+  "a counter, timer or PWM generator with enable and reset",
+  "a button debouncer or edge detector",
+  "a two-flop synchronizer or a handshake across clock domains",
+  "a round-robin or fixed-priority arbiter",
+  "a shift register, serializer or deserializer",
+  "a small ALU or a pipelined arithmetic block",
+  "a UART transmitter or receiver",
+  "a register file or a simple memory-mapped register block",
+];
+
+/** Verification problems for chip verification roles. */
+export const hdlVerificationTopics = [
+  "a self-checking testbench for a given block, with a reference model",
+  "SystemVerilog assertions for a valid/ready handshake or another protocol rule",
+  "a scoreboard that compares a DUT's output stream with expected transactions",
+  "constrained-random stimulus: a transaction class with constraints for legal and corner cases",
+  "functional coverage: covergroups and crosses for a described feature",
+  "a bus monitor that turns pin activity into transactions",
+  "finding the bug in a short given RTL block by writing the test that exposes it",
+];
+
+/** The RTL problems that fit a role: verification work, or design work. */
+export function hdlTopicsFor(title: string): string[] {
+  return engineeringSpecialtyFor(title)?.id === "verification"
+    ? hdlVerificationTopics
+    : hdlDesignTopics;
+}
 
 /** SQL problems for data roles, over small tables given in the question. */
 export const sqlTopics = [

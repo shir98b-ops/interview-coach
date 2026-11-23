@@ -11,7 +11,7 @@ import {
   parseCodeLanguage,
   type CodeLanguage,
 } from "@/lib/code/languages";
-import { isCodingRole, isTechnicalRole } from "@/lib/interview/question-bank";
+import { hasDesignRound, isCodingRole } from "@/lib/interview/question-bank";
 import {
   MAX_ANSWER_LENGTH,
   MAX_CODE_ANSWER_LENGTH,
@@ -51,7 +51,7 @@ export function StartPracticeForm({
   );
   const [roleId, setRoleId] = useState(roles[0]?.id);
   const selected = roles.find((role) => role.id === roleId);
-  const technical = selected ? isTechnicalRole(selected.title) : false;
+  const technical = selected ? hasDesignRound(selected.title) : false;
   const coding = selected ? isCodingRole(selected.title) : false;
 
   return (

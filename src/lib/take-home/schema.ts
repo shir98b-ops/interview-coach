@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { clampScore } from "@/lib/interview/feedback";
-import { matchRoleFamilies } from "@/lib/interview/question-bank";
+import {
+  engineeringSpecialtyFor,
+  matchRoleFamilies,
+} from "@/lib/interview/question-bank";
 
 /**
  * Practice take-home assignments: original tasks in the style of the ones
@@ -87,6 +90,8 @@ const taskTypes: Record<string, string> = {
     "an incident report: logs and a timeline in the brief, asking for what happened, the impact, containment steps and how to prevent it",
   admin:
     "an office organization task: a week of requests, meetings and an event to plan, asking for a prioritized plan and the messages to send",
+  solutions:
+    "a pre-sales case: a prospect's systems and needs in the brief, asking for a discovery plan, a demo or proof-of-concept plan with success criteria, and answers to their technical objections",
   management:
     "a leadership case: plan the first 90 days of a team, or handle a team conflict and a missed goal",
 };
@@ -94,6 +99,10 @@ const taskTypes: Record<string, string> = {
 export function taskTypeFor(title: string): string {
   const families = matchRoleFamilies(title);
   const types = families.map((f) => taskTypes[f.id]).filter(Boolean);
+  const electrical = engineeringSpecialtyFor(title);
+  if (electrical) {
+    return `${taskTypes.hardware}. Set it in ${electrical.label}, on a problem like: ${electrical.designProblems[0]}`;
+  }
   return (
     types[0] ??
     "a business case: analyze a realistic problem for the role and recommend a plan"
