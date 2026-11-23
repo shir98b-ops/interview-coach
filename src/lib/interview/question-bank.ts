@@ -1795,11 +1795,8 @@ export const codingTopics = [
   "heaps: top-k items or scheduling by priority",
 ];
 
-/**
- * RTL problems for chip design, verification and FPGA roles, written in
- * Verilog, SystemVerilog or VHDL.
- */
-export const hdlTopics = [
+/** RTL design problems for chip design and FPGA roles. */
+export const hdlDesignTopics = [
   "a finite state machine for a simple protocol or controller",
   "a synchronous FIFO with full and empty flags",
   "a counter, timer or PWM generator with enable and reset",
@@ -1809,10 +1806,26 @@ export const hdlTopics = [
   "a shift register, serializer or deserializer",
   "a small ALU or a pipelined arithmetic block",
   "a UART transmitter or receiver",
-  "a self-checking testbench for a given block",
-  "SystemVerilog assertions for a valid/ready handshake",
   "a register file or a simple memory-mapped register block",
 ];
+
+/** Verification problems for chip verification roles. */
+export const hdlVerificationTopics = [
+  "a self-checking testbench for a given block, with a reference model",
+  "SystemVerilog assertions for a valid/ready handshake or another protocol rule",
+  "a scoreboard that compares a DUT's output stream with expected transactions",
+  "constrained-random stimulus: a transaction class with constraints for legal and corner cases",
+  "functional coverage: covergroups and crosses for a described feature",
+  "a bus monitor that turns pin activity into transactions",
+  "finding the bug in a short given RTL block by writing the test that exposes it",
+];
+
+/** The RTL problems that fit a role: verification work, or design work. */
+export function hdlTopicsFor(title: string): string[] {
+  return engineeringSpecialtyFor(title)?.id === "verification"
+    ? hdlVerificationTopics
+    : hdlDesignTopics;
+}
 
 /** SQL problems for data roles, over small tables given in the question. */
 export const sqlTopics = [

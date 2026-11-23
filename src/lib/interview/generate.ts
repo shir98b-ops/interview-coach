@@ -14,7 +14,7 @@ import {
   engineeringSpecialtyFor,
   engineeringTopicsFor,
   focusAreasFor,
-  hdlTopics,
+  hdlTopicsFor,
   isTechnicalRole,
   designProblemFor,
   sampleBank,
@@ -330,7 +330,11 @@ ${sampleBank(bankFor(target.title, target.seniority), BANK_SAMPLE_SIZE)
     const language = target.codeLanguage ?? "python";
     const hdl = isHdl(language);
     const topics = sampleBank(
-      language === "sql" ? sqlTopics : hdl ? hdlTopics : codingTopics,
+      language === "sql"
+        ? sqlTopics
+        : hdl
+          ? hdlTopicsFor(target.title)
+          : codingTopics,
       CODING_QUESTION_COUNT,
     );
     return `<programming_language>${codeLanguages[language]}</programming_language>

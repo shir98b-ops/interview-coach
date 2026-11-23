@@ -10,6 +10,9 @@ import {
   engineeringSpecialtyFor,
   engineeringTopicsFor,
   hasDesignRound,
+  hdlDesignTopics,
+  hdlTopicsFor,
+  hdlVerificationTopics,
   focusAreasFor,
   isCodingRole,
   isTechnicalRole,
@@ -440,5 +443,16 @@ describe("titles that used to fall between the chairs", () => {
   it("treats a Hebrew test engineer as software QA", () => {
     expect(isTechnicalRole("מהנדס בדיקות")).toBe(true);
     expect(techSpecialtyFor("מהנדס בדיקות")?.id).toBe("qa");
+  });
+});
+
+describe("RTL coding problems", () => {
+  it("gives verification engineers verification problems, and designers design problems", () => {
+    expect(hdlTopicsFor("Design Verification Engineer")).toBe(
+      hdlVerificationTopics,
+    );
+    expect(hdlTopicsFor("מהנדס אימות שבבים")).toBe(hdlVerificationTopics);
+    expect(hdlTopicsFor("FPGA Engineer")).toBe(hdlDesignTopics);
+    expect(hdlTopicsFor("ASIC Design Engineer")).toBe(hdlDesignTopics);
   });
 });
