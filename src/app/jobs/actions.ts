@@ -13,6 +13,10 @@ import {
 import { readLinkedInJobs } from "@/lib/jobs/linkedin-import";
 import { interviewsForJob, stagesBefore } from "@/lib/jobs/queries";
 import { writePrepPlan } from "@/lib/jobs/prep";
+import {
+  stageReviewsTakeHome,
+  submittedTakeHome,
+} from "@/lib/take-home/for-interview";
 import { DAILY_PREP_LIMIT, validateDescription } from "@/lib/jobs/prep-schema";
 import { resumeSchema } from "@/lib/resume/schema";
 import { redirect } from "next/navigation";
@@ -167,6 +171,15 @@ export async function updateJob(formData: FormData) {
 export async function deleteJob(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const { supabase } = await requireUser();
+  // The button promises the job's interviews go too: its practice
+  // interviews are deleted with it instead of staying as "a deleted role".
+  const { error: sessionsError } = await supabase
+    .from("sessions")
+    .delete()
+    .eq("job_id", id);
+  if (sessionsError) {
+    console.error("Deleting job practices failed:", sessionsError.message);
+  }
   const { error } = await supabase.from("jobs").delete().eq("id", id);
   if (error) console.error("Deleting job failed:", error.message);
   redirect("/jobs");
@@ -320,6 +333,21 @@ export async function createPrepPlan(
     };
   }
 
+  // A work interview after a take-home reviews it, so the plan prepares
+  // the candidate to defend their own submission.
+  const { data: takeHomeRows } = stageReviewsTakeHome(stage?.kind ?? null)
+    ? await supabase
+        .from("take_homes")
+        .select("brief, submission, feedback")
+        .eq("job_id", job.id)
+        .not("feedback", "is", null)
+        .order("submitted_at", { ascending: false })
+        .limit(1)
+    : { data: [] };
+  const takeHome = takeHomeRows?.[0]
+    ? submittedTakeHome(takeHomeRows[0])
+    : null;
+
   let plan;
   try {
     plan = await writePrepPlan(
@@ -334,6 +362,7 @@ export async function createPrepPlan(
       stage
         ? { kind: stage.kind, history: stagesBefore(stages, stage.startsAt) }
         : null,
+      takeHome,
     );
   } catch (error) {
     if (error instanceof AiError) {

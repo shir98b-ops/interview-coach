@@ -25,7 +25,21 @@ ${rubric.map((r) => `- ${r.prompt}`).join("\n")}
 
 Scale: 1 = missing or off topic, 2 = weak, 3 = acceptable but generic,
 4 = strong, 5 = excellent, ready for a real interview. Be honest and
-consistent: a short or vague answer cannot score above 2 on content.
+consistent: a short or vague answer cannot score above 2 on content, and an
+answer that does not address the question scores 1 on content and no more
+than 2 on structure and clarity.
+
+Score each criterion on its own evidence, so the candidate learns what to fix.
+They often differ: a well-organized answer with a wrong fact is strong on
+structure and weak on content; a correct answer that rambles is strong on
+content and weak on clarity. Give all three the same score only when the
+answer really is equally strong or weak on each.
+
+Mark seriousError when the answer holds a mistake that would end it in a real
+interview: one that would harm a patient, client or user, lose data or money,
+break the law or a safety rule, or shows a core concept of the profession
+misunderstood. Name that mistake first in the improvements. The app caps the
+scores of such an answer.
 ${dictationNote}
 
 Answers to professional knowledge and case questions (kind "technical" or

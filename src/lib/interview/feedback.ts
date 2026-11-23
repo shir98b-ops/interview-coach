@@ -37,6 +37,11 @@ export const evaluationSchema = z.object({
       content: z.number().describe("Score from 1 to 5."),
       structure: z.number().describe("Score from 1 to 5."),
       clarity: z.number().describe("Score from 1 to 5."),
+      seriousError: z
+        .boolean()
+        .describe(
+          "True when the answer contains a serious professional mistake: one that would harm a patient, client or user, lose data or money, break the law or a safety rule, or shows a core concept misunderstood.",
+        ),
       strengths: z
         .string()
         .describe("One or two sentences on what worked in the answer."),
@@ -66,6 +71,12 @@ export interface AnswerFeedback {
   betterAnswer: string;
 }
 
+/**
+ * In a real interview a serious professional mistake ends the answer, however
+ * well it is told, so it caps the scores: content at 2, the others at 3.
+ */
+export const SERIOUS_ERROR_CAP = { content: 2, structure: 3, clarity: 3 };
+
 /** Rounds a score and keeps it on the 1-5 scale. */
 export function clampScore(value: number): number {
   if (!Number.isFinite(value)) return 1;
@@ -84,10 +95,14 @@ export function feedbackByPosition(
   for (const item of evaluation.answers) {
     if (!positions.includes(item.position) || result.has(item.position))
       continue;
+    const cap = (key: RubricKey, value: number) =>
+      item.seriousError
+        ? Math.min(clampScore(value), SERIOUS_ERROR_CAP[key])
+        : clampScore(value);
     result.set(item.position, {
-      content: clampScore(item.content),
-      structure: clampScore(item.structure),
-      clarity: clampScore(item.clarity),
+      content: cap("content", item.content),
+      structure: cap("structure", item.structure),
+      clarity: cap("clarity", item.clarity),
       strengths: item.strengths.trim(),
       improvements: item.improvements.trim(),
       betterAnswer: item.betterAnswer.trim(),

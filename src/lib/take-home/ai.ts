@@ -7,6 +7,7 @@ import {
   type InterviewLanguage,
 } from "@/lib/interview/schema";
 import { codeLanguages, type CodeLanguage } from "@/lib/code/languages";
+import { companyContext } from "@/lib/jobs/company-context";
 import {
   briefSchema,
   codeBriefSchema,
@@ -72,8 +73,11 @@ export async function generateTakeHome(
         {
           role: "user",
           content: `You are a hiring manager writing a take-home assignment for
-candidates. Write an ORIGINAL assignment in the style companies really send,
-for a fictional company (never copy a real company's test).
+candidates. Write an ORIGINAL assignment in the style companies really send${
+            target.job
+              ? ", as the hiring company below would send it (never copy a real company's actual test)"
+              : ", for a fictional company (never copy a real company's test)"
+          }.
 
 ${
   code
@@ -93,9 +97,14 @@ ${
             target.job
               ? `
 
-The candidate expects a take-home from this company. Build the assignment
-around the work this posting describes, the kind of task this company would
-likely send. Keep the data and details invented.
+The candidate expects a take-home from this company. Write it as this
+company's own assignment: put the company's real name in "company", build the
+task around its own product, customers and the work this posting describes,
+the kind of task this company would likely send for this role. Invent the
+data, numbers and internal details, and say in the context that they are
+illustrative.
+
+${companyContext}
 
 <job_posting company="${target.job.company.replace(/"/g, "'")}">
 ${target.job.description}

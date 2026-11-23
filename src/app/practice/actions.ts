@@ -30,6 +30,10 @@ import {
   validateAnswer,
 } from "@/lib/interview/schema";
 import { resumeSchema } from "@/lib/resume/schema";
+import {
+  stageReviewsTakeHome,
+  submittedTakeHome,
+} from "@/lib/take-home/for-interview";
 import { createClient } from "@/lib/supabase/server";
 import { hasNoLimits } from "@/lib/auth/no-limits";
 import { getSignedInUser } from "@/lib/supabase/user";
@@ -98,9 +102,23 @@ export async function startPractice(
         : Promise.resolve({ data: null }),
     ]);
   // A practice for a specific job is built from its posting, and for one
-  // stage of its process when a stage is chosen.
-  const stages =
-    job && stageKind ? await interviewsForJob(supabase, job.id) : [];
+  // stage of its process when a stage is chosen. A work interview after a
+  // take-home digs into the candidate's latest reviewed submission for it.
+  const [stages, { data: takeHomeRows }] = await Promise.all([
+    job && stageKind ? interviewsForJob(supabase, job.id) : [],
+    job && stageReviewsTakeHome(stageKind)
+      ? supabase
+          .from("take_homes")
+          .select("brief, submission, feedback")
+          .eq("job_id", job.id)
+          .not("feedback", "is", null)
+          .order("submitted_at", { ascending: false })
+          .limit(1)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const takeHome = takeHomeRows?.[0]
+    ? submittedTakeHome(takeHomeRows[0])
+    : null;
   const role = job
     ? {
         id: null,
@@ -116,6 +134,7 @@ export async function startPractice(
               history: historyText(stagesBefore(stages, new Date())),
             }
           : null,
+        takeHome,
       }
     : savedRole;
   const usage = await getUsage(supabase);

@@ -4,6 +4,7 @@ import {
   bankFor,
   behavioralThemes,
   commonQuestions,
+  designProblemFor,
   focusAreasFor,
   isCodingRole,
   isTechnicalRole,
@@ -11,7 +12,9 @@ import {
   previousQuestionList,
   sampleBank,
   systemDesignProblems,
+  techSpecialtyFor,
   technicalTopics,
+  technicalTopicsFor,
 } from "./question-bank";
 
 const ids = (title: string) => matchRoleFamilies(title).map((f) => f.id);
@@ -213,5 +216,75 @@ describe("isCodingRole", () => {
     expect(isTechnicalRole("מנהל מוצר")).toBe(false);
     expect(isTechnicalRole("Business Developer")).toBe(false);
     expect(isTechnicalRole("מפתח עסקי")).toBe(false);
+  });
+});
+
+describe("role matching for titles that used to miss", () => {
+  it("does not treat analysts or marketers as developers", () => {
+    expect(isTechnicalRole("Web Analyst")).toBe(false);
+    expect(isTechnicalRole("Marketing Automation Manager")).toBe(false);
+    expect(isTechnicalRole("Platform Product Manager")).toBe(false);
+  });
+
+  it("recognizes software specialties and engineering leadership", () => {
+    expect(isTechnicalRole("Embedded Software Engineer")).toBe(true);
+    expect(isTechnicalRole("Firmware Engineer")).toBe(true);
+    expect(isTechnicalRole("Data Scientist")).toBe(true);
+    expect(isTechnicalRole("Cloud Engineer")).toBe(true);
+    expect(isTechnicalRole("מפתחת אלגוריתמים")).toBe(true);
+    expect(ids("Engineering Manager")).toContain("management");
+  });
+
+  it("gives common titles a profession", () => {
+    expect(ids("IT Support")).toEqual(["it"]);
+    expect(ids("Strategy Consultant")).toContain("consulting");
+    expect(ids("יועץ אסטרטגי")).toContain("consulting");
+    expect(ids("יועצת חינוכית")).not.toContain("consulting");
+    expect(ids("CFO")).toContain("finance");
+    expect(ids("מבקר פנים")).toContain("finance");
+    expect(ids("HRBP")).toContain("people");
+    expect(ids("מרפאה בעיסוק")).toContain("health");
+    expect(ids("קניין")).toContain("project");
+  });
+
+  it("gives the core business roles focus areas", () => {
+    for (const title of [
+      "Product Manager",
+      "Data Analyst",
+      "Marketing Manager",
+      "SDR",
+      "UX Designer",
+    ]) {
+      expect(focusAreasFor(title).length).toBeGreaterThan(4);
+    }
+  });
+});
+
+describe("software specialties", () => {
+  it("matches a title to its specialty", () => {
+    expect(techSpecialtyFor("Senior Frontend Developer")?.id).toBe("frontend");
+    expect(techSpecialtyFor("iOS Developer")?.id).toBe("mobile");
+    expect(techSpecialtyFor("DevOps Engineer")?.id).toBe("devops");
+    expect(techSpecialtyFor("QA Automation Engineer")?.id).toBe("qa");
+    expect(techSpecialtyFor("Data Engineer")?.id).toBe("data");
+    expect(techSpecialtyFor("ML Engineer")?.id).toBe("ml");
+    expect(techSpecialtyFor("Embedded Software Engineer")?.id).toBe("embedded");
+    expect(techSpecialtyFor("Backend Developer")).toBeNull();
+  });
+
+  it("draws most topics from the specialty and one fundamental", () => {
+    const topics = technicalTopicsFor("Frontend Developer", 5, () => 0);
+    expect(topics).toHaveLength(5);
+    const frontend = techSpecialtyFor("Frontend Developer")!.topics;
+    expect(topics.filter((t) => frontend.includes(t))).toHaveLength(4);
+    expect(technicalTopics).toContain(topics[4]);
+  });
+
+  it("picks a design problem of the specialty", () => {
+    const mobile = techSpecialtyFor("Android Developer")!.designProblems;
+    expect(mobile).toContain(designProblemFor("Android Developer"));
+    expect(systemDesignProblems).toContain(
+      designProblemFor("Backend Developer"),
+    );
   });
 });
