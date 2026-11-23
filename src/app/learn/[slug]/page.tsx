@@ -86,7 +86,7 @@ async function LessonContent({ slug }: { slug: string }) {
       {lesson.sections.map((section, i) => (
         <section key={section.heading} className="flex flex-col gap-3">
           <h2 className="flex items-center gap-3 text-2xl font-extrabold">
-            <span className="bg-sky-soft text-blue-dark flex size-9 shrink-0 items-center justify-center rounded-xl text-lg">
+            <span className="bg-sky text-ink flex size-9 shrink-0 items-center justify-center rounded-full text-lg">
               {i + 1}
             </span>
             {section.heading}
@@ -95,14 +95,14 @@ async function LessonContent({ slug }: { slug: string }) {
             {section.body}
           </p>
           {section.example && (
-            <div className="border-pink bg-pink-soft rounded-2xl border-s-4 p-5 text-lg leading-relaxed whitespace-pre-line">
+            <div className="bg-pink rounded-2xl p-5 text-lg leading-relaxed whitespace-pre-line">
               {section.example}
             </div>
           )}
         </section>
       ))}
 
-      <Card tone="lavender" className="gap-4 p-6 sm:p-8">
+      <Card tone="blue" className="gap-4 p-6 sm:p-8">
         <Chip tone="blue">תרגיל</Chip>
         <h2 className="text-2xl leading-snug font-extrabold">
           {lesson.exercise.question}
@@ -115,7 +115,7 @@ async function LessonContent({ slug }: { slug: string }) {
       {next && (
         <Link
           href={`/learn/${next.slug}`}
-          className="hover:bg-sky-soft flex flex-col gap-1 rounded-[28px] bg-white p-6 shadow-[0_12px_40px_rgba(77,40,200,0.08)] transition"
+          className="bg-mint flex flex-col gap-1 rounded-[28px] p-6 transition duration-200 hover:shadow-[0_14px_28px_rgba(20,38,58,0.14)] motion-safe:hover:-translate-y-1"
         >
           <span className="text-blue text-sm font-bold">השיעור הבא ←</span>
           <span className="text-xl font-bold">{next.title}</span>
@@ -145,7 +145,7 @@ function PastAttempts({
           const feedback = readExerciseFeedback(attempt.feedback);
           return (
             <li key={attempt.id}>
-              <details className="rounded-[28px] bg-white p-5 shadow-[0_6px_20px_rgba(77,40,200,0.06)]">
+              <details className="bg-sky-light [&_.text-muted]:text-ink-soft rounded-[28px] p-5">
                 <summary className="flex cursor-pointer items-center justify-between gap-3 font-bold">
                   <span>{formatDate(attempt.created_at)}</span>
                   {feedback && (

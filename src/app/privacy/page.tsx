@@ -71,7 +71,11 @@ export default function PrivacyPage() {
           </p>
         </div>
         {sections.map((section, i) => (
-          <Card key={section.heading} tone={tileTones[i % 4]} className="gap-3">
+          <Card
+            key={section.heading}
+            tone={tileTones[i % tileTones.length]}
+            className="gap-3"
+          >
             <h2 className="text-xl font-extrabold">{section.heading}</h2>
             <ul className="flex list-disc flex-col gap-2 ps-5 text-lg">
               {section.items.map((item) => (

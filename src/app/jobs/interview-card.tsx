@@ -8,7 +8,7 @@ import { interviewKinds } from "@/lib/jobs/schema";
 import { daysUntil, formatInterviewTime, whenLabel } from "@/lib/jobs/time";
 
 const smallButton =
-  "inline-flex min-h-11 items-center rounded-full bg-white px-4 text-sm font-bold ring-2 ring-line hover:bg-sky-soft";
+  "inline-flex min-h-11 items-center rounded-full bg-white px-4 text-sm font-bold ring-2 ring-line hover:bg-canvas";
 
 /** One interview: when, what kind, and buttons to add it to a calendar. */
 export function InterviewCard({

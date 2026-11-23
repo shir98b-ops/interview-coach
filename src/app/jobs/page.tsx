@@ -118,7 +118,7 @@ async function JobsContent({
             <h2 className="text-[28px] leading-tight font-black">
               מוסיפים את המשרה הראשונה
             </h2>
-            <p className="text-[#1f3f6e]">
+            <p className="text-ink">
               הדבקה אחת של המודעה, ואנחנו מוציאים ממנה את החברה, התפקיד
               והדרישות, ומכינים תוכנית הכנה.
             </p>

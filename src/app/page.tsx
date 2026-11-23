@@ -87,7 +87,10 @@ export default function Home() {
           <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, index) => (
               <li key={step.title}>
-                <Card tone={tileTones[index % 4]} className="h-full">
+                <Card
+                  tone={tileTones[index % tileTones.length]}
+                  className="h-full"
+                >
                   <div className="flex items-center gap-3">
                     <Icon name={step.icon} size={48} />
                     <h3 className="text-xl font-bold">

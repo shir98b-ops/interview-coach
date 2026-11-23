@@ -109,10 +109,7 @@ async function PracticeContent({
             </p>
           </>
         ) : (
-          <p
-            role="status"
-            className="bg-pink-soft text-pink-ink rounded-2xl p-4"
-          >
+          <p role="status" className="bg-pink text-ink rounded-2xl p-4">
             {limitMessage(usage)}
           </p>
         )}
@@ -123,8 +120,12 @@ async function PracticeContent({
           <h2 className="text-2xl font-extrabold">התרגולים שלך</h2>
           <ProgressChart scores={scores} change={change} />
           <ul className="flex flex-col gap-3">
-            {finished.map((session) => (
-              <PracticeItem key={session.id} session={session} />
+            {finished.map((session, i) => (
+              <PracticeItem
+                key={session.id}
+                session={session}
+                color={i % 2 ? "bg-mint" : "bg-sky-light"}
+              />
             ))}
           </ul>
           {unfinished.length > 0 && (
@@ -154,7 +155,13 @@ interface PracticeRow {
   jobs: unknown;
 }
 
-function PracticeItem({ session }: { session: PracticeRow }) {
+function PracticeItem({
+  session,
+  color = "bg-white",
+}: {
+  session: PracticeRow;
+  color?: string;
+}) {
   const role = session.target_roles as unknown as {
     title: string;
   } | null;
@@ -166,7 +173,7 @@ function PracticeItem({ session }: { session: PracticeRow }) {
     <li>
       <Link
         href={`/practice/${session.id}`}
-        className="hover:bg-sky-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
+        className={`${color} [&_.text-muted]:text-ink-soft flex items-center justify-between gap-4 rounded-[26px] px-5 py-4 transition duration-200 hover:shadow-[0_14px_28px_rgba(20,38,58,0.14)] motion-safe:hover:-translate-y-1 motion-safe:active:scale-[.98]`}
       >
         <span className="flex flex-col">
           <span className="font-bold">
@@ -204,7 +211,7 @@ function ProgressChart({
 }) {
   if (scores.length < 2) return null;
   return (
-    <Card tone="lavender" className="gap-4">
+    <Card tone="sky" className="gap-4">
       <p className="font-bold">
         {change === null
           ? "כל עמודה היא תרגול אחד. ההשוואה היא רק בין תרגולים מאותו סוג ולאותו תפקיד."

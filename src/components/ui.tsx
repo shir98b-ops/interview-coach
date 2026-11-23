@@ -13,7 +13,7 @@ const buttonBase =
 
 export const buttonStyles = {
   primary: `${buttonBase} bg-ink text-white hover:shadow-[0_8px_18px_rgba(20,38,58,0.25)]`,
-  quiet: `${buttonBase} border-[1.5px] border-line bg-white text-ink font-bold hover:bg-[#eef1f6]`,
+  quiet: `${buttonBase} border-[1.5px] border-line bg-white text-ink font-bold hover:bg-canvas`,
 } as const;
 
 type Variant = keyof typeof buttonStyles;
@@ -79,7 +79,7 @@ const cardTones = {
 } as const;
 
 /** Colors for a row of tiles, so neighbors never share a color. */
-export const tileTones = ["sky", "lavender", "mint", "pink"] as const;
+export const tileTones = ["sky", "mint", "pink"] as const;
 
 export function Card({
   tone = "white",
@@ -105,8 +105,8 @@ export function Chip({
   children: ReactNode;
 }) {
   const tones = {
-    pink: "text-pink-ink",
-    blue: "text-[#0b3a80]",
+    pink: "text-ink",
+    blue: "text-blue",
     mint: "text-success-ink",
     glass: "text-ink",
   };
@@ -216,11 +216,11 @@ export function ScoreTrend({
     <div className="flex flex-wrap items-baseline gap-2.5">
       <p dir="ltr" className="text-5xl leading-none font-black">
         {score}
-        <span className="text-base font-bold text-[#3d5a80]"> /100</span>
+        <span className="text-muted text-base font-bold"> /100</span>
       </p>
       {change !== null && (
         <span
-          className={`text-sm font-extrabold ${change < 0 ? "text-pink-ink" : "text-[#1d5b36]"}`}
+          className={`text-sm font-extrabold ${change < 0 ? "text-ink" : "text-success-ink"}`}
         >
           {change === 0
             ? "כמו בפעם הקודמת"

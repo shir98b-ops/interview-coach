@@ -48,7 +48,7 @@ export function AccountLinks({
       <form action={signOut}>
         <button
           type="submit"
-          className="text-muted min-h-11 rounded-full px-4 font-medium hover:bg-[#eef1f6]"
+          className="text-muted hover:bg-canvas min-h-11 rounded-full px-4 font-medium"
         >
           יציאה
         </button>

@@ -48,10 +48,7 @@ async function SignInSection({
   return (
     <>
       {deleted && (
-        <p
-          role="status"
-          className="bg-success-soft text-success-ink rounded-2xl p-4 font-bold"
-        >
+        <p role="status" className="bg-mint text-ink rounded-2xl p-4 font-bold">
           החשבון וכל המידע שלו נמחקו.
         </p>
       )}

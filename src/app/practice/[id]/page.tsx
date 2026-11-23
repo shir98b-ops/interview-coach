@@ -214,7 +214,7 @@ async function SessionContent({
             </Card>
           )}
 
-          <details className="rounded-[28px] bg-white p-6 shadow-[0_12px_40px_rgba(77,40,200,0.08)]">
+          <details className="bg-sky-light rounded-[28px] p-6">
             <summary className="cursor-pointer font-bold">
               איך נותנים ציון לתשובות?
             </summary>
@@ -243,7 +243,10 @@ async function SessionContent({
           <ol className="flex flex-col gap-6">
             {questions.map((q, index) => (
               <li key={q.id}>
-                <Card tone={tileTones[index % 4]} className="gap-4">
+                <Card
+                  tone={tileTones[index % tileTones.length]}
+                  className="gap-4"
+                >
                   <Chip tone="glass">
                     שאלה {index + 1} · {kindLabel(q.kind)}
                   </Chip>
@@ -314,14 +317,14 @@ function FeedbackDetails({
         <Chip tone="mint">ממוצע {answerAverage(feedback).toFixed(1)}</Chip>
       </div>
       {feedback.strengths && (
-        <div className="bg-success-soft rounded-2xl p-4">
+        <div className="rounded-2xl bg-white/60 p-4">
           <p className="text-success-ink font-bold">מה עבד</p>
           <p dir="auto">{feedback.strengths}</p>
         </div>
       )}
       {feedback.improvements && (
-        <div className="bg-pink-soft rounded-2xl p-4">
-          <p className="text-pink-ink font-bold">מה לשפר</p>
+        <div className="rounded-2xl bg-white/60 p-4">
+          <p className="font-bold">מה לשפר</p>
           {coding ? (
             <RichText text={feedback.improvements} />
           ) : (
@@ -330,8 +333,8 @@ function FeedbackDetails({
         </div>
       )}
       {feedback.betterAnswer && (
-        <details className="bg-sky-soft rounded-2xl p-4">
-          <summary className="text-blue-dark cursor-pointer font-bold">
+        <details className="rounded-2xl bg-white/60 p-4">
+          <summary className="text-blue cursor-pointer font-bold">
             {coding ? "פתרון לדוגמה" : "ככה יכולה להישמע תשובה חזקה יותר"}
           </summary>
           {coding ? (

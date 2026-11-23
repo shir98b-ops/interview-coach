@@ -72,11 +72,11 @@ async function TakeHomes() {
         <section className="flex flex-col gap-4">
           <h2 className="text-2xl font-extrabold">מבחני הבית שלך</h2>
           <ul className="flex flex-col gap-3">
-            {takeHomes.map((t) => (
+            {takeHomes.map((t, i) => (
               <li key={t.id}>
                 <Link
                   href={`/learn/take-home/${t.id}`}
-                  className="hover:bg-sky-soft flex items-center justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-[0_6px_20px_rgba(77,40,200,0.06)] transition"
+                  className={`${i % 2 ? "bg-mint" : "bg-sky-light"} [&_.text-muted]:text-ink-soft flex items-center justify-between gap-4 rounded-[26px] px-5 py-4 transition duration-200 hover:shadow-[0_14px_28px_rgba(20,38,58,0.14)] motion-safe:hover:-translate-y-1 motion-safe:active:scale-[.98]`}
                 >
                   <span className="flex flex-col">
                     <span dir="auto" className="font-bold">

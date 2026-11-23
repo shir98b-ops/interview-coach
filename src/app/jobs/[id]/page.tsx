@@ -126,7 +126,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
         )}
       </header>
 
-      <Card className="gap-4 p-6 sm:p-8">
+      <Card tone="mint" className="gap-4 p-6 sm:p-8">
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-extrabold">שלבי התהליך</h2>
           <p className="text-muted">
@@ -154,7 +154,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                       current
                         ? "bg-blue text-white"
                         : done
-                          ? "bg-success-soft text-success-ink"
+                          ? "text-success-ink bg-white/60"
                           : "bg-canvas text-muted"
                     }`}
                   >
@@ -207,7 +207,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                       </p>
                     ) : (
                       <details
-                        className="border-line rounded-2xl border-2 bg-white p-4"
+                        className="rounded-2xl bg-white/60 p-4"
                         open={interview.id === nextStage?.id}
                       >
                         <summary className="cursor-pointer text-lg font-extrabold">
@@ -294,7 +294,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
           <DescriptionForm jobId={job.id} current={null} />
         </Card>
       ) : (
-        <Card tone="lavender" className="gap-6 p-6 sm:p-8">
+        <Card tone="sky" className="gap-6 p-6 sm:p-8">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-extrabold">
               {interviews.length
@@ -313,7 +313,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
       )}
 
       {job.description && (
-        <Card tone="lavender" className="gap-4 p-6 sm:p-8">
+        <Card tone="mint" className="gap-4 p-6 sm:p-8">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-extrabold">תרגול ראיון למשרה</h2>
             <p>חמש שאלות שנבנות מתוך המודעה, ואחריהן ציון ומשוב על כל תשובה.</p>
@@ -331,7 +331,7 @@ async function JobContent({ params }: Pick<PageProps<"/jobs/[id]">, "params">) {
                 <li key={p.id}>
                   <Link
                     href={`/practice/${p.id}`}
-                    className="hover:bg-sky-soft flex items-center justify-between rounded-2xl bg-white px-4 py-3"
+                    className="flex items-center justify-between rounded-2xl bg-white/60 px-4 py-3 transition hover:bg-white"
                   >
                     <span>
                       {p.stage

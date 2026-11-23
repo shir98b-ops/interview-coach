@@ -46,7 +46,7 @@ export function FileField({
         />
         <label
           htmlFor={id}
-          className="bg-sky-soft text-blue-dark inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 font-bold peer-disabled:opacity-60"
+          className="bg-sky-light text-ink inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 font-bold peer-disabled:opacity-60"
         >
           בחירת קובץ
         </label>
