@@ -104,7 +104,7 @@ async function SessionContent({
       supabase
         .from("sessions")
         .select(
-          "id, overall_score, target_roles(title, seniority), jobs(title, company)",
+          "id, overall_score, seniority, target_roles(title, seniority), jobs(title, company)",
         )
         .eq("id", id)
         .maybeSingle(),
@@ -126,10 +126,13 @@ async function SessionContent({
     title: string;
     company: string;
   } | null;
+  // The level chosen for this practice; older ones show the role's level.
+  const level = (session.seniority as string | null) ?? role?.seniority;
+  const levelText = level ? ` · ${seniorityLabel(level)}` : "";
   const roleName = job
-    ? `${job.title} · ${job.company}`
+    ? `${job.title} · ${job.company}${levelText}`
     : role
-      ? `${role.title}${role.seniority ? ` · ${seniorityLabel(role.seniority)}` : ""}`
+      ? `${role.title}${levelText}`
       : "תפקיד שנמחק";
   const current = questions.find((q) => answerText(q) === null);
 
