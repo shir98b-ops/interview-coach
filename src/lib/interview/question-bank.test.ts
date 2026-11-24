@@ -579,8 +579,13 @@ describe("life sciences gaps", () => {
     expect(families("עורכת דין רגולציה")).toContain("legal");
   });
 
-  it("treats a clinical application specialist as product support, not nursing", () => {
-    expect(families("Clinical Application Specialist")).toEqual(["solutions"]);
+  it("treats a clinical application specialist as clinical product support, not nursing or pre-sales", () => {
+    expect(families("Clinical Application Specialist")).toEqual([
+      "applications",
+    ]);
+    expect(families("Field Clinical Specialist")).toEqual(["applications"]);
+    expect(families("מומחית יישום קליני")).toEqual(["applications"]);
+    expect(families("Solutions Engineer")).toEqual(["solutions"]);
     expect(families("Clinical Nurse Specialist")).toEqual(["health"]);
   });
 });

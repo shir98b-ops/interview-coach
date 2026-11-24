@@ -1131,6 +1131,41 @@ export const roleFamilies: RoleFamily[] = [
     ],
   },
   {
+    // Medical device companies' specialists who train clinicians on the
+    // product and support them in procedures. Placed before pre-sales so the
+    // role gets its own questions.
+    id: "applications",
+    label: "Clinical application specialist (medical devices)",
+    keywords: [
+      "clinical application specialist",
+      "clinical applications specialist",
+      "field clinical specialist",
+      "clinical specialist",
+    ],
+    hebrew: [
+      "מומח(ה|ית) (יישום|אפליקציה) קליני(ת)?",
+      "מומח(ה|ית) קליני(ת)?",
+      "(מדריך|מדריכה) קליני(ת)?",
+    ],
+    questions: [
+      "Tell me about a time you taught something technical to someone under time pressure. How did you know they understood?",
+      "A surgeon asks you mid-procedure to change a device setting outside its labeling. What do you do?",
+      "How would you plan the training for a new hospital department that is starting to use our system?",
+      "Tell me about a time a user blamed the product for a problem. How did you find the real cause?",
+      "How do you report a malfunction or a patient incident you saw in the field?",
+      "How do you pass what you hear from clinicians back to R&D and marketing?",
+    ],
+    focus: [
+      "training clinicians and nurses on the device: planning, hands-on practice and checking competence",
+      "case and procedure support in the hospital: preparation, sterile field rules and staying within the labeling (no off-label advice)",
+      "troubleshooting in the field: user error vs device fault, and when to escalate",
+      "complaint and adverse event reporting from the field, on time and with the right details",
+      "the clinical workflow and anatomy or physiology the product touches",
+      "working with sales, service and clinical teams, and passing clinicians' feedback to R&D",
+      "installation, setup and acceptance at a new site",
+    ],
+  },
+  {
     id: "solutions",
     label: "Solutions and pre-sales engineering",
     keywords: [
@@ -1145,13 +1180,8 @@ export const roleFamilies: RoleFamily[] = [
       "implementation specialist",
       "implementation engineer",
       "implementation consultant",
-      // Medical device companies' specialists who train and support
-      // clinicians on the product.
-      "clinical application specialist",
-      "clinical applications specialist",
       "application specialist",
       "applications specialist",
-      "field clinical specialist",
     ],
     hebrew: [
       "פריסייל",
@@ -1303,6 +1333,7 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
       medtechEngineer ||
       technical ||
       matches(family("solutions")) ||
+      matches(family("applications")) ||
       /medical (devices?|equipment)|(ציוד|מכשור) רפואי/i.test(title)) &&
     !(
       /\b(nurse|nursing|physician|doctor|pharmacist)s?\b/i.test(title) ||
@@ -1351,6 +1382,9 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
         return !hardwareDesigner && matches(f);
       case "data":
         return !notDataAnalyst && matches(f);
+      // A clinical application specialist trains clinicians; not pre-sales.
+      case "solutions":
+        return !matches(family("applications")) && matches(f);
       default:
         return matches(f);
     }
