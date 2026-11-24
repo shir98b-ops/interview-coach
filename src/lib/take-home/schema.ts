@@ -95,6 +95,8 @@ const taskTypes: Record<string, string> = {
     "an incident report: logs and a timeline in the brief, asking for what happened, the impact, containment steps and how to prevent it",
   admin:
     "an office organization task: a week of requests, meetings and an event to plan, asking for a prioritized plan and the messages to send",
+  applications:
+    "a field case at a hospital: a short scenario in the brief (a new department starting on the device, a user complaint or a problem during a procedure), asking for a training plan with how competence is checked, the troubleshooting steps, what must be reported and to whom, and a short message to the clinical manager",
   solutions:
     "a pre-sales case: a prospect's systems and needs in the brief, asking for a discovery plan, a demo or proof-of-concept plan with success criteria, and answers to their technical objections",
   management:

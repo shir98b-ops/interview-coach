@@ -1131,6 +1131,41 @@ export const roleFamilies: RoleFamily[] = [
     ],
   },
   {
+    // Medical device companies' specialists who train clinicians on the
+    // product and support them in procedures. Placed before pre-sales so the
+    // role gets its own questions.
+    id: "applications",
+    label: "Clinical application specialist (medical devices)",
+    keywords: [
+      "clinical application specialist",
+      "clinical applications specialist",
+      "field clinical specialist",
+      "clinical specialist",
+    ],
+    hebrew: [
+      "מומח(ה|ית) (יישום|אפליקציה) קליני(ת)?",
+      "מומח(ה|ית) קליני(ת)?",
+      "(מדריך|מדריכה) קליני(ת)?",
+    ],
+    questions: [
+      "Tell me about a time you taught something technical to someone under time pressure. How did you know they understood?",
+      "A surgeon asks you mid-procedure to change a device setting outside its labeling. What do you do?",
+      "How would you plan the training for a new hospital department that is starting to use our system?",
+      "Tell me about a time a user blamed the product for a problem. How did you find the real cause?",
+      "How do you report a malfunction or a patient incident you saw in the field?",
+      "How do you pass what you hear from clinicians back to R&D and marketing?",
+    ],
+    focus: [
+      "training clinicians and nurses on the device: planning, hands-on practice and checking competence",
+      "case and procedure support in the hospital: preparation, sterile field rules and staying within the labeling (no off-label advice)",
+      "troubleshooting in the field: user error vs device fault, and when to escalate",
+      "complaint and adverse event reporting from the field, on time and with the right details",
+      "the clinical workflow and anatomy or physiology the product touches",
+      "working with sales, service and clinical teams, and passing clinicians' feedback to R&D",
+      "installation, setup and acceptance at a new site",
+    ],
+  },
+  {
     id: "solutions",
     label: "Solutions and pre-sales engineering",
     keywords: [
@@ -1145,13 +1180,8 @@ export const roleFamilies: RoleFamily[] = [
       "implementation specialist",
       "implementation engineer",
       "implementation consultant",
-      // Medical device companies' specialists who train and support
-      // clinicians on the product.
-      "clinical application specialist",
-      "clinical applications specialist",
       "application specialist",
       "applications specialist",
-      "field clinical specialist",
     ],
     hebrew: [
       "פריסייל",
@@ -1303,6 +1333,7 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
       medtechEngineer ||
       technical ||
       matches(family("solutions")) ||
+      matches(family("applications")) ||
       /medical (devices?|equipment)|(ציוד|מכשור) רפואי/i.test(title)) &&
     !(
       /\b(nurse|nursing|physician|doctor|pharmacist)s?\b/i.test(title) ||
@@ -1351,6 +1382,9 @@ export function matchRoleFamilies(rawTitle: string): RoleFamily[] {
         return !hardwareDesigner && matches(f);
       case "data":
         return !notDataAnalyst && matches(f);
+      // A clinical application specialist trains clinicians; not pre-sales.
+      case "solutions":
+        return !matches(family("applications")) && matches(f);
       default:
         return matches(f);
     }
@@ -2219,6 +2253,45 @@ export function hdlTopicsFor(title: string): string[] {
   return engineeringSpecialtyFor(title)?.id === "verification"
     ? hdlVerificationTopics
     : hdlDesignTopics;
+}
+
+/**
+ * Statistical programming problems for biostatisticians, on small trial
+ * data sets given in the question.
+ */
+export const biostatisticsCodingTopics = [
+  "summarizing adverse events by treatment arm: counts and percent of participants",
+  "change from baseline per participant and visit, with missing visits",
+  "a demographics table by arm: mean, SD, median and counts",
+  "flagging out-of-range lab values and protocol deviations in visit data",
+  "a two-group comparison with the right test, and reporting the result",
+  "time to event: censoring, and a Kaplan-Meier estimate from a small table",
+  "simulating the power of a simple two-arm trial",
+  "merging participant, visit and lab tables into one analysis data set",
+];
+
+/**
+ * Coding problems for bioinformaticians, on small sequence or count data
+ * given in the question.
+ */
+export const bioinformaticsCodingTopics = [
+  "parsing FASTA or FASTQ records and computing GC content or read quality",
+  "counting k-mers in a set of sequences",
+  "reverse complement and finding a motif in a DNA sequence",
+  "filtering variants in VCF-like rows by quality and depth",
+  "overlapping genomic intervals: which reads or peaks fall in which genes",
+  "normalizing a small gene count table and finding the top changed genes",
+  "parsing a GTF-like annotation into genes and their exons",
+  "summarizing a sample sheet and flagging samples that failed QC",
+];
+
+/** The kinds of coding problems that fit a role in a general language. */
+export function codingTopicsFor(title: string): string[] {
+  if (/biostatistic|ביוסטטיסטיק/i.test(title)) return biostatisticsCodingTopics;
+  if (techSpecialtyFor(title)?.id === "bioinformatics") {
+    return bioinformaticsCodingTopics;
+  }
+  return codingTopics;
 }
 
 /** SQL problems for data roles, over small tables given in the question. */

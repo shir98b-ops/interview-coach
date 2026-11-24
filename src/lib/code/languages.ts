@@ -13,6 +13,8 @@ export const codeLanguages = {
   kotlin: "Kotlin",
   swift: "Swift",
   sql: "SQL",
+  r: "R",
+  sas: "SAS",
   verilog: "Verilog / SystemVerilog",
   vhdl: "VHDL",
 } as const;
@@ -40,6 +42,8 @@ export function defaultCodeLanguage(title: string): CodeLanguage {
     )
   )
     return "verilog";
+  // Biostatisticians analyze trial data in R (or SAS).
+  if (/biostatistic|ביוסטטיסטיק/.test(t)) return "r";
   if (/\b(data analyst|bi|business intelligence|analytics)\b|אנליסט/.test(t))
     return "sql";
   if (/\bios\b|swift/.test(t)) return "swift";

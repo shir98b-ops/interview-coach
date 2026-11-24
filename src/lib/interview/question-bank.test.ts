@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  biostatisticsCodingTopics,
+  bioinformaticsCodingTopics,
+  codingTopics,
+  codingTopicsFor,
   PREVIOUS_QUESTION_LIMIT,
   bankFor,
   behavioralThemes,
@@ -575,8 +579,24 @@ describe("life sciences gaps", () => {
     expect(families("עורכת דין רגולציה")).toContain("legal");
   });
 
-  it("treats a clinical application specialist as product support, not nursing", () => {
-    expect(families("Clinical Application Specialist")).toEqual(["solutions"]);
+  it("treats a clinical application specialist as clinical product support, not nursing or pre-sales", () => {
+    expect(families("Clinical Application Specialist")).toEqual([
+      "applications",
+    ]);
+    expect(families("Field Clinical Specialist")).toEqual(["applications"]);
+    expect(families("מומחית יישום קליני")).toEqual(["applications"]);
+    expect(families("Solutions Engineer")).toEqual(["solutions"]);
     expect(families("Clinical Nurse Specialist")).toEqual(["health"]);
+  });
+});
+
+describe("coding problems by field", () => {
+  it("gives biostatisticians and bioinformaticians problems of their field", () => {
+    expect(codingTopicsFor("Biostatistician")).toBe(biostatisticsCodingTopics);
+    expect(codingTopicsFor("ביוסטטיסטיקאית")).toBe(biostatisticsCodingTopics);
+    expect(codingTopicsFor("Bioinformatician")).toBe(
+      bioinformaticsCodingTopics,
+    );
+    expect(codingTopicsFor("Backend Developer")).toBe(codingTopics);
   });
 });
